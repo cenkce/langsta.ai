@@ -1,13 +1,6 @@
 import { useEffect, useState } from "react";
 import type { ExtractTabContentMessage } from "../domain/content/messages";
 
-// const words = {
-//   extensions:
-//     "Extensions are software programs, built on web technologies (such as HTML, CSS, and JavaScript) that enable users to customize the Chrome browsing experience.",
-//   popup:
-//     "A UI surface which appears when an extension's action icon is clicked.",
-// };
-
 export const SidepanelApp = () => {
   const [content, setContent] = useState<string>();
 

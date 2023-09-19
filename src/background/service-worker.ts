@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { CompletionRequestMessage } from "../domain/gpt-api/CompletionRequestMessage";
+import { CompletionRequestMessage } from "../services/gpt-api/CompletionRequestMessage";
 import { contentMessagesEmitter } from "../domain/content/messages";
 
 const openai = new OpenAI({
