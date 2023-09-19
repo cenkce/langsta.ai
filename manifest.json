@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Wordster Extension",
+  "description": "Base Level Extension",
+  "version": "1.0",
+  "permissions": [
+    "contextMenus",
+    "browsingData",
+    "scripting",
+    "nativeMessaging",
+    "webNavigation",
+    "storage",
+    "tabs",
+    "sidePanel"
+  ],
+  "storage": {
+    "managed_schema": "schema.json"
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.ts",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": ["src/foreground/content.ts"],
+
+      "matches": ["http://localhost/*", "<all_urls>"]
+    }
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "logo.png",
+      "32": "logo.png",
+      "24": "logo.png"
+    }
+  }
+}
