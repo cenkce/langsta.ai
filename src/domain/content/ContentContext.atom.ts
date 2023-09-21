@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { atom, useRecoilState, useRecoilValue } from "recoil";
 import { syncEffect } from "recoil-sync";
 import { nullable, number, object, string, voidable } from "@recoiljs/refine";
@@ -26,32 +25,36 @@ export const ContentContextAtom = atom({
   },
   effects: [
     syncEffect({
-      storeKey: "common-store",
+      storeKey: "content-store",
       refine: ContentContextAtomChecker,
+      itemKey: 'contentContextAtom',
+      read: ({read}) => {
+        return read('contentContextAtom')
+      },
     }),
   ],
 });
 
 export const ContentContextSubscriber = () => {
-  const [, setContentState] = useRecoilState(ContentContextAtom);
-  useEffect(() => {
-    chrome.runtime.onMessage.addListener((message) => {
-      console.log('contentMessagesEmitter : ', message);
-      if (message.type === "define-selected-text") {
-        setContentState((state) => ({
-          ...state,
-          selectedText: message.payload,
-        }));
-      } else if (message.type === "extract-tab-content") {
-        setContentState((state) => ({
-          ...state,
-          activeTabContent: message.payload
-            ? { ...message.payload }
-            : undefined,
-        }));
-      }
-    });
-  }, []);
+  // const [, setContentState] = useRecoilState(ContentContextAtom);
+  // useEffect(() => {
+  //   chrome.runtime.onMessage.addListener((message) => {
+  //     console.log('contentMessagesEmitter : ', message);
+  //     if (message.type === "define-selected-text") {
+  //       setContentState((state) => ({
+  //         ...state,
+  //         selectedText: message.payload,
+  //       }));
+  //     } else if (message.type === "extract-tab-content") {
+  //       setContentState((state) => ({
+  //         ...state,
+  //         activeTabContent: message.payload
+  //           ? { ...message.payload }
+  //           : undefined,
+  //       }));
+  //     }
+  //   });
+  // }, []);
 
   return null;
 };

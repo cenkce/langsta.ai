@@ -54,5 +54,4 @@ export class ExtensionEventEmitter<
   }
 }
 
-export class MessageEventEmitter extends ExtensionEventEmitter<chrome.runtime.ExtensionMessageEvent> {}
-export class StorageEventEmitter extends ExtensionEventEmitter<chrome.storage.StorageChangedEvent> {}
+

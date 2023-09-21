@@ -13,9 +13,6 @@
     "tabs",
     "sidePanel"
   ],
-  "storage": {
-    "managed_schema": "schema.json"
-  },
   "background": {
     "service_worker": "src/background/service-worker.ts",
     "type": "module"

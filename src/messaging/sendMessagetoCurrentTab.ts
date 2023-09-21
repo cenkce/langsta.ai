@@ -1,4 +1,4 @@
-export const sendMessagetoCurrentTab = async (message: any) => {
+export const sendMessagetoCurrentTab = async <M = any>(message: M) => {
   const queryOptions = { active: true, currentWindow: true };
   const tabs = await chrome.tabs.query(queryOptions);
 

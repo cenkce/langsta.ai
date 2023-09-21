@@ -1,27 +1,32 @@
 import { useLayoutEffect, useRef } from "react";
 import { getSelectedText } from "../domain/utils/getSelectedText";
 import { emitContentMessage } from "../domain/content/messages";
+import { useUserContentState } from "../domain/content/ContentContext.atom";
 
 export const ContentNavigationMarker = () => {
   const markerRef = useRef<HTMLDivElement | null>(null);
+  const [, setUserContent] = useUserContentState();
 
   useLayoutEffect(() => {
     const globalClickHandler = (e: MouseEvent) => {
-      if (getSelectedText().length > 0) 
-        emitContentMessage({type: "define-selected-text", payload: getSelectedText()});
+      if (getSelectedText().length > 0)
+        setUserContent((state) => ({
+          ...state,
+          selectedText: getSelectedText(),
+        }));
 
       setMarkerPosition({
         left: e.pageX,
         top: e.pageY,
       });
-    }
+    };
     document.addEventListener("click", globalClickHandler);
 
-    const handler =  () => {
+    const handler = () => {
       if (getSelectedText()?.length === 0) {
         setMarkerPosition({ display: "none" });
       }
-    }
+    };
 
     document.addEventListener("selectionchange", handler);
 
@@ -37,7 +42,7 @@ export const ContentNavigationMarker = () => {
     return () => {
       document.removeEventListener("selectionchange", handler);
       document.removeEventListener("click", globalClickHandler);
-    }
+    };
   }, []);
 
   // const hideMarker = () => {
@@ -51,6 +56,10 @@ export const ContentNavigationMarker = () => {
     <div
       onClick={(e) => {
         e.stopPropagation();
+        emitContentMessage({
+          type: "define-selected-text",
+          payload: getSelectedText(),
+        });
       }}
       style={{
         width: "35px",

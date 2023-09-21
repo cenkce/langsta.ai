@@ -1,5 +1,4 @@
 import { useUserContentValue } from '../domain/content/ContentContext.atom';
-import { UserProvider } from '../domain/user/UserProvider'
 import { Panel } from '../ui/Panel'
 import { SimplifyContentMenu } from '../ui/SimplifyContentMenu'
 import './App.css'
@@ -11,14 +10,14 @@ function App() {
   console.log('main app : ', content);
 
   return (
-    <UserProvider>
+    // <UserProvider>
       <Panel>
         <SimplifyContentMenu onClick={() => {
 
           // simplifyService.simplifyCOntentByLevel(level, "");
         }} />
       </Panel>
-    </UserProvider>
+    // </UserProvider>
   )
 }
 

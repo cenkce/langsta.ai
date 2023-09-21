@@ -1,10 +1,26 @@
 import OpenAI from "openai";
 import { CompletionRequestMessage } from "../services/gpt-api/CompletionRequestMessage";
-import { contentMessagesEmitter } from "../domain/content/messages";
+import { ContentMessageEventEmitter } from "../domain/content/ContentMessageEventEmitter";
 
 const openai = new OpenAI({
-  apiKey: "", // defaults to process.env["OPENAI_API_KEY"]
+  apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
   dangerouslyAllowBrowser: true,
+});
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.contextMenus.create({
+    id: 'defineSelection',
+    title: 'Define selection',
+    contexts: ['all']
+  });
+  chrome.tabs.create({ url: 'page.html' });
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === 'defineSelection') {
+    // @ts-ignore
+    chrome.sidePanel.open({ windowId: tab.windowId });
+  }
 });
 
 export async function sendCompletionRequest(message: CompletionRequestMessage) {
@@ -26,25 +42,19 @@ export async function sendCompletionRequest(message: CompletionRequestMessage) {
   return completion;
 }
 
-contentMessagesEmitter.addListener(async (message, sender) => {
-  console.log('contentMessagesEmitter : ', message);
+ContentMessageEventEmitter.addListener(async (message, sender) => {
+  console.log('contentMessagesEmitter : ', message, sender.tab?.id);
   if(message.type === 'define-selected-text'){
-      await chrome.sidePanel.setOptions({
-        tabId: sender.tab?.id,
-        path: 'sidepanel.html',
-        enabled: true
-      });
+      try {
+        // @ts-ignore
+        await chrome.sidePanel.open({ tabId: sender.tab?.id });
+        await chrome.sidePanel.setOptions({
+          tabId: sender.tab?.id,
+          path: 'sidepanel.html',
+          enabled: true
+        });
+      } catch (error) {
+        console.error(error);
+      }
   }
 })
-
-// chrome.runtime.onMessage.addListener(
-//   async (message: CompletionRequestMessage, sender, sendResponse) => {
-//     console.log('contentMessagesEmitter : ', message);
-//     if (message.type === "completion-request") {
-//       const response = await sendCompletionRequest(message);
-//       console.log(response);
-//       sendResponse(response);
-//       return true;
-//     }
-//   }
-// );

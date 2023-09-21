@@ -1,4 +1,4 @@
-import { StorageEventEmitter } from "./MessageEvent";
+import { StorageEventEmitterImpl } from "./StorageEventEmitter";
 
 export interface IStorage {
   write(key: string, value: unknown): void;
@@ -10,30 +10,15 @@ export interface IAsyncStorage {
   read(key: string): Promise<{ [key: string]: unknown }>;
 }
 
-const storage = chrome.storage.local;
-
-export class LocalStorage implements IAsyncStorage {
-  write(key: string, value: unknown): Promise<void> {
-    return storage.set({ [key]: value });
-  }
-
-  read(key: string): Promise<{ [key: string]: unknown }> {
-    return storage.get(key);
-  }
-
-  subscribe() {
-    // chrome.
-  }
-}
-
-type Changes = Parameters<Parameters<StorageEventEmitter['addListener']>[0]>[0];
-type StorageAddListener = Parameters<StorageEventEmitter['addListener']>;
+type Changes = Parameters<Parameters<chrome.storage.StorageChangedEvent['addListener']>[0]>[0];
+type StorageAddListener = Parameters<chrome.storage.StorageChangedEvent['addListener']>;
 type StorageAddListenerCallback = StorageAddListener[0];
 type AreaName = Parameters<StorageAddListenerCallback>[1];
 
 export abstract class Storage implements IAsyncStorage {
-  private emitter = new StorageEventEmitter(chrome.storage.onChanged);
+  private emitter = new StorageEventEmitterImpl();
   private subscribers: WeakMap<(param: Changes) => void, StorageAddListenerCallback> = new WeakMap();
+  
   constructor(
     private storage: chrome.storage.StorageArea,
     private area: AreaName
@@ -82,6 +67,8 @@ export class ExtensionLocalStorage extends Storage {
     super(chrome.storage.local, 'local');
   }
 }
+
+export const ExtensionLocalStorageInstace = new ExtensionLocalStorage();
 
 export class ExtensionSyncStorage extends Storage {
   constructor() {
