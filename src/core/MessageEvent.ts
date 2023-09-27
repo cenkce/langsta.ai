@@ -25,12 +25,12 @@ export class ExtensionEventEmitter<
     callback: (rules: chrome.events.Rule[]) => void
   ): void;
   getRules(ruleIdentifiers: any, callback?: any): void {
-    chrome.runtime.onMessage.getRules(ruleIdentifiers, callback);
+    this.emitter.getRules(ruleIdentifiers, callback);
   }
   hasListener(
     callback: ExtractEventParams<TEvent>
   ): boolean {
-    return chrome.runtime.onMessage.hasListener(callback);
+    return this.emitter.hasListener(callback);
   }
   removeRules(
     ruleIdentifiers?: string[] | undefined,
@@ -38,19 +38,19 @@ export class ExtensionEventEmitter<
   ): void;
   removeRules(callback?: (() => void) | undefined): void;
   removeRules(ruleIdentifiers?: any, callback?: any): void {
-    chrome.runtime.onMessage.removeRules(ruleIdentifiers, callback);
+    this.emitter.removeRules(ruleIdentifiers, callback);
   }
   addRules(
     rules: chrome.events.Rule[],
     callback?: ((rules: chrome.events.Rule[]) => void) | undefined
   ): void {
-    chrome.runtime.onMessage.addRules(rules, callback);
+    this.emitter.addRules(rules, callback);
   }
   removeListener(callback: ExtractEventParams<TEvent>): void {
-    chrome.runtime.onMessage.removeListener(callback);
+    this.emitter.removeListener(callback);
   }
   hasListeners(): boolean {
-    return chrome.runtime.onMessage.hasListeners();
+    return this.emitter.hasListeners();
   }
 }
 

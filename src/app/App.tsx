@@ -1,4 +1,5 @@
-import { useUserContentValue } from '../domain/content/ContentContext.atom';
+import ContentContextAtom, { useUserContentValue } from '../domain/content/ContentContext.atom';
+import { LocalstorageSyncProvider } from '../domain/storage/LocalstorageSync';
 import { Panel } from '../ui/Panel'
 import { SimplifyContentMenu } from '../ui/SimplifyContentMenu'
 import './App.css'
@@ -10,14 +11,12 @@ function App() {
   console.log('main app : ', content);
 
   return (
-    // <UserProvider>
+    <LocalstorageSyncProvider debugKey='main' storageAtom={ContentContextAtom}>
       <Panel>
         <SimplifyContentMenu onClick={() => {
-
-          // simplifyService.simplifyCOntentByLevel(level, "");
         }} />
       </Panel>
-    // </UserProvider>
+    </LocalstorageSyncProvider>
   )
 }
 

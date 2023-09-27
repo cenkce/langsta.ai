@@ -19,7 +19,7 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === 'defineSelection') {
     // @ts-ignore
-    chrome.sidePanel.open({ windowId: tab.windowId });
+    chrome.sidePanel.open({ windowId: tab?.windowId });
   }
 });
 

@@ -1,35 +1,53 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect, useMemo } from "react";
+import { ContentStorage } from "../content/ContentStorage";
 import { RecoilSync } from "recoil-sync";
-import { ExtensionLocalStorageInstace } from "./Storage";
-import { DefaultValue } from "recoil";
-import { useUserContentValue } from "../content/ContentContext.atom";
+import { DefaultValue, RecoilState, useRecoilState } from "recoil";
+import ContentContextAtom from "../content/ContentContext.atom";
 
-export function LocalstorageSync(props: PropsWithChildren) {
-  console.log(useUserContentValue());
+export function LocalstorageSyncProvider<
+  T = any
+>(
+  props: PropsWithChildren<{ debugKey?: string; storageAtom: RecoilState<T> }>
+) {
+  const [, setStorageData] = useRecoilState(ContentContextAtom);
+  const contentStorage = useMemo(() => {
+    return new ContentStorage(props.storageAtom.key);
+  }, []);
+
+  useEffect(() => {
+    contentStorage
+      .getState()
+      .then((data) => {
+        console.log('initial data : ', data);
+        data && setStorageData(data as any)
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <RecoilSync
       storeKey="content-store"
-      read={(key) => {
-        console.log('read')
-        return ExtensionLocalStorageInstace.read(key).then(res => res || new DefaultValue());
+      read={(key: any) => {
+        return contentStorage
+          .read(key)
+          .then((res) => res || new DefaultValue());
       }}
       listen={({ updateItem }) => {
-        console.log('listen')
-        return ExtensionLocalStorageInstace.subscribe((changes) => {
+        return contentStorage.subscribe((changes) => {
+          console.debug(props.debugKey, "listen", changes);
           Object.entries(changes).forEach(([key, { newValue, oldValue }]) => {
-            if(newValue !== oldValue)
-              updateItem(key, newValue);
+            if (newValue !== oldValue) updateItem(key, newValue);
           });
         });
       }}
-      write={({ diff }) => {
-        console.log('write')
+      write={({ diff }: { diff: Map<any, any> }) => {
+        console.debug(props.debugKey, "write", diff);
         for (const [key, value] of diff) {
-          ExtensionLocalStorageInstace.write(key, value);
+          contentStorage.write(key, value);
         }
       }}
     >
-      {props.children}
+      <>{props.children}</>
     </RecoilSync>
   );
 }

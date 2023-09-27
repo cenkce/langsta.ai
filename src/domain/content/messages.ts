@@ -6,8 +6,7 @@ export type ExtractTabContentMessage = {
 };
 
 export type DefineSelectedTextMessage = {
-  type: 'define-selected-text',
-  payload: string
+  type: 'define-selected-text'
 };
 
 export type ContentContextMessages = ExtractTabContentMessage | DefineSelectedTextMessage;

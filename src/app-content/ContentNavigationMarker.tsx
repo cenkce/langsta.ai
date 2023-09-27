@@ -9,16 +9,21 @@ export const ContentNavigationMarker = () => {
 
   useLayoutEffect(() => {
     const globalClickHandler = (e: MouseEvent) => {
-      if (getSelectedText().length > 0)
+      if (getSelectedText().trim().length > 0){
         setUserContent((state) => ({
-          ...state,
           selectedText: getSelectedText(),
+          activeTabContent: state?.activeTabContent
         }));
-
-      setMarkerPosition({
-        left: e.pageX,
-        top: e.pageY,
-      });
+        setMarkerPosition({
+          left: e.pageX,
+          top: e.pageY,
+        });
+      } else {
+        setMarkerPosition({
+          left: 0,
+          top: 0,
+        });
+      }
     };
     document.addEventListener("click", globalClickHandler);
 
@@ -58,7 +63,6 @@ export const ContentNavigationMarker = () => {
         e.stopPropagation();
         emitContentMessage({
           type: "define-selected-text",
-          payload: getSelectedText(),
         });
       }}
       style={{
