@@ -50,7 +50,6 @@ export abstract class Storage<
     (param: Changes) => void,
     StorageAddListenerCallback
   > = new WeakMap();
-  private initialData?: TData;
 
   constructor() {}
 
@@ -71,7 +70,6 @@ export abstract class Storage<
   }
 
   subscribe = (handler: (changes: Changes) => void) => {
-    console.log("subscribe");
     const wrapper: StorageAddListenerCallback = (changes, area) => {
       if (area === this.getStoragAreaName() && this.checkValidData(changes)) {
         handler(changes);
@@ -86,12 +84,41 @@ export abstract class Storage<
     };
   };
 
+  /**
+   * @template
+   * Returns storafe areaname
+   */
   protected abstract getStoragAreaName(): AreaName;
+
+  /**
+   * @template
+   * 
+   * Refurns a storage instance
+   */
   protected abstract getStorageInstance(): chrome.storage.StorageArea;
+
+  /**
+   * @template
+   * 
+   * Return storage name
+   */
   protected abstract getStorageName(): string;
+
+  /**
+   * @template
+   * 
+   * In order to filter out the result
+   */
   protected abstract checkValidData(changes: Changes): boolean;
+
+  /**
+   * Returns storage field names
+   */
   protected abstract getKeys(): U[0][];
 
+  /**
+   * Returns storage field names
+   */
   get keys(): U[0][] {
     return this.getKeys();
   }
@@ -106,47 +133,3 @@ export abstract class Storage<
     }
   };
 }
-
-// export class ExtensionLocalStorage<
-//   TData extends Record<string, any>
-// > extends Storage<TData> {
-//   constructor() {
-//     super(chrome.storage.local, "local");
-//   }
-
-//   protected getKeys(): Tuples<TData>[0][] {
-//     throw new Error("Method not implemented.");
-//   }
-
-//   protected checkValidData(changes: Changes): boolean {
-//     console.log("changes : ", changes);
-//    return true;
-//   }
-// }
-
-// export class ExtensionSyncStorage<T extends Record<string, any>> extends Storage<T> {
-//   constructor() {
-//     super(chrome.storage.local, "sync");
-//   }
-
-//   protected getKeys(): Tuples<T>[0][] {
-//     throw new Error("Method not implemented.");
-//   }
-//   protected checkValidData(changes: Changes): boolean {
-//     throw new Error("Method not implemented."+ changes);
-//   }
-// }
-
-// export class ExtensionSessionStorage extends Storage {
-//   constructor() {
-//     super(chrome.storage.local, "session");
-//   }
-
-//   protected getKeys(): string[] {
-//     throw new Error("Method not implemented.");
-//   }
-
-//   protected checkValidData(changes: Changes): boolean {
-//     throw new Error("Method not implemented."+ changes);
-//   }
-// }

@@ -1,6 +1,7 @@
 import OpenAI from "openai";
-import { CompletionRequestMessage } from "../services/gpt-api/CompletionRequestMessage";
 import { ContentMessageEventEmitter } from "../domain/content/ContentMessageEventEmitter";
+import { TranslateRequestMessage } from "../services/gpt-api/messages";
+import { GPTMessagesEventEmitter } from "../services/gpt-api/sendGPTRequest";
 
 const openai = new OpenAI({
   apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
@@ -23,7 +24,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-export async function sendCompletionRequest(message: CompletionRequestMessage) {
+export async function translate(message: TranslateRequestMessage) {
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
     messages: [
       { role: "system", content: message.systemMessage },
@@ -41,6 +42,20 @@ export async function sendCompletionRequest(message: CompletionRequestMessage) {
 
   return completion;
 }
+
+GPTMessagesEventEmitter.addListener(async (message, sender) => {
+  console.log('contentMessagesEmitter : ', message, sender.tab?.id);
+  if(message.type === 'gpt/translate'){
+      try {
+        const result = await translate(message);
+
+        console.log(result);
+      } catch (error) {
+        console.error(error);
+      }
+  }
+})
+
 
 ContentMessageEventEmitter.addListener(async (message, sender) => {
   console.log('contentMessagesEmitter : ', message, sender.tab?.id);

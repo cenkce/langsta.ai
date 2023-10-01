@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { MLService } from "../../core/MLService";
 import { TargetLanguageLevel } from "../student/TargetLanguageLevel";
-import { sendChatGPTRequestMessage } from "../../services/gpt-api/sendChatGPTRequestMessage";
+import { sendGPTRequest } from "../../services/gpt-api/sendGPTRequest";
 import { simplifyContentSystemMessage } from "./simplifySystemMessage";
 
 export const useSimplifyContentService = () => {
@@ -14,11 +14,11 @@ export class SimplifyContentService extends MLService {
     super();
   }
 
-  simplifyCOntentByLevel(level: TargetLanguageLevel, content: string) {
+  simplifyContentByLevel(level: TargetLanguageLevel, content: string) {
     return new Promise((res) => {
-      sendChatGPTRequestMessage(
+      sendGPTRequest(
         {
-          type: "completion-request",
+          type: "gpt/simplify",
           content,
           systemMessage: simplifyContentSystemMessage(level),
         },
