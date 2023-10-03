@@ -1,10 +1,28 @@
 import { Storage } from "../storage/Storage";
-import { ContentContextState } from "./ContentContext.atom";
+import { ContentContextState, ContentStorageList } from "./ContentContext.atom";
 
 
 export class ContentStorage extends Storage<ContentContextState> {
-  constructor(private storageName: string){
+  private static storages: Map<ContentStorageList, ContentStorage> = new Map();
+
+  static of(key: ContentStorageList){
+    const storage = this.getStorage(key) || new ContentStorage(key);
+    if(!ContentStorage.storages.has(key))
+      ContentStorage.storages.set(key, storage);
+
+    return storage;
+  }
+
+  static getStorage(key: ContentStorageList){
+    return this.storages.get(key);
+  }
+
+  constructor(private storageName: ContentStorageList){
     super();
+  }
+
+  get name() {
+    return this.storageName;
   }
 
   protected getStoragAreaName(): "sync" | "local" | "managed" | "session" {
@@ -16,7 +34,7 @@ export class ContentStorage extends Storage<ContentContextState> {
   }
 
   protected getKeys(): (keyof ContentContextState)[] {
-    return ['selectedText', 'activeTabContent'];
+    return ['selectedText', 'activeTabContent', 'translation'];
   }
 
   protected getStorageName() {
@@ -26,4 +44,5 @@ export class ContentStorage extends Storage<ContentContextState> {
   protected checkValidData(): boolean {
     return true; 
   }
+  
 }

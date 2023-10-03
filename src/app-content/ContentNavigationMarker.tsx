@@ -1,18 +1,19 @@
 import { useLayoutEffect, useRef } from "react";
 import { getSelectedText } from "../domain/utils/getSelectedText";
 import { emitContentMessage } from "../domain/content/messages";
-import { useUserContentState } from "../domain/content/ContentContext.atom";
+import { useUserContentSetState } from "../domain/content/ContentContext.atom";
+import { useTranslateService } from "../domain/translation/TranslationService";
 
 export const ContentNavigationMarker = () => {
   const markerRef = useRef<HTMLDivElement | null>(null);
-  const [, setUserContent] = useUserContentState();
-
+  const setUserContent = useUserContentSetState();
+  const { translate } = useTranslateService();
   useLayoutEffect(() => {
     const globalClickHandler = (e: MouseEvent) => {
-      if (getSelectedText().trim().length > 0){
+      if (getSelectedText().trim().length > 0) {
         setUserContent((state) => ({
+          ...state,
           selectedText: getSelectedText(),
-          activeTabContent: state?.activeTabContent
         }));
         setMarkerPosition({
           left: e.pageX,
@@ -64,6 +65,7 @@ export const ContentNavigationMarker = () => {
         emitContentMessage({
           type: "define-selected-text",
         });
+        translate();
       }}
       style={{
         width: "35px",

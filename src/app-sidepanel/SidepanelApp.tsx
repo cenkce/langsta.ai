@@ -1,13 +1,14 @@
-import { useUserContentValue } from "../domain/content/ContentContext.atom";
+import { useUserContentState } from "../domain/content/ContentContext.atom";
 
 export const SidepanelApp = () => {
-  const userContent = useUserContentValue();
-  console.log("userContent : ", userContent);
+  const [userContent] = useUserContentState();
+  console.log("userContent?.translation : ", userContent);
 
   return (
     <div>
-      <h2 id="definition-word">Learn Smarter</h2>
+      <h2>Learn Smarter</h2>
       <p id="definition-text">{userContent?.selectedText}</p>
+      <p id="definition-text-tranlation">{userContent?.translation?.translation}</p>
     </div>
   );
 };

@@ -1,61 +1,64 @@
-import { atom, useRecoilState, useRecoilValue } from "recoil";
-import { syncEffect } from "recoil-sync";
-import { nullable, number, object, string, voidable } from "@recoiljs/refine";
+import { BehaviorSubject } from "rxjs";
+import { useAtom } from "../../core/useAtom";
 
-const ContentContextAtomChecker = voidable(object({
-  selectedText: voidable(string()),
-  activeTabContent: voidable(nullable(object({
-    title: string(),
-    content: string(),
-    textContent: string(),
-    length: number(),
-    excerpt: string(),
-    byline: string(),
-    dir: string(),
-    siteName: string(),
-    lang: string(),
-  })))
-}));
+export enum ContentStorageList {
+  contentContextAtom = "contentContextAtom",
+}
+
+// const ContentContextAtomChecker = voidable(
+//   object({
+//     selectedText: voidable(string()),
+//     activeTabContent: voidable(
+//       nullable(
+//         object({
+//           title: string(),
+//           content: string(),
+//           textContent: string(),
+//           length: number(),
+//           excerpt: string(),
+//           byline: string(),
+//           dir: string(),
+//           siteName: string(),
+//           lang: string(),
+//         })
+//       )
+//     ),
+//     translation: optional(
+//       object({
+//         translation: string(),
+//         words: array(dict(object({ translation: string(), kind: string() }))),
+//       })
+//     ),
+//   })
+// ) as Partial<ContentContextState>;
 
 export type ContentContextState = {
-  selectedText: string,
+  selectedText: string;
   activeTabContent: {
-    title: string,
-    content: string,
-    textContent: string,
-    length: number,
-    excerpt: string,
-    byline: string,
-    dir: string,
-    siteName: string,
-    lang: string,
-  }
+    title: string;
+    content: string;
+    textContent: string;
+    length: number;
+    excerpt: string;
+    byline: string;
+    dir: string;
+    siteName: string;
+    lang: string;
+  };
+  translation: {
+    translation: string;
+    words: { [key: string]: { translation: string; kind: string }[] };
+  };
 };
 
-const ContentContextAtom = atom({
-  key: "contentContextAtom",
-  default: {
-    activeTabContent: undefined,
-    selectedText: undefined
-  },
-  effects: [
-    syncEffect({
-      storeKey: "content-store",
-      refine: ContentContextAtomChecker,
-      itemKey: 'contentContextAtom',
-      read: ({read}) => {
-        return read('contentContextAtom')
-      },
-    }),
-  ],
-});
-
-export default ContentContextAtom;
-
-export const useUserContentValue = () => {
-  return useRecoilValue(ContentContextAtom);
-}
+export const ContentContextAtom = new BehaviorSubject<
+  Partial<ContentContextState>
+>({});
 
 export const useUserContentState = () => {
-  return useRecoilState(ContentContextAtom);
-}
+  return useAtom(ContentContextAtom);
+};
+
+export const useUserContentSetState = () => {
+  return useAtom(ContentContextAtom, true);
+};

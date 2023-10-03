@@ -1,23 +1,34 @@
-import ContentContextAtom, { useUserContentValue } from '../domain/content/ContentContext.atom';
-import { LocalstorageSyncProvider } from '../domain/storage/LocalstorageSync';
-import { Panel } from '../ui/Panel'
-import { SimplifyContentMenu } from '../ui/SimplifyContentMenu'
-import './App.css'
+import {
+  ContentContextAtom,
+  ContentStorageList,
+  useUserContentState,
+} from "../domain/content/ContentContext.atom";
+import { ContentStorage } from "../domain/content/ContentStorage";
+import { LocalstorageSyncProvider } from "../domain/storage/LocalstorageSync";
+import { Panel } from "../ui/Panel";
+import { SimplifyContentMenu } from "../ui/SimplifyContentMenu";
+import "./App.css";
 // import { useSimplifyContentService } from './domain/simplify-content/SimplifyContentService'
+const contentStorage = new ContentStorage(
+  ContentStorageList.contentContextAtom
+);
 
 function App() {
   // const simplifyService = useSimplifyContentService();
-  const content = useUserContentValue();
-  console.log('main app : ', content);
+  const content = useUserContentState();
+  console.log("main app : ", content);
 
   return (
-    <LocalstorageSyncProvider debugKey='main' storageAtom={ContentContextAtom}>
+    <LocalstorageSyncProvider
+      debugKey="main"
+      storageAtom={ContentContextAtom}
+      contentStorage={contentStorage}
+    >
       <Panel>
-        <SimplifyContentMenu onClick={() => {
-        }} />
+        <SimplifyContentMenu onClick={() => {}} />
       </Panel>
     </LocalstorageSyncProvider>
-  )
+  );
 }
 
-export default App
+export default App;

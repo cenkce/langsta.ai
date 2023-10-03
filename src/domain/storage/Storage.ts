@@ -50,11 +50,24 @@ export abstract class Storage<
     (param: Changes) => void,
     StorageAddListenerCallback
   > = new WeakMap();
+  private handlers = new Set<(param: Changes) => void>()
 
-  constructor() {}
+  constructor() {
+    // this.getStorageInstance().clear();
+  }
 
-  write = (...params: U): Promise<void> => {
-    return this.getStorageInstance().set({ [params[0]]: params[1] });
+  write = async (...params: U): Promise<void> => {
+    const state = await this.getState();
+    return this.getStorageInstance().set({ [this.getStorageName()]: {
+      ...state,
+      [params[0]]: params[1]
+    } });
+  };
+
+  load = async (params: U): Promise<void> => {
+    console.log('load data : ', params);
+    if(!(this.getStorageName() in params))
+      return this.getStorageInstance().set({[this.getStorageName()]: params});
   };
 
   read = (key: U[0]) => {
@@ -66,7 +79,10 @@ export abstract class Storage<
   getState() {
     return this.getStorageInstance()
       .get(this.getStorageName())
-      .then((data) => data[this.getStorageName()]);
+      .then((data) => {
+        console.log('get state : ', data);
+        return data[this.getStorageName()]
+      });
   }
 
   subscribe = (handler: (changes: Changes) => void) => {
@@ -112,6 +128,8 @@ export abstract class Storage<
   protected abstract checkValidData(changes: Changes): boolean;
 
   /**
+   * @template
+   * 
    * Returns storage field names
    */
   protected abstract getKeys(): U[0][];
@@ -123,9 +141,16 @@ export abstract class Storage<
     return this.getKeys();
   }
 
+  dispose() {
+    for(const handler of this.handlers){
+      this.unsubscribe(handler);
+    }
+  }
+
   unsubscribe = (handler: (changes: Changes) => void) => {
     if (this.subscribers.has(handler)) {
       const wrapper = this.subscribers.get(handler);
+      this.handlers.delete(handler);
       if (wrapper) {
         this.emitter.removeListener(wrapper);
         this.subscribers.delete(handler);
