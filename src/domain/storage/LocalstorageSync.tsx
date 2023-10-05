@@ -1,12 +1,12 @@
 import { PropsWithChildren, useEffect } from "react";
 import { useAtom } from "../../core/useAtom";
-import { BehaviorSubject } from "rxjs";
 import { ContentStorage } from "../content/ContentStorage";
+import { Atom } from "../../core/StoreSubject";
 
 export function LocalstorageSyncProvider (
   props: PropsWithChildren<{
     debugKey?: string;
-    storageAtom: BehaviorSubject<Record<string, any>>;
+    storageAtom: Atom<Record<string, any>>;
     contentStorage: ContentStorage;
   }>
 ) {
@@ -23,12 +23,7 @@ export function LocalstorageSyncProvider (
         data && setStorageData(data);
       })
       .catch(console.error);
-
-    props.storageAtom.subscribe((state) => {
-      console.log("subscribe : ", props.debugKey, state);
-      props.contentStorage.load(state as any);
-    })
-    
+      
     return contentStorage.subscribe((changes) => {
       Object.entries(changes).forEach(([key, { newValue, oldValue }]) => {
         console.debug(props.debugKey, "contentStorage subsbription", key, newValue);

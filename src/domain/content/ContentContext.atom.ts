@@ -1,5 +1,5 @@
-import { BehaviorSubject } from "rxjs";
 import { useAtom } from "../../core/useAtom";
+import { Atom, StoreSubject } from "../../core/StoreSubject";
 
 export enum ContentStorageList {
   contentContextAtom = "contentContextAtom",
@@ -50,10 +50,11 @@ export type ContentContextState = {
     words: { [key: string]: { translation: string; kind: string }[] };
   };
 };
-
-export const ContentContextAtom = new BehaviorSubject<
-  Partial<ContentContextState>
->({});
+// <Record<'contentContextAtom', Partial<ContentContextState>>>
+export const ContentContextAtom = Atom.of({key: 'contentContextAtom'}, new StoreSubject({'contentContextAtom': {} as Partial<ContentContextState>}))
+export const TranslateionContextAtom = Atom.of({key: 'translation'}, new StoreSubject({'translation': 0}))
+TranslateionContextAtom.get$().subscribe((value) => value)
+ContentContextAtom.get$('activeTabContent').subscribe((value) => value);
 
 export const useUserContentState = () => {
   return useAtom(ContentContextAtom);

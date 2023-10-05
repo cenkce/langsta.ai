@@ -48,7 +48,7 @@ test("should create a new primitive Atom and set or get new values", (done) => {
   });
   const atom = Atom.of({ key: "state-name" }, store);
   const values: number[] = []
-  const subscription = atom.get$().subscribe((value) => {
+  const subscription = atom.get$().subscribe((value: any) => {
     expect(value).toBe([0, 1][value]);
     values.push(value);
     subscription.unsubscribe();
