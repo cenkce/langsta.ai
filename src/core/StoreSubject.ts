@@ -7,11 +7,12 @@ type AtomParams<T extends string = string> = {
 export class Atom<
   T = any,
   P extends string = string,
-  M = T extends Record<string, any> ? keyof T : undefined
+  M = T extends Record<string, any> ? keyof T : undefined,
+  A extends Record<P, T> = Record<P, T>
 > {
   static of<
     S = any,
-    K extends string = string
+    K extends string = string,
   >(params: AtomParams<K>, store: StoreSubject<Record<K, S>>) {
     return new Atom<S, K>(params, store);
   }
@@ -20,7 +21,7 @@ export class Atom<
    */
   protected constructor(
     private params: AtomParams<P>,
-    private store: StoreSubject<Record<AtomParams<P>["key"], T>>
+    private store: StoreSubject<A>
   ) {}
 
   private _getValue(state: Record<P, T>, key?: M) {
@@ -45,7 +46,7 @@ export class Atom<
       distinctUntilChanged()
     );
   }
-  set$(value: T extends Record<string, infer H> ? Partial<H> : T) {
+  set$(value: Partial<T>) {
     const state = this.store.getValue();
     const prevValue: Partial<T> = state[this.params.key] || {};
     const update = (
@@ -54,7 +55,7 @@ export class Atom<
 
     this.store.next({
       [this.params.key]: update,
-    } as Record<P, T>);
+    } as A);
   }
 }
 

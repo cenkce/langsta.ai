@@ -1,7 +1,5 @@
 import { initializeApplication } from "../app-content/main";
 
-// const getSelectedText = () => window.getSelection()?.toString() || "";
-
 const contentApplicationRoot = document.createElement("div");
 contentApplicationRoot.id = 'contentAppllicationRoot';
 contentApplicationRoot.style.zIndex = Number.MAX_SAFE_INTEGER.toString();

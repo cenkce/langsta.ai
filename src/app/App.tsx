@@ -1,7 +1,6 @@
 import {
   ContentContextAtom,
   ContentStorageList,
-  useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { ContentStorage } from "../domain/content/ContentStorage";
 import { LocalstorageSyncProvider } from "../domain/storage/LocalstorageSync";
@@ -14,9 +13,6 @@ const contentStorage = new ContentStorage(
 );
 
 function App() {
-  // const simplifyService = useSimplifyContentService();
-  const content = useUserContentState();
-  console.log("main app : ", content);
 
   return (
     <LocalstorageSyncProvider

@@ -6,7 +6,7 @@ beforeAll(() => {
 
 test("should create a new Atom and set or get new values", (done) => {
   const store = new StoreSubject<{
-    ["state-name"]?: { state: string; state2: number };
+    ["state-name"]: { state: string; state2: number } | undefined;
   }>({
     "state-name": { state: "state-value", state2: 1 },
   });

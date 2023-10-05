@@ -2,8 +2,8 @@ import { Storage } from "../storage/Storage";
 import { ContentContextState, ContentStorageList } from "./ContentContext.atom";
 
 
-export class ContentStorage extends Storage<ContentContextState> {
-  private static storages: Map<ContentStorageList, ContentStorage> = new Map();
+export class ContentStorage<T extends Record<string, unknown> = Record<string, unknown>> extends Storage<T> {
+  private static storages: Map<ContentStorageList, ContentStorage<Record<string, unknown>>> = new Map();
 
   static of(key: ContentStorageList){
     const storage = this.getStorage(key) || new ContentStorage(key);

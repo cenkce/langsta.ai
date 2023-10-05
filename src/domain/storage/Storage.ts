@@ -42,8 +42,8 @@ type Tuples<T extends Record<string, any>> = T extends Record<infer K, infer V>
 //   : Readonly<Result>;
 
 export abstract class Storage<
-  TData extends Record<string, any> = Record<string, any>,
-  U extends [string, any] = Tuples<TData>
+  T extends Record<string, any> = Record<string, any>,
+  U extends [string, any] = Tuples<T>
 > {
   private emitter = new StorageEventEmitter();
   private subscribers: WeakMap<
@@ -64,8 +64,7 @@ export abstract class Storage<
     } });
   };
 
-  load = async (params: U): Promise<void> => {
-    console.log('load data : ', params);
+  load = async (params: T): Promise<void> => {
     if(!(this.getStorageName() in params))
       return this.getStorageInstance().set({[this.getStorageName()]: params});
   };
@@ -80,7 +79,6 @@ export abstract class Storage<
     return this.getStorageInstance()
       .get(this.getStorageName())
       .then((data) => {
-        console.log('get state : ', data);
         return data[this.getStorageName()]
       });
   }
@@ -95,7 +93,6 @@ export abstract class Storage<
     this.subscribers.set(handler, wrapper);
 
     return () => {
-      console.log("unsubscribe");
       this.unsubscribe(handler);
     };
   };

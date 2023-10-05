@@ -52,9 +52,9 @@ export type ContentContextState = {
 };
 // <Record<'contentContextAtom', Partial<ContentContextState>>>
 export const ContentContextAtom = Atom.of({key: 'contentContextAtom'}, new StoreSubject({'contentContextAtom': {} as Partial<ContentContextState>}))
-export const TranslateionContextAtom = Atom.of({key: 'translation'}, new StoreSubject({'translation': 0}))
-TranslateionContextAtom.get$().subscribe((value) => value)
-ContentContextAtom.get$('activeTabContent').subscribe((value) => value);
+// export const TranslateionContextAtom = Atom.of({key: 'translation'}, new StoreSubject({'translation': 0}))
+// TranslateionContextAtom.get$().subscribe((value) => value)
+// ContentContextAtom.get$('activeTabContent').subscribe((value) => value);
 
 export const useUserContentState = () => {
   return useAtom(ContentContextAtom);

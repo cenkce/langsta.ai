@@ -8,17 +8,17 @@ import {
 } from "react";
 import { Atom } from "./StoreSubject";
 
-function useStore<T extends Record<string, any> = any>(
+function useAtom<T = any>(
   atom: Atom<T>,
   noStateUpdate?: false | undefined,
   equityCHeck?: (newState: T, state: T) => boolean
 ): [T, Dispatch<SetStateAction<T>>];
-function useStore<T extends Record<string, any> = any>(
+function useAtom<T = any>(
   atom: Atom<T>,
   noStateUpdate: true,
   equityCHeck?: (newState: T, state: T) => boolean
 ): Dispatch<SetStateAction<T>>;
-function useStore<T extends Record<string, any> = any>(
+function useAtom<T = any>(
   atom: Atom<T>,
   noStateUpdate: boolean = false,
   equityCHeck?: (newState: T, state: T) => boolean
@@ -31,9 +31,14 @@ function useStore<T extends Record<string, any> = any>(
     if (noStateUpdate === false) {
       const subscription = atom.get$().subscribe({
         next(newState) {
-          setState((curr) =>
-            equityCHeck ? (equityCHeck(newState, curr) ? curr : newState) : curr
-          );
+          setState((curr) => {
+            const update = equityCHeck
+              ? equityCHeck(newState, curr)
+                ? curr
+                : newState
+              : newState;
+            return update;
+          });
         },
         error: console.error,
       });
@@ -43,15 +48,12 @@ function useStore<T extends Record<string, any> = any>(
     }
   }, [atom]);
 
-  useEffect(() => {
-    atom.set$(state);
-  }, [state]);
-
   const setNewState = useCallback((newState: ((state: T) => T) | T) => {
-    const update = newState instanceof Function ? newState(state) : newState
-    atom.set$( update );
-  }, []);
+    const update = newState instanceof Function ? newState(atom.getValue()) : newState;
+    atom.set$(update);
+  }, [atom]);
+
   return noStateUpdate === true ? setNewState : ([state, setNewState] as const);
 }
 
-export { useStore as useAtom };
+export { useAtom };

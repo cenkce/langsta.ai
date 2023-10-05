@@ -31,7 +31,6 @@ GPTMessagesEventEmitter.addListener(async (message) => {
 });
 
 ContentMessageEventEmitter.addListener(async (message, sender) => {
-  console.log("contentMessagesEmitter : ", message, sender.tab?.id);
   if (message.type === "define-selected-text") {
     try {
       // @ts-ignore

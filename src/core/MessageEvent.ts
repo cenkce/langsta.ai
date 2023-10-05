@@ -1,8 +1,8 @@
-export type MessageEvent<TMessage = any> = chrome.events.Event<
+export type MessageEvent<TMessage = unknown> = chrome.events.Event<
   (
     message: TMessage,
     sender: chrome.runtime.MessageSender,
-    sendResponse: (response?: any) => void
+    sendResponse: (response?: unknown) => void
   ) => void
 >;
 
