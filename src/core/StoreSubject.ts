@@ -29,8 +29,8 @@ export class Atom<
     return key ? state[this.params.key][key] : state[this.params.key];
   }
 
-  getValue() {
-    return this._getValue(this.store.getValue());
+  getValue(key?: M) {
+    return this._getValue(this.store.getValue(), key);
   }
 
   get$<Y extends M>(key?: Y): Observable<T extends Record<string, any>

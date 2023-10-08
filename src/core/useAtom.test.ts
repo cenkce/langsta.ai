@@ -1,7 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { useAtom } from "./useAtom";
 import { Atom, StoreSubject } from "./StoreSubject";
-
+import { expect, test } from 'vitest';
+/**
+ * @vitest-environment jsdom
+ */
 test("should set state of Atom", async () => {
   const MockAtom = Atom.of(
     { key: "mockAtom" },
