@@ -1,23 +1,31 @@
 import {
   Observable,
+  Subject,
   catchError,
   distinctUntilChanged,
   finalize,
   map,
+  takeUntil,
 } from "rxjs";
 import { StoreSubject } from "../core/StoreSubject";
 import { nanoid } from "nanoid";
 
-type Task<
+export type Task<
   R = unknown,
-  P extends Record<string, unknown> = Record<string, unknown>
-> = (params?: TaskParams<P>) => Observable<R>;
-type TaskParams<T extends Record<string, unknown> = Record<string, unknown>> = {
-  tags: string[];
-} & T;
-type TaskNode = {
-  task: Task;
-  params?: TaskParams;
+  P extends Record<string, unknown> | undefined = undefined
+> = (params: TaskParams<P>) => Observable<R>;
+export type TaskParams<
+  T extends Record<string, unknown> | undefined = undefined
+> = T extends undefined
+  ? {
+      tags: string[];
+    }
+  : {
+      tags: string[];
+    } & T;
+export type TaskNode<R = unknown, P extends Record<string, unknown> | undefined = undefined> = {
+  task: Task<R, P>;
+  params?: TaskParams<P>;
   status: TaskStatus;
   error?: any;
   result?: any;
@@ -25,14 +33,14 @@ type TaskNode = {
 
 type TaskStatus = "completed" | "idle" | "progress" | "error";
 
-export class TaskAtom {
+export class TaskAtom<R = unknown, P extends Record<string, unknown> | undefined = undefined> {
   private id: string = nanoid();
   constructor(
     store: StoreSubject<{
-      tasks: Map<string, TaskNode>;
+      tasks: Map<string, TaskNode<unknown, any>>;
       nodesByTag: Map<string, string>;
     }>,
-    private node: TaskNode
+    private node: TaskNode<R, P>
   ) {
     const state = store.getValue();
     const nodes = new Map(state.tasks);
@@ -61,20 +69,24 @@ export class TaskAtom {
 }
 
 export class TaskStore extends StoreSubject<{
-  tasks: Map<string, TaskNode>;
+  tasks: Map<string, TaskNode<unknown, any>>;
   nodesByTag: Map<string, string>;
 }> {
   private static _instance = new TaskStore();
+
+  static get instance() {
+    return this._instance;
+  }
 
   protected constructor() {
     super({ tasks: new Map(), nodesByTag: new Map() });
   }
 
-  updateNode(id: string, update: Partial<TaskNode>) {
-    
-    const state = new Map(this.value.tasks);
-    const currentNode = state.get(id);
-    if (currentNode) state.set(id, { ...currentNode, ...update });
+  updateNode(id: string, update: Partial<TaskNode<unknown, any>>) {
+    const tasks = new Map(this.value.tasks);
+    const currentNode = tasks.get(id);
+    if (currentNode) tasks.set(id, { ...currentNode, ...update });
+    this.next({ tasks, nodesByTag: this.value.nodesByTag });
   }
 
   subscribeTaskById(id: string) {
@@ -90,35 +102,45 @@ export class TaskStore extends StoreSubject<{
     );
   }
 
-  static createAtom<R = unknown>(task: Task<R>, params?: TaskParams) {
-    const atom = new TaskAtom(TaskStore._instance, {
+  static createAtom<
+    R = unknown,
+    P extends Record<string, unknown> | undefined = undefined
+  >(task: Task<R, P>, params?: TaskParams<P>) {
+    const atom = new TaskAtom<R, P>(TaskStore._instance, {
       task,
       params,
       status: "idle",
     });
 
     const node = atom.getNode();
+    const completeSubject = new Subject<any>();
 
     return {
-      chargeAtom$: () => {
-        return node.task(node.params)
+      id: atom.getId(),
+      completeTask: () => {
+        completeSubject.next(null);
       },
-      plugAtom$: (stream$: Observable<any>) => {
+      chargeAtom$: () => {
+        return node.task((node.params || { tags: [] }) as TaskParams<P>);
+      },
+      plugAtom$: (stream$: Observable<R>) => {
         return stream$.pipe(
           finalize(() => {
             TaskStore._instance.getValue();
+            completeSubject.complete();
             this._instance.updateNode(atom.getId(), {
               status: "completed",
             });
           }),
-          map((response: R) => {
+          catchError((err, caught) => {
+            this._instance.updateNode(atom.getId(), { error: err });
+            return caught;
+          }),
+          takeUntil(completeSubject),
+          map((response) => {
             this._instance.updateNode(atom.getId(), { result: response });
             return response;
           }),
-          catchError((err) => {
-            this._instance.updateNode(atom.getId(), { error: err });
-            return err;
-          })
         );
       },
     };
