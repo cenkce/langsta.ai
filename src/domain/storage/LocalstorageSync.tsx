@@ -14,11 +14,9 @@ export function LocalstorageSyncProvider(
   const [storageValue, setStorageData] = useAtom(props.storageAtom);
   const contentStorage = props.contentStorage;
 
-  console.log(props.debugKey, "storageValue : ", storageValue);
-
   useEffect(() => {
     if (initializedRef.current) contentStorage.load(storageValue);
-  }, [storageValue]);
+  }, [contentStorage, storageValue]);
 
   useEffect(() => {
     // loads initial storage value

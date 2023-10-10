@@ -25,6 +25,8 @@ function useAtom<T = any>(
 ) {
   const [state, setState] = useState<T>(atom.getValue());
   const stateRef = useRef(state);
+  const equityCHeckRef = useRef(equityCHeck);
+  equityCHeckRef.current = equityCHeck
   stateRef.current = state;
 
   useEffect(() => {
@@ -32,8 +34,8 @@ function useAtom<T = any>(
       const subscription = atom.get$().subscribe({
         next(newState) {
           setState((curr) => {
-            const update = equityCHeck
-              ? equityCHeck(newState, curr)
+            const update = equityCHeckRef.current
+              ? equityCHeckRef.current?.(newState, curr)
                 ? curr
                 : newState
               : newState;
@@ -46,7 +48,7 @@ function useAtom<T = any>(
         subscription?.unsubscribe();
       };
     }
-  }, [atom]);
+  }, [atom, noStateUpdate]);
 
   const setNewState = useCallback((newState: ((state: T) => T) | T) => {
     const update = newState instanceof Function ? newState(atom.getValue()) : newState;

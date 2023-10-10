@@ -2,7 +2,6 @@ import { useUserContentState } from "../domain/content/ContentContext.atom";
 
 export const SidepanelApp = () => {
   const [userContent] = useUserContentState();
-  console.log("userContent?.translation : ", userContent);
 
   return (
     <div>
