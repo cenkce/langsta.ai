@@ -3,6 +3,12 @@ import { getSelectedText } from "../domain/utils/getSelectedText";
 import { emitContentMessage } from "../domain/content/messages";
 import { useUserContentSetState } from "../domain/content/ContentContext.atom";
 import { useTranslateService } from "../domain/translation/TranslationService";
+import styles from './ContentNavigationMarker.module.scss';
+import logoUrl from '../assets/logo.png'
+import { ImageIcon } from "../ui/icons/ImageIcon";
+import { useBackgroundTaskSubscription } from "../task/useBackgroundTaskSubscription";
+import { Loading } from "../ui/icons/Loading";
+
 
 export const ContentNavigationMarker = () => {
   const markerRef = useRef<HTMLDivElement | null>(null);
@@ -51,6 +57,10 @@ export const ContentNavigationMarker = () => {
     };
   }, []);
 
+  const status = useBackgroundTaskSubscription("translate-service");
+
+  console.log('status : ', status);
+
   // const hideMarker = () => {
   //   setMarkerPosition({
   //     left: -60,
@@ -67,18 +77,13 @@ export const ContentNavigationMarker = () => {
         });
         translate();
       }}
+      className={styles.marker}
       style={{
-        width: "35px",
-        height: "35px",
-        position: "absolute",
-        cursor: "pointer",
-        zIndex: Number.MAX_SAFE_INTEGER,
-        borderRadius: "25%",
-        backgroundColor: "red",
+        zIndex: Number.MAX_SAFE_INTEGER
       }}
       ref={markerRef}
     >
-      {" "}
+     {status === 'progress' ? <Loading/> : <ImageIcon iconUrl={logoUrl} />}
     </div>
   );
 };

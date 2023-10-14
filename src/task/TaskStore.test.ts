@@ -39,7 +39,7 @@ test("should create task and get its result using tag", () => {
     TaskStore.instance
       .subscribeTaskByTagName(tag, ["completed", "idle", 'progress'])
       .pipe(timeout(100))
-      .subscribe(([task]) => {
+      .subscribe((task) => {
         if(task)
           statuses.push(task?.status)
         if (task?.status === "completed") {

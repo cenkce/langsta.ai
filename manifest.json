@@ -11,6 +11,7 @@
     "webNavigation",
     "storage",
     "tabs",
+    "activeTab",
     "sidePanel"
   ],
   "background": {
@@ -20,13 +21,16 @@
   "content_scripts": [
     {
       "js": ["src/foreground/content.ts"],
-
       "matches": ["http://localhost/*", "<all_urls>"]
     }
   ],
   "side_panel": {
     "default_path": "sidepanel.html"
   },
+  "web_accessible_resources": [{
+    "matches": ["https://www.google.com/*"],
+    "resources": ["src/assets/*.png"]
+  }],
   "action": {
     "default_popup": "index.html",
     "default_icon": {

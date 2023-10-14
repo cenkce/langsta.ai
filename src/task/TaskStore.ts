@@ -36,13 +36,15 @@ export type TaskNode<
 };
 // const INITIAL_VALUE = Symbol("TASK_INITIAL_VALUE");
 
-type TaskStatus = "completed" | "idle" | "progress" | "error";
-const TaskStatuses = ["completed", "idle", "progress", "error"] as TaskStatus[];
+export type TaskStatus = "completed" | "idle" | "progress" | "error";
+export const TaskStatuses = ["completed", "idle", "progress", "error"] as TaskStatus[];
 
-type TasksSubject = StoreSubject<{
-  tasks: Map<string, TaskNode<unknown, any>>;
+type TaskStoreState<R = unknown, P extends Record<string, unknown> | undefined = undefined> = {
+  tasks: Map<string, TaskNode<R, P>>;
   nodesByTag: Map<string, Set<string>>;
-}>;
+  recentTaskId?: string;
+};
+type TasksSubject = StoreSubject<TaskStoreState>;
 export type TaskNodeParams<
   R,
   P extends Record<string, unknown> | undefined = undefined
@@ -55,7 +57,7 @@ export class TaskAtom<
   constructor(store: TasksSubject, private nodeParams: TaskNodeParams<R, P>) {
     const state = store.getValue();
     const nodes = new Map(state.tasks);
-    const node = { ...this.nodeParams, id: this.id } as TaskNode<R, P>;
+    const node = { ...this.nodeParams, id: this.id } as TaskNode;
     nodes.set(this.id, node);
 
     const newTasks = new Map(store.getValue().tasks);
@@ -63,6 +65,7 @@ export class TaskAtom<
     store.next({
       ...state,
       tasks: newTasks,
+      recentTaskId: this.id
     });
   }
 
@@ -75,10 +78,7 @@ export class TaskAtom<
   }
 }
 
-export class TaskStore extends StoreSubject<{
-  tasks: Map<string, TaskNode<unknown, undefined>>;
-  nodesByTag: Map<string, Set<string>>;
-}> {
+export class TaskStore extends StoreSubject<TaskStoreState> {
   private static _instance;
   private static forceCancelSubject = new Subject<string>();
 
@@ -111,7 +111,6 @@ export class TaskStore extends StoreSubject<{
 
     const updateNode = { ...currentNode, ...update } as TaskNode;
 
-    console.log(id, update)
     if (currentNode) tasks.set(id, updateNode);
 
     const nodesByTag = new Map(this.value.nodesByTag);
@@ -122,7 +121,10 @@ export class TaskStore extends StoreSubject<{
       nodesByTag.set(tag, tagMap);
     });
 
-    this.next({ tasks, nodesByTag });
+    console.log(id, update, nodesByTag)
+
+
+    this.next({ tasks, nodesByTag, recentTaskId: id });
   }
 
   static cancelTask(id: string) {
@@ -139,23 +141,31 @@ export class TaskStore extends StoreSubject<{
   ) {
     return this.pipe(
       map(
-        ({ tasks, nodesByTag }) => {
-          const statusHashes = nodesByTag.get(tag);
-          const selectedTasks: string[] = [];
+        ({ tasks, recentTaskId }) => {
+          if(!recentTaskId)
+            return null;
 
-          statusHashes?.forEach((hash) => {
-            if (statuses.some((status) => hash.indexOf(status) === 0)) {
-              const taskId = hash.substring(hash.indexOf("_") + 1); // parse taskid
-              selectedTasks.push(taskId);
-            }
-          });
 
-          return selectedTasks.map((taskId) => tasks.get(taskId));
+          const taskNode = tasks.get(recentTaskId);
+          if(taskNode && statuses.includes(taskNode.status) && taskNode.params?.tags.includes(tag)){
+            return taskNode
+          }
+
+          return null
+
+          // statusHashes?.forEach((hash) => {
+          //   if (statuses.some((status) => hash.indexOf(status) === 0)) {
+          //     const taskId = hash.substring(hash.indexOf("_") + 1); // parse taskid
+          //     if(taskNode?.id === taskId)
+          //     selectedTasks.push(taskId);
+          //   }
+          // });
         },
         distinctUntilChanged<TaskNode<unknown, any>[]>((prev, current) => {
-          return current.some((taskNode, i) => Object.is(taskNode, prev[i]));
+          return !!current && current.some((taskNode, i) => Object.is(taskNode, prev[i]));
         })
-      )
+      ),
+      share()
     );
   }
 
