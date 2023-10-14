@@ -7,9 +7,8 @@ export const useBackgroundTaskSubscription = (tag: string) => {
 
   useEffect(() => {
     return TaskEventEmitter.addListener((message) => {
-      console.log('message : ', message)
       if(message.type === 'task/update' && message.payload.tag?.includes(tag)){
-        console.log('task updated ', message.payload);
+        console.debug('task/update : ', message)
         setStatus(message.payload.progress)
       }
     })

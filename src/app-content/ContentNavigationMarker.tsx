@@ -6,7 +6,7 @@ import { useTranslateService } from "../domain/translation/TranslationService";
 import styles from './ContentNavigationMarker.module.scss';
 import logoUrl from '../assets/logo.png'
 import { ImageIcon } from "../ui/icons/ImageIcon";
-import { useBackgroundTaskSubscription } from "../task/useBackgroundTaskSubscription";
+import { useBackgroundTaskSubscription } from "../api/task/useBackgroundTaskSubscription";
 import { Loading } from "../ui/icons/Loading";
 
 

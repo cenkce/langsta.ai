@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { MLService } from "../../core/MLService";
+import { MLService } from "../../api/core/MLService";
 import { TargetLanguageLevel } from "../student/TargetLanguageLevel";
 import { sendGPTRequest } from "../../services/gpt-api/sendGPTRequest";
 import { simplifyContentSystemMessage } from "./simplifySystemMessage";

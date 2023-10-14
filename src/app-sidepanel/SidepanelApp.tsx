@@ -1,7 +1,7 @@
 import { useUserContentState } from "../domain/content/ContentContext.atom";
 import { FlexRow } from "../ui/FlexRow";
 import { Loading } from "../ui/icons/Loading";
-import { useBackgroundTaskSubscription } from "../task/useBackgroundTaskSubscription";
+import { useBackgroundTaskSubscription } from "../api/task/useBackgroundTaskSubscription";
 
 export const SidepanelApp = () => {
   const [userContent] = useUserContentState();

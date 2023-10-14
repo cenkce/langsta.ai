@@ -2,13 +2,11 @@ import OpenAI from "openai";
 import { TranslateRequestMessage } from "../../services/gpt-api/messages";
 import { openai } from "../service-worker";
 import {
-  ContentContextState,
-  ContentStorageList,
+  ContentContextState, ContentStorage,
 } from "../../domain/content/ContentContext.atom";
-import { ContentStorage } from "../../domain/content/ContentStorage";
-import { TaskStore } from "../../task/TaskStore";
+import { TaskStore } from "../../api/task/TaskStore";
 import { from } from "rxjs";
-import { TaskMessage } from "../../task/TaskMessage";
+import { TaskMessage } from "../../api/task/TaskMessage";
 
 TaskStore.instance
   .subscribeTaskByTagName("background-task", [
@@ -32,7 +30,7 @@ TaskStore.instance
       }
     },
     complete() {
-      console.log("translate-service on back completed ");
+      console.debug("translate-service is completed");
     },
   });
 
@@ -42,7 +40,7 @@ export async function translateHander(message: TranslateRequestMessage) {
   });
   taskAtom.plugAtom$(taskAtom.chargeAtom$()).subscribe({
     next(result) {
-      const storage = ContentStorage.of(ContentStorageList.contentContextAtom);
+      const storage = ContentStorage;
       result && storage?.write("translation", result);
     },
     error(err) {

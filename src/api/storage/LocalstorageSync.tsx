@@ -1,13 +1,13 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
-import { useAtom } from "../../core/useAtom";
-import { ContentStorage } from "../content/ContentStorage";
-import { Atom } from "../../core/StoreSubject";
+import { useAtom } from "../core/useAtom";
+import { LocalStorage } from "./LocalStorage";
+import { Atom } from "../core/StoreSubject";
 
-export function LocalstorageSyncProvider(
+export function LocalstorageSyncProvider<StorageT extends Record<string, unknown> = Record<string, unknown>>(
   props: PropsWithChildren<{
     debugKey?: string;
     storageAtom: Atom<Record<string, unknown>>;
-    contentStorage: ContentStorage;
+    contentStorage: LocalStorage<StorageT>;
   }>
 ) {
   const initializedRef = useRef(false);
@@ -15,7 +15,7 @@ export function LocalstorageSyncProvider(
   const contentStorage = props.contentStorage;
 
   useEffect(() => {
-    if (initializedRef.current) contentStorage.load(storageValue);
+    if (initializedRef.current) contentStorage.load(storageValue as StorageT);
   }, [contentStorage, storageValue]);
 
   useEffect(() => {

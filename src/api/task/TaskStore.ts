@@ -34,7 +34,6 @@ export type TaskNode<
   result?: any;
   id: string;
 };
-// const INITIAL_VALUE = Symbol("TASK_INITIAL_VALUE");
 
 export type TaskStatus = "completed" | "idle" | "progress" | "error";
 export const TaskStatuses = ["completed", "idle", "progress", "error"] as TaskStatus[];
@@ -121,8 +120,6 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
       nodesByTag.set(tag, tagMap);
     });
 
-    console.log(id, update, nodesByTag)
-
 
     this.next({ tasks, nodesByTag, recentTaskId: id });
   }
@@ -152,14 +149,6 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
           }
 
           return null
-
-          // statusHashes?.forEach((hash) => {
-          //   if (statuses.some((status) => hash.indexOf(status) === 0)) {
-          //     const taskId = hash.substring(hash.indexOf("_") + 1); // parse taskid
-          //     if(taskNode?.id === taskId)
-          //     selectedTasks.push(taskId);
-          //   }
-          // });
         },
         distinctUntilChanged<TaskNode<unknown, any>[]>((prev, current) => {
           return !!current && current.some((taskNode, i) => Object.is(taskNode, prev[i]));

@@ -42,8 +42,8 @@ type Tuples<T extends Record<string, any>> = T extends Record<infer K, infer V>
 //   : Readonly<Result>;
 
 export abstract class Storage<
-  T extends Record<string, any> = Record<string, any>,
-  U extends [string, any] = Tuples<T>
+  StateT extends Record<string, unknown> = Record<string, unknown>,
+  U extends [string, any] = Tuples<StateT>
 > {
   private emitter = new StorageEventEmitter();
   private subscribers: WeakMap<
@@ -64,7 +64,7 @@ export abstract class Storage<
     } });
   };
 
-  load = async (params: T): Promise<void> => {
+  load = async (params: StateT): Promise<void> => {
     if(!(this.getStorageName() in params))
       return this.getStorageInstance().set({[this.getStorageName()]: params});
   };
@@ -104,39 +104,22 @@ export abstract class Storage<
   protected abstract getStoragAreaName(): AreaName;
 
   /**
-   * @template
    * 
    * Refurns a storage instance
    */
   protected abstract getStorageInstance(): chrome.storage.StorageArea;
 
   /**
-   * @template
    * 
    * Return storage name
    */
   protected abstract getStorageName(): string;
 
   /**
-   * @template
    * 
    * In order to filter out the result
    */
   protected abstract checkValidData(changes: Changes): boolean;
-
-  /**
-   * @template
-   * 
-   * Returns storage field names
-   */
-  protected abstract getKeys(): U[0][];
-
-  /**
-   * Returns storage field names
-   */
-  get keys(): U[0][] {
-    return this.getKeys();
-  }
 
   dispose() {
     for(const handler of this.handlers){
