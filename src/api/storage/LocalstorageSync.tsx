@@ -15,7 +15,7 @@ export function LocalstorageSyncProvider<StorageT extends Record<string, unknown
   const contentStorage = props.contentStorage;
 
   useEffect(() => {
-    if (initializedRef.current) contentStorage.load(storageValue as StorageT);
+    if (initializedRef.current && storageValue) contentStorage.load(storageValue as StorageT);
   }, [contentStorage, storageValue]);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function LocalstorageSyncProvider<StorageT extends Record<string, unknown
       .catch(console.error);
 
     // subscribes storage changes and updates its local state with
-    return contentStorage.subscribe((changes) => { 
+    return contentStorage.subscribe((changes) => {
       Object.entries(changes).forEach(([key, { newValue, oldValue }]) => {
         console.debug(
           props.debugKey,

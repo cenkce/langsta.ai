@@ -125,6 +125,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
   }
 
   static cancelTask(id: string) {
+    console.log('cancel task : ', id);
     this.forceCancelSubject.next(id);
   }
 
@@ -195,6 +196,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
           takeUntil(
             this.forceCancelSubject.pipe(
               filter((incomingId) => {
+                console.log('cancell ', incomingId, atom.getId())
                 return incomingId === atom.getId();
               })
             )

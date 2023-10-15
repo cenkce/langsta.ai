@@ -1,9 +1,17 @@
 import { useAtom } from "../../api/core/useAtom";
 import { Atom, StoreSubject } from "../../api/core/StoreSubject";
 import { LocalStorage } from "../../api/storage/LocalStorage";
+import { TaskStatus } from "../../api/task/TaskStore";
 
+export const ContentStorage =
+  LocalStorage.of<ContentContextState>("contentContextAtom");
 
-export const ContentStorage = LocalStorage.of<ContentContextState>("contentContextAtom");
+export async function deleteTranslation(id: string) {
+  const translations = await ContentStorage.read("translation");
+  const newTranslations = { ...translations };
+  if (id in newTranslations) delete newTranslations[id];
+  ContentStorage.write("translation", newTranslations);
+}
 
 export type ContentContextState = {
   selectedText: string;
@@ -18,12 +26,32 @@ export type ContentContextState = {
     siteName: string;
     lang: string;
   };
-  translation: {
-    translation: string;
-    words: { [key: string]: { translation: string; kind: string }[] };
-  };
+  translation: Record<string, TranslationTask>;
 };
-export const ContentContextAtom = Atom.of({key: 'contentContextAtom'}, new StoreSubject({'contentContextAtom': {} as Partial<ContentContextState>}))
+
+export type TranslationResponse = {
+  translation: string;
+  words: { [key: string]: { translation: string; kind: string }[] };
+};
+
+export type TranslationTask = {
+  selectedText: string;
+  taskId?: string;
+  result?: TranslationResponse;
+  error?: string;
+  status: TaskStatus;
+};
+
+export const ContentContextAtom = Atom.of(
+  { key: "contentContextAtom" },
+  new StoreSubject({
+    contentContextAtom: {
+      selectedText: "",
+      activeTabContent: {},
+      translation: {},
+    } as Partial<ContentContextState>,
+  })
+);
 
 export const useUserContentState = () => {
   return useAtom(ContentContextAtom);

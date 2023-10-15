@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { ContentMessageEventEmitter } from "../domain/content/ContentMessageEventEmitter";
 import { GPTMessagesEventEmitter } from "../services/gpt-api/sendGPTRequest";
 import { translateHander } from "./services/translate";
+import { TaskStore } from "../api/task/TaskStore";
 
 export const openai = new OpenAI({
   apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
@@ -43,5 +44,7 @@ ContentMessageEventEmitter.addListener(async (message, sender) => {
     } catch (error) {
       console.error(error);
     }
+  } else if(message.type === 'backend/delete-task') {
+    TaskStore.cancelTask(message.payload.task);
   }
 });

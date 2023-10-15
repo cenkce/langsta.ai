@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { MLService } from "../../api/core/MLService";
 import { TargetLanguageLevel } from "../student/TargetLanguageLevel";
 import { sendGPTRequest } from "../../services/gpt-api/sendGPTRequest";
 import { simplifyContentSystemMessage } from "./simplifySystemMessage";
@@ -9,9 +8,8 @@ export const useSimplifyContentService = () => {
 
   return service;
 };
-export class SimplifyContentService extends MLService {
+export class SimplifyContentService {
   constructor() {
-    super();
   }
 
   simplifyContentByLevel(level: TargetLanguageLevel, content: string) {

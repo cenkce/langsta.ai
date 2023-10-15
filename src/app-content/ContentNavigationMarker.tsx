@@ -1,13 +1,13 @@
 import { useLayoutEffect, useRef } from "react";
 import { getSelectedText } from "../domain/utils/getSelectedText";
-import { emitContentMessage } from "../domain/content/messages";
+import { ContentMessageDispatch } from "../domain/content/messages";
 import { useUserContentSetState } from "../domain/content/ContentContext.atom";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import styles from './ContentNavigationMarker.module.scss';
 import logoUrl from '../assets/logo.png'
 import { ImageIcon } from "../ui/icons/ImageIcon";
 import { useBackgroundTaskSubscription } from "../api/task/useBackgroundTaskSubscription";
-import { Loading } from "../ui/icons/Loading";
+import { LoadingIcon } from "../ui/icons/LoadingIcon";
 
 
 export const ContentNavigationMarker = () => {
@@ -72,7 +72,7 @@ export const ContentNavigationMarker = () => {
     <div
       onClick={(e) => {
         e.stopPropagation();
-        emitContentMessage({
+        ContentMessageDispatch({
           type: "define-selected-text",
         });
         translate();
@@ -83,7 +83,7 @@ export const ContentNavigationMarker = () => {
       }}
       ref={markerRef}
     >
-     {status === 'progress' ? <Loading/> : <ImageIcon iconUrl={logoUrl} />}
+     {status === 'progress' ? <LoadingIcon/> : <ImageIcon iconUrl={logoUrl} />}
     </div>
   );
 };

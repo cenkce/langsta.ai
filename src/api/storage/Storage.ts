@@ -69,13 +69,13 @@ export abstract class Storage<
       return this.getStorageInstance().set({[this.getStorageName()]: params});
   };
 
-  read = (key: U[0]) => {
+  read = <M extends U[0]>(key: M): Promise<StateT[M]> => {
     return this.getStorageInstance()
       .get(this.getStorageName())
       .then((data) => data[this.getStorageName()][key]);
   };
 
-  getState() {
+  getState(): Promise<StateT>  {
     return this.getStorageInstance()
       .get(this.getStorageName())
       .then((data) => {

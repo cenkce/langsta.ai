@@ -8,7 +8,7 @@ export class LocalStorage<T extends Record<string, unknown> = Record<string, unk
     this.storages = new Map();
   }
 
-  static of<TState extends Record<string, unknown> = Record<string, unknown>, NameST extends string = string>(key: NameST){
+  static of<TState extends Record<string, unknown> = Record<string, unknown>, NameST extends string = string>(key: NameST) {
     const storage = this.getStorage(key) || new LocalStorage(key);
     if(!LocalStorage.storages.has(key))
       LocalStorage.storages.set(key, storage);
@@ -16,11 +16,11 @@ export class LocalStorage<T extends Record<string, unknown> = Record<string, unk
     return storage as LocalStorage<TState, NameST>;
   }
 
-  static getStorage(key: string){
+  static getStorage(key: string) {
     return this.storages.get(key);
   }
 
-  constructor(private storageName: NameT){
+  constructor(private storageName: NameT) {
     super();
   }
 

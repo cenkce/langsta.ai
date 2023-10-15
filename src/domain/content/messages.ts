@@ -9,6 +9,13 @@ export type DefineSelectedTextMessage = {
   type: 'define-selected-text'
 };
 
-export type ContentContextMessages = ExtractTabContentMessage | DefineSelectedTextMessage;
+export type DeleteTask = {
+  type: 'backend/delete-task',
+  payload: {
+    task: string
+  }
+};
 
-export const emitContentMessage = chrome.runtime.sendMessage<ContentContextMessages>;
+export type ContentContextMessages = ExtractTabContentMessage | DefineSelectedTextMessage | DeleteTask;
+
+export const ContentMessageDispatch = chrome.runtime.sendMessage<ContentContextMessages>;
