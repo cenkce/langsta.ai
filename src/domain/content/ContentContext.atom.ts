@@ -26,7 +26,7 @@ export type ContentContextState = {
     siteName: string;
     lang: string;
   };
-  translation: Record<string, TranslationTask>;
+  translation: Record<string, TranslationTextTask>;
 };
 
 export type TranslationResponse = {
@@ -34,10 +34,11 @@ export type TranslationResponse = {
   words: { [key: string]: { translation: string; kind: string }[] };
 };
 
-export type TranslationTask = {
+export type TranslationTextTask = {
   selectedText: string;
   taskId?: string;
-  result?: TranslationResponse;
+  // result?: TranslationResponse;
+  result?: string;
   error?: string;
   status: TaskStatus;
 };

@@ -1,5 +1,12 @@
-import { PropsWithChildren } from "react"
+import { PropsWithChildren } from "react";
 
-export const FlexRow = (props: PropsWithChildren) => {
-  return <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>{props.children}</div>
-}
+export const FlexRow = (props: PropsWithChildren<{ className?: string }>) => {
+  return (
+    <div
+      className={props.className}
+      style={{ display: "flex", alignItems: "center", gap: "5px" }}
+    >
+      {props.children}
+    </div>
+  );
+};

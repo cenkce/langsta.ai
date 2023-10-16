@@ -7,9 +7,9 @@ export type TaskUpdateMessage = {
 };
 export const TaskMessage = (task: TaskUpdateMessage) => {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    if (tabs[0].id) chrome.tabs.sendMessage(tabs[0].id, task);
+    if (tabs[0]?.id) chrome.tabs.sendMessage(tabs[0].id, task).catch(console.error);
   });
-  chrome.runtime.sendMessage<TaskUpdateMessage>(task);
+  chrome.runtime.sendMessage<TaskUpdateMessage>(task).catch(console.error);
 };
 export const TaskEventEmitter = new ExtensionEventEmitter<
   MessageEvent<TaskUpdateMessage>

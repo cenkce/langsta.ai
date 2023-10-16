@@ -5,7 +5,7 @@ import manifest from "./manifest.json";
 import eslint from 'vite-plugin-eslint'
 
 export default defineConfig({
-  plugins: [eslint(), react({include: ['**/*.tsx', '**/*.scss']}), crx({ manifest: manifest as ManifestV3Export})],
+  plugins: [react({include: ['**/*.tsx', '**/*.scss']}), crx({ manifest: manifest as ManifestV3Export}), eslint()],
   server: {
     watch: {
       usePolling: true

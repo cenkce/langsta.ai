@@ -3,6 +3,7 @@ import { ContentMessageEventEmitter } from "../domain/content/ContentMessageEven
 import { GPTMessagesEventEmitter } from "../services/gpt-api/sendGPTRequest";
 import { translateHander } from "./services/translate";
 import { TaskStore } from "../api/task/TaskStore";
+import { createTranslateTextMessage } from "../domain/translation/TranslationService";
 
 export const openai = new OpenAI({
   apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
@@ -11,15 +12,23 @@ export const openai = new OpenAI({
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "defineSelection",
-    title: "Define selection",
+    id: "wordsplorer",
+    title: "Wordsplorer",
     contexts: ["all"],
   });
-  chrome.tabs.create({ url: "page.html" });
+  chrome.contextMenus.create({
+    id: "wordsplorer-defineSelection",
+    parentId: "wordsplorer",
+    title: "Translate selection",
+    contexts: ["selection"]
+  });
+  // chrome.tabs.create({ url: "page.html" });
 });
 
+
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "defineSelection") {
+  if (info.menuItemId === "wordsplorer-defineSelection") {
+    info.selectionText && translateHander(createTranslateTextMessage(info.selectionText));
     // @ts-ignore
     chrome.sidePanel.open({ windowId: tab?.windowId });
   }
@@ -45,6 +54,7 @@ ContentMessageEventEmitter.addListener(async (message, sender) => {
       console.error(error);
     }
   } else if(message.type === 'backend/delete-task') {
+    // @TODO: Doesn't work yet
     TaskStore.cancelTask(message.payload.task);
   }
 });

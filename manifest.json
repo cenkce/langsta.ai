@@ -31,6 +31,11 @@
     "matches": ["https://www.google.com/*"],
     "resources": ["src/assets/*.png"]
   }],
+  "icons": {
+    "16": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
   "action": {
     "default_popup": "index.html",
     "default_icon": {

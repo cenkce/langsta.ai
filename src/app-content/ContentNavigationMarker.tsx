@@ -6,14 +6,21 @@ import { useTranslateService } from "../domain/translation/TranslationService";
 import styles from './ContentNavigationMarker.module.scss';
 import logoUrl from '../assets/logo.png'
 import { ImageIcon } from "../ui/icons/ImageIcon";
-import { useBackgroundTaskSubscription } from "../api/task/useBackgroundTaskSubscription";
-import { LoadingIcon } from "../ui/icons/LoadingIcon";
-
 
 export const ContentNavigationMarker = () => {
   const markerRef = useRef<HTMLDivElement | null>(null);
   const setUserContent = useUserContentSetState();
   const { translate } = useTranslateService();
+  
+  const setMarkerPosition = (
+    markerPosition: Record<string, number | string>
+  ) => {
+    if (markerRef.current) {
+      markerRef.current.style.left = markerPosition.left + "px";
+      markerRef.current.style.top = markerPosition.top + "px";
+    }
+  };
+
   useLayoutEffect(() => {
     const globalClickHandler = (e: MouseEvent) => {
       if (getSelectedText().trim().length > 0) {
@@ -27,46 +34,36 @@ export const ContentNavigationMarker = () => {
         });
       } else {
         setMarkerPosition({
-          left: 0,
-          top: 0,
+          left: -60,
+          top: -60,
         });
       }
     };
     document.addEventListener("click", globalClickHandler);
 
-    const handler = () => {
-      if (getSelectedText()?.length === 0) {
-        setMarkerPosition({ display: "none" });
-      }
-    };
+    // const handler = () => {
+    //   if (getSelectedText()?.length === 0) {
+    //     setMarkerPosition({
+    //       left: -60,
+    //       top: -60,
+    //     });
+    //   }
+    // };
 
-    document.addEventListener("selectionchange", handler);
-
-    const setMarkerPosition = (
-      markerPosition: Record<string, number | string>
-    ) => {
-      if (markerRef.current) {
-        markerRef.current.style.left = markerPosition.left + "px";
-        markerRef.current.style.top = markerPosition.top + "px";
-      }
-    };
+    // document.addEventListener("selectionchange", handler);
 
     return () => {
-      document.removeEventListener("selectionchange", handler);
+      // document.removeEventListener("selectionchange", handler);
       document.removeEventListener("click", globalClickHandler);
     };
   }, []);
 
-  const status = useBackgroundTaskSubscription("translate-service");
-
-  console.log('status : ', status);
-
-  // const hideMarker = () => {
-  //   setMarkerPosition({
-  //     left: -60,
-  //     top: -60,
-  //   });
-  // };
+  const hideMarker = () => {
+    setMarkerPosition({
+      left: -60,
+      top: -60,
+    });
+  };
 
   return (
     <div
@@ -76,6 +73,7 @@ export const ContentNavigationMarker = () => {
           type: "define-selected-text",
         });
         translate();
+        hideMarker();
       }}
       className={styles.marker}
       style={{
@@ -83,7 +81,7 @@ export const ContentNavigationMarker = () => {
       }}
       ref={markerRef}
     >
-     {status === 'progress' ? <LoadingIcon/> : <ImageIcon iconUrl={logoUrl} />}
+     <ImageIcon iconUrl={logoUrl} />
     </div>
   );
 };

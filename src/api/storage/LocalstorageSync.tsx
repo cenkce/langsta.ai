@@ -30,14 +30,7 @@ export function LocalstorageSyncProvider<StorageT extends Record<string, unknown
 
     // subscribes storage changes and updates its local state with
     return contentStorage.subscribe((changes) => {
-      Object.entries(changes).forEach(([key, { newValue, oldValue }]) => {
-        console.debug(
-          props.debugKey,
-          "contentStorage subsbription",
-          key,
-          newValue,
-          changes
-        );
+      Object.entries(changes).forEach(([, { newValue, oldValue }]) => {
         if (newValue !== oldValue) setStorageData(newValue);
       });
     });

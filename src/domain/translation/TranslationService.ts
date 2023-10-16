@@ -6,13 +6,17 @@ export const useTranslateService = () => {
   const [selectedText] = useUserContentState();
   const translate = () => {
     if (selectedText?.selectedText)
-      sendGPTRequest({
-        type: "gpt/translate",
-        content: selectedText?.selectedText,
-        systemMessage: TranslatePropmpts.tranlate,
-      });
+      sendGPTRequest(createTranslateTextMessage(selectedText?.selectedText));
   };
   return {
     translate,
   };
 };
+
+export function createTranslateTextMessage(text: string){
+  return {
+    type: "gpt/translate",
+    content: text,
+    systemMessage: TranslatePropmpts.translate_text_string,
+  } as const;
+}

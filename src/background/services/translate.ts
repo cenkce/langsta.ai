@@ -3,8 +3,7 @@ import { TranslateRequestMessage } from "../../services/gpt-api/messages";
 import { openai } from "../service-worker";
 import {
   ContentStorage,
-  TranslationResponse,
-  TranslationTask,
+  TranslationTextTask,
 } from "../../domain/content/ContentContext.atom";
 import { TaskStore } from "../../api/task/TaskStore";
 import { from } from "rxjs";
@@ -30,32 +29,43 @@ TaskStore.instance
         });
       }
     },
+    error(err) {
+      console.error(err);
+    },
     complete() {
       console.debug("translate-service is completed");
     },
   });
 
-async function upsertTranslationTask(update: TranslationTask) {
+async function upsertTranslationTask(update: TranslationTextTask) {
   if (!update.taskId) return;
-  const taskStates = await ContentStorage?.read("translation");
-  const newTaskStates = taskStates[update.taskId]
-    ? {
-        ...taskStates,
-        [update.taskId]: { ...taskStates[update.taskId], ...update },
-      }
-    : { ...taskStates, [update.taskId]: { ...update } };
-  ContentStorage.write("translation", newTaskStates);
+  try {
+    const taskStates = await ContentStorage?.read("translation");
+    const newTaskStates = taskStates[update.taskId]
+      ? {
+          ...taskStates,
+          [update.taskId]: { ...taskStates[update.taskId], ...update },
+        }
+      : { ...taskStates, [update.taskId]: { ...update } };
+    await ContentStorage.write("translation", newTaskStates);
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 export async function translateHander(message: TranslateRequestMessage) {
+  
   const taskAtom = TaskStore.createTaskAtom(() => from(translate(message)), {
     tags: ["translate-service", "background-task"],
   });
+  
   await upsertTranslationTask({
     selectedText: message.content,
     status: "progress",
     taskId: taskAtom.id,
   });
+
+
   taskAtom.plugAtom$(taskAtom.chargeAtom$()).subscribe({
     next(result) {
       result &&
@@ -66,17 +76,15 @@ export async function translateHander(message: TranslateRequestMessage) {
           result: result,
         });
     },
-    complete() {
-      
-    },
+    complete() {},
     error(err) {
+      console.error(err);
       upsertTranslationTask({
         selectedText: message.content,
         status: "progress",
         taskId: taskAtom.id,
         error: err,
       });
-      console.error(err);
     },
   });
 }
@@ -94,10 +102,13 @@ export async function translate(message: TranslateRequestMessage) {
     frequency_penalty: 0,
     presence_penalty: 0,
   };
-  const completion: OpenAI.Chat.ChatCompletion =
+  try {
+    const completion: OpenAI.Chat.ChatCompletion =
     await openai.chat.completions.create(params);
-
-  return JSON.parse(
-    completion.choices[0].message.content || ""
-  ) as TranslationResponse;
+    // return JSON.parse(completion.choices[0].message.content || "") as string;
+    return completion.choices[0].message.content || "";
+  } catch (error) {
+    console.error(error);
+    return "";
+  }
 }
