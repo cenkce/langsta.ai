@@ -1,4 +1,4 @@
-import { LevelsIcon, IconLevelMid, IconLevelHigh } from "./LevelsIcon";
+import { LevelsIcon, IconLevelMid, IconLevelHigh } from "../ui/LevelsIcon";
 import { TargetLanguageLevel } from "../domain/student/TargetLanguageLevel";
 
 const solutions = [
@@ -22,10 +22,10 @@ const solutions = [
   },
 ] as const;
 
-export function SimplifyContentMenu(props: { onClick: (level: TargetLanguageLevel) => void }) {
+export function LauncherPopOver(props: { onClick: (level: TargetLanguageLevel) => void }) {
   return (
     <div className="min-h-full min-w-full overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-      <div className="relative grid gap-8 bg-white p-7 lg:grid-cols-2">
+      <div className="relative grid gap-8 p-7 lg:grid-cols-6">
         {solutions.map((item) => (
           <div
             style={{ cursor: "pointer", userSelect: "none" }}

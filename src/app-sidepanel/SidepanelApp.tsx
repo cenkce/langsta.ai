@@ -7,7 +7,9 @@ import { ContentMessageDispatch } from "../domain/content/messages";
 import { FlexRow } from "../ui/FlexRow";
 import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
-import styles from './SidepanelApp.module.scss';
+import styles from "./SidepanelApp.module.scss";
+
+document.documentElement.classList.remove('dark')
 
 export const SidepanelApp = () => {
   const [userContent] = useUserContentState();
@@ -24,29 +26,31 @@ export const SidepanelApp = () => {
           overflowX: "hidden",
         }}
       >
-        {tasks.map((task) => {
-          return (
-            <TranslationItem
-              key={task.taskId}
-              onDelete={(id) => {
-                deleteTranslation(id);
-                ContentMessageDispatch({
-                  type: "backend/delete-task",
-                  payload: {
-                    task: id,
-                  },
-                });
-              }}
-              task={task}
-            />
-          );
-        })}
+        {tasks
+          .sort((a, b) => b.createdAt - a.createdAt)
+          .map((task) => {
+            return (
+              <TranslationRow
+                key={task.taskId}
+                onDelete={(id) => {
+                  deleteTranslation(id);
+                  ContentMessageDispatch({
+                    type: "backend/delete-task",
+                    payload: {
+                      task: id,
+                    },
+                  });
+                }}
+                task={task}
+              />
+            );
+          })}
       </div>
     </div>
   );
 };
 
-const TranslationItem = ({
+const TranslationRow = ({
   task,
   onDelete,
 }: {
@@ -56,18 +60,23 @@ const TranslationItem = ({
   return (
     <div className={styles.translationItem} style={{ fontSize: "12px" }}>
       <pre id="definition-text" style={{ whiteSpace: "break-spaces" }}>
-        {task?.selectedText.replaceAll('\n', '\n\n')}
+        {task?.selectedText.replaceAll("\n", "\n\n")}
       </pre>
       {task.status === "progress" ? (
-        <FlexRow>
+        <FlexRow className={styles['translationItem_translation']}>
           <LoadingIcon />
           translating ...
         </FlexRow>
       ) : (
-        <pre className={styles.translationItem_translate} style={{ whiteSpace: "break-spaces" }}>{task.result?.trim().replaceAll('\n', '\n\n')}</pre>
+        <pre
+          className={`${styles['translationItem_translation']}`}
+        >
+          {task.result?.trim().replaceAll("\n", "\n\n")}
+        </pre>
       )}
-      <FlexRow>
+      <FlexRow className="place-content-between ">
         <TrashIcon onClick={() => onDelete(task.taskId || "")}></TrashIcon>
+        <div>{new Date(task.createdAt).toLocaleString()}</div>
       </FlexRow>
     </div>
   );

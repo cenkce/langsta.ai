@@ -33,6 +33,7 @@ export type TaskNode<
   error?: any;
   result?: any;
   id: string;
+  createdAt: number;
 };
 
 export type TaskStatus = "completed" | "idle" | "progress" | "error";
@@ -47,16 +48,18 @@ type TasksSubject = StoreSubject<TaskStoreState>;
 export type TaskNodeParams<
   R,
   P extends Record<string, unknown> | undefined = undefined
-> = Omit<TaskNode<R, P>, "id">;
+> = Omit<TaskNode<R, P>, "id" | "createdAt">;
 export class TaskAtom<
   R = unknown,
   P extends Record<string, unknown> | undefined = undefined
 > {
   private id: string = nanoid();
+  #createdAt = Date.now();
+  
   constructor(store: TasksSubject, private nodeParams: TaskNodeParams<R, P>) {
     const state = store.getValue();
     const nodes = new Map(state.tasks);
-    const node = { ...this.nodeParams, id: this.id } as TaskNode;
+    const node = { ...this.nodeParams, id: this.id, createdAt: this.createdAt } as TaskNode;
     nodes.set(this.id, node);
 
     const newTasks = new Map(store.getValue().tasks);
@@ -66,6 +69,10 @@ export class TaskAtom<
       tasks: newTasks,
       recentTaskId: this.id
     });
+  }
+
+  get createdAt() {
+    return this.#createdAt;
   }
 
   getId() {
@@ -171,6 +178,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     const node = atom.getNode();
     return {
       id: atom.getId(),
+      createdAt: atom.createdAt,
       cancelTask: () => {
         this.cancelTask(atom.getId());
       },

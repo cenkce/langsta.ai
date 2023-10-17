@@ -9,7 +9,7 @@ export const useBackgroundTaskSubscription = (tag: string) => {
     return TaskEventEmitter.addListener((message) => {
       if(message.type === 'task/update' && message.payload.tag?.includes(tag)){
         console.debug('task/update : ', message)
-        setStatus(message.payload.progress)
+        setStatus(message.payload.status)
       }
     })
   }, [tag]);

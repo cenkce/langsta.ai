@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { TranslateRequestMessage } from "../../services/gpt-api/messages";
 import { openai } from "../service-worker";
 import {
+  ContentContextState,
   ContentStorage,
   TranslationTextTask,
 } from "../../domain/content/ContentContext.atom";
@@ -19,12 +20,13 @@ TaskStore.instance
   .subscribe({
     next(task) {
       if (task) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {id: taskId, task: taskNode,  ...rest} = task;
         TaskMessage({
           type: "task/update",
           payload: {
-            progress: task?.status,
-            tag: task?.params?.tags,
-            taskId: task?.id,
+            taskId,
+            ...rest
           },
         });
       }
@@ -37,16 +39,19 @@ TaskStore.instance
     },
   });
 
-async function upsertTranslationTask(update: TranslationTextTask) {
+async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
   if (!update.taskId) return;
   try {
     const taskStates = await ContentStorage?.read("translation");
     const newTaskStates = taskStates[update.taskId]
-      ? {
+      ? ({
           ...taskStates,
           [update.taskId]: { ...taskStates[update.taskId], ...update },
-        }
-      : { ...taskStates, [update.taskId]: { ...update } };
+        } as ContentContextState["translation"])
+      : ({
+          ...taskStates,
+          [update.taskId]: { ...update },
+        } as ContentContextState["translation"]);
     await ContentStorage.write("translation", newTaskStates);
   } catch (error) {
     console.error(error);
@@ -54,17 +59,16 @@ async function upsertTranslationTask(update: TranslationTextTask) {
 }
 
 export async function translateHander(message: TranslateRequestMessage) {
-  
   const taskAtom = TaskStore.createTaskAtom(() => from(translate(message)), {
     tags: ["translate-service", "background-task"],
   });
-  
+
   await upsertTranslationTask({
     selectedText: message.content,
     status: "progress",
     taskId: taskAtom.id,
+    createdAt: taskAtom.createdAt,
   });
-
 
   taskAtom.plugAtom$(taskAtom.chargeAtom$()).subscribe({
     next(result) {
@@ -81,7 +85,7 @@ export async function translateHander(message: TranslateRequestMessage) {
       console.error(err);
       upsertTranslationTask({
         selectedText: message.content,
-        status: "progress",
+        status: "error",
         taskId: taskAtom.id,
         error: err,
       });
@@ -104,7 +108,7 @@ export async function translate(message: TranslateRequestMessage) {
   };
   try {
     const completion: OpenAI.Chat.ChatCompletion =
-    await openai.chat.completions.create(params);
+      await openai.chat.completions.create(params);
     // return JSON.parse(completion.choices[0].message.content || "") as string;
     return completion.choices[0].message.content || "";
   } catch (error) {

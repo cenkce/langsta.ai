@@ -3,7 +3,7 @@ import {
 } from "../domain/content/ContentContext.atom";
 import { LocalstorageSyncProvider } from "../api/storage/LocalstorageSync";
 import { Panel } from "../ui/Panel";
-import { SimplifyContentMenu } from "../ui/SimplifyContentMenu";
+import { LauncherPopOver } from "./LauncherPopOver";
 import "./App.css";
 
 function App() {
@@ -15,7 +15,7 @@ function App() {
       contentStorage={ContentStorage}
     >
       <Panel>
-        <SimplifyContentMenu onClick={() => {}} />
+        <LauncherPopOver onClick={() => {}} />
       </Panel>
     </LocalstorageSyncProvider>
   );

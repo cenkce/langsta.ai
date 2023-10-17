@@ -1,9 +1,10 @@
 import { ExtensionEventEmitter, MessageEvent } from "../core/MessageEvent";
 import { TaskStatus } from "./TaskStore";
 
+export type TaskUpdate = { taskId: string; status: TaskStatus; tag?: string[], createdAt: number, error?: unknown };
 export type TaskUpdateMessage = {
   type: "task/update";
-  payload: { taskId: string; progress: TaskStatus; tag?: string[] };
+  payload: TaskUpdate;
 };
 export const TaskMessage = (task: TaskUpdateMessage) => {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {

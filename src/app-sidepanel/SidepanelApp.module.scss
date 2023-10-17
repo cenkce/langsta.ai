@@ -1,9 +1,11 @@
 .translationItem {
-  border-bottom: 0.25px solid grey;
-  padding: 10px;
-  &_translate {
-    padding: 10px;
-    background-color: rgb(216, 216, 216);
+  @apply flex flex-col gap-5 p-3 w-full flex-wrap border-solid border-b-current border-b-2;
+  svg {
+    @apply stroke-current;
+  }
+  &_translation {
+    @apply dark:bg-zinc-700 bg-slate-300 p-3 rounded-lg;
+    white-space-collapse: break-spaces;
+    white-space: break-spaces;
   }
 }
-

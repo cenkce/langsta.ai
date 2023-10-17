@@ -41,6 +41,7 @@ export type TranslationTextTask = {
   result?: string;
   error?: string;
   status: TaskStatus;
+  createdAt: number;
 };
 
 export const ContentContextAtom = Atom.of(
