@@ -1,4 +1,7 @@
+import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import {
+  ContentContextAtom,
+  ContentStorage,
   TranslationTextTask,
   deleteTranslation,
   useUserContentState,
@@ -9,22 +12,21 @@ import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
 import styles from "./SidepanelApp.module.scss";
 
-document.documentElement.classList.remove('dark')
-
 export const SidepanelApp = () => {
   const [userContent] = useUserContentState();
   const tasks = Object.values(userContent?.translation || {});
+  
+  useLocalstorageSync({
+    debugKey: "content-sidepanel",
+    storageAtom: ContentContextAtom,
+    contentStorage: ContentStorage,
+  });
 
   return (
     <div>
       <h2>Learn Smarter</h2>
       <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          width: "100%",
-          overflowX: "hidden",
-        }}
+        className={styles.container}
       >
         {tasks
           .sort((a, b) => b.createdAt - a.createdAt)

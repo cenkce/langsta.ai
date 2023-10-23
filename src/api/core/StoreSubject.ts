@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, distinctUntilChanged, map } from "rxjs";
+import { BehaviorSubject, Observable, distinctUntilChanged, map, share } from "rxjs";
 
 type AtomParams<T extends string = string> = {
   key: T;
@@ -43,9 +43,12 @@ export class Atom<
         (state) =>
           this._getValue(state, key)
       ),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      share()
     );
   }
+
+
   set$(value: Partial<T>) {
     const state = this.store.getValue();
     const prevValue: Partial<T> = state[this.params.key] || {};
@@ -56,6 +59,12 @@ export class Atom<
     this.store.next({
       [this.params.key]: update,
     } as A);
+
+    return this.store.asObservable();
+  }
+  
+  [Symbol.dispose] (){
+    this.store.complete();
   }
 }
 

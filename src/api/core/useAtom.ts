@@ -8,6 +8,15 @@ import {
 } from "react";
 import { Atom } from "./StoreSubject";
 
+/**
+ * A hook that allows you to listen an atom that can be changed anywhere.
+ * 
+ * @returns [value, setValue]
+ * 
+ * @example
+ * var atom = Atom.of({key: "settings"}, new StoreSubject({settings: {}}));
+ * const [value, setValue] = useAtom(atom);
+ */
 function useAtom<T = any>(
   atom: Atom<T>,
   noStateUpdate?: false | undefined,

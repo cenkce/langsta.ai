@@ -9,3 +9,7 @@
     white-space: break-spaces;
   }
 }
+
+.container {
+  @apply flex flex-col flex-wrap w-full overflow-x-auto;
+}

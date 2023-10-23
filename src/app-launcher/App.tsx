@@ -1,23 +1,32 @@
 import {
   ContentContextAtom, ContentStorage,
 } from "../domain/content/ContentContext.atom";
-import { LocalstorageSyncProvider } from "../api/storage/LocalstorageSync";
-import { Panel } from "../ui/Panel";
+import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
+import { ArtBoard } from "../ui/ArtBoard";
 import { LauncherPopOver } from "./LauncherPopOver";
 import "./App.css";
+import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 
 function App() {
+  useLocalstorageSync({
+    debugKey: "content-sidepanel",
+    storageAtom: ContentContextAtom,
+    contentStorage: ContentStorage,
+  });
+  useLocalstorageSync({
+    debugKey: "settings-sidepanel",
+    storageAtom: SettingsAtom,
+    contentStorage: SettingsStorage,
+  });
 
   return (
-    <LocalstorageSyncProvider
-      debugKey="main"
-      storageAtom={ContentContextAtom}
-      contentStorage={ContentStorage}
+    <ArtBoard
+      title="Langsta"
+      subtitle="Self-taught Language Asistant"
+      theme="cupcake"
     >
-      <Panel>
-        <LauncherPopOver onClick={() => {}} />
-      </Panel>
-    </LocalstorageSyncProvider>
+      <LauncherPopOver />
+    </ArtBoard>
   );
 }
 

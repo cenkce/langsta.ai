@@ -3,7 +3,7 @@ import { useAtom } from "../core/useAtom";
 import { LocalStorage } from "./LocalStorage";
 import { Atom } from "../core/StoreSubject";
 
-export function LocalstorageSyncProvider<StorageT extends Record<string, unknown> = Record<string, unknown>>(
+export function useLocalstorageSync<StorageT extends Record<string, unknown> = Record<string, unknown>>(
   props: PropsWithChildren<{
     debugKey?: string;
     storageAtom: Atom<Record<string, unknown>>;
@@ -13,6 +13,9 @@ export function LocalstorageSyncProvider<StorageT extends Record<string, unknown
   const initializedRef = useRef(false);
   const [storageValue, setStorageData] = useAtom(props.storageAtom);
   const contentStorage = props.contentStorage;
+
+  // if(props.debugKey === 'settings')
+  console.log(props.debugKey, storageValue);
 
   useEffect(() => {
     if (initializedRef.current && storageValue) contentStorage.load(storageValue as StorageT);
@@ -30,12 +33,12 @@ export function LocalstorageSyncProvider<StorageT extends Record<string, unknown
 
     // subscribes storage changes and updates its local state with
     return contentStorage.subscribe((changes) => {
-      Object.entries(changes).forEach(([, { newValue, oldValue }]) => {
-        if (newValue !== oldValue) setStorageData(newValue);
-      });
+      if(props.contentStorage.name in changes) {
+        Object.entries(changes).forEach(([, { newValue, oldValue }]) => {
+          if (newValue !== oldValue) setStorageData(newValue);
+        });
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  return <>{props.children}</>;
 }

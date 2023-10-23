@@ -24,7 +24,6 @@
     "react-dom": "18.2.0",
     "react-feather": "^2.0.10",
     "recoil": "^0.7.7",
-    "recoil-sync": "^0.2.0",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
@@ -38,6 +37,7 @@
     "@typescript-eslint/parser": "^6.0.0",
     "@vitejs/plugin-react": "^4.1.0",
     "autoprefixer": "^10.4.15",
+    "daisyui": "^3.9.3",
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
@@ -48,6 +48,7 @@
     "tslib": "^2.6.2",
     "type-fest": "^4.3.1",
     "typescript": "^5.2.2",
+    "typescript-plugin-css-modules": "^5.0.2",
     "vite": "^4.4.11",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^0.34.6"

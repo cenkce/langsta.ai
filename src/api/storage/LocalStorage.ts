@@ -12,7 +12,6 @@ export class LocalStorage<T extends Record<string, unknown> = Record<string, unk
     const storage = this.getStorage(key) || new LocalStorage(key);
     if(!LocalStorage.storages.has(key))
       LocalStorage.storages.set(key, storage);
-
     return storage as LocalStorage<TState, NameST>;
   }
 
