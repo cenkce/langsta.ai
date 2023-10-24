@@ -7,6 +7,7 @@ import {
   useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { ContentMessageDispatch } from "../domain/content/messages";
+import { ArtBoard } from "../ui/ArtBoard";
 import { FlexRow } from "../ui/FlexRow";
 import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
@@ -23,11 +24,12 @@ export const SidepanelApp = () => {
   });
 
   return (
-    <div>
-      <h2>Learn Smarter</h2>
-      <div
-        className={styles.container}
-      >
+    <ArtBoard
+      title="Langsta"
+      subtitle="Self-taught Language Asistant"
+      theme="cupcake"
+    >
+      <div className={styles.container}>
         {tasks
           .sort((a, b) => b.createdAt - a.createdAt)
           .map((task) => {
@@ -48,7 +50,7 @@ export const SidepanelApp = () => {
             );
           })}
       </div>
-    </div>
+    </ArtBoard>
   );
 };
 
@@ -60,23 +62,26 @@ const TranslationRow = ({
   task: TranslationTextTask;
 }) => {
   return (
-    <div className={styles.translationItem} style={{ fontSize: "12px" }}>
-      <pre id="definition-text" style={{ whiteSpace: "break-spaces" }}>
-        {task?.selectedText.replaceAll("\n", "\n\n")}
-      </pre>
-      {task.status === "progress" ? (
-        <FlexRow className={styles['translationItem_translation']}>
-          <LoadingIcon />
-          translating ...
-        </FlexRow>
-      ) : (
-        <pre
-          className={`${styles['translationItem_translation']}`}
-        >
-          {task.result?.trim().replaceAll("\n", "\n\n")}
+    <div className={`${styles.translationItem} collapse collapse-arrow bg-base-200 `} style={{ fontSize: "12px" }}>
+      <input type="radio" name={"sidebar-translations"} />
+      <div className={styles.title}>
+        <pre style={{ whiteSpace: "break-spaces" }}>
+          {task?.selectedText.trim().replaceAll("\n", "\n\n")}
         </pre>
-      )}
-      <FlexRow className="place-content-between ">
+      </div>
+      <div className="collapse-content">
+        {task.status === "progress" ? (
+          <FlexRow className={styles.content}>
+            <LoadingIcon />
+            translating ...
+          </FlexRow>
+        ) : (
+          <pre className={`${styles.content} text-neutral-600`}>
+            {task.result?.trim().replaceAll("\n", "\n\n")}
+          </pre>
+        )}
+      </div>
+      <FlexRow className="place-content-between">
         <TrashIcon onClick={() => onDelete(task.taskId || "")}></TrashIcon>
         <div>{new Date(task.createdAt).toLocaleString()}</div>
       </FlexRow>

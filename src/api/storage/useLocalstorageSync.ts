@@ -14,9 +14,6 @@ export function useLocalstorageSync<StorageT extends Record<string, unknown> = R
   const [storageValue, setStorageData] = useAtom(props.storageAtom);
   const contentStorage = props.contentStorage;
 
-  // if(props.debugKey === 'settings')
-  console.log(props.debugKey, storageValue);
-
   useEffect(() => {
     if (initializedRef.current && storageValue) contentStorage.load(storageValue as StorageT);
   }, [contentStorage, storageValue]);

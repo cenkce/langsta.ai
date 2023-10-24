@@ -24,6 +24,7 @@ function App() {
       title="Langsta"
       subtitle="Self-taught Language Asistant"
       theme="cupcake"
+      className="phone-4"
     >
       <LauncherPopOver />
     </ArtBoard>

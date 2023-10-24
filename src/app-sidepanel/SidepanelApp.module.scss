@@ -1,10 +1,16 @@
 .translationItem {
-  @apply flex flex-col gap-5 p-3 w-full flex-wrap border-solid border-b-current border-b-2;
+  @apply p-3 
+    border-solid 
+    border-b-current 
+    border-b-2;
+
   svg {
     @apply stroke-current;
   }
-  &_translation {
-    @apply dark:bg-zinc-700 bg-slate-300 p-3 rounded-lg;
+}
+.title {
+  @apply collapse-title;
+  pre {
     white-space-collapse: break-spaces;
     white-space: break-spaces;
   }
@@ -12,4 +18,8 @@
 
 .container {
   @apply flex flex-col flex-wrap w-full overflow-x-auto;
+}
+
+.content {
+  white-space: break-spaces;
 }
