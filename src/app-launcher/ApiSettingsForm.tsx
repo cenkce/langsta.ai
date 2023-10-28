@@ -20,7 +20,7 @@ export const ApiSettingsForm = () => {
         clearTimeout(timeout);
       };
     }
-  }, [settings]);
+  }, [saved]);
 
   return (
     <div className="form-control">
