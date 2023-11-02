@@ -1,12 +1,10 @@
 import { TranslatePropmpts } from "../../prompts/translate";
 import { sendGPTRequest } from "../../services/gpt-api/sendGPTRequest";
-import { useUserContentState } from "../content/ContentContext.atom";
 
 export const useTranslateService = () => {
-  const [selectedText] = useUserContentState();
-  const translate = () => {
-    if (selectedText?.selectedText)
-      sendGPTRequest(createTranslateTextMessage(selectedText?.selectedText));
+  const translate = (text: string) => {
+    if (text)
+      sendGPTRequest(createTranslateTextMessage(text));
   };
   return {
     translate,

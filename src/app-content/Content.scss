@@ -1,9 +1,8 @@
-.marker {
-  width: 28px;
-  height: 28px;
+@import "../index.scss";
+
+.ContentMarkerBadge {
   position: absolute;
   cursor: pointer;
-  border-radius: 15%;
   background-color: white;
   display: flex;
   align-items: center;
@@ -11,4 +10,13 @@
   box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   border: 0.25px solid rgb(152, 152, 152);
+  &--minimize {
+    width: 28px;
+    height: 28px;
+    border-radius: 15%;
+  }
+}
+
+.TranslationPopover {
+  @apply card w-96 bg-primary tooltip tooltip-open tooltip-top;
 }

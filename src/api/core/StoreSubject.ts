@@ -25,7 +25,7 @@ export class Atom<
   ) {}
 
   private _getValue(state: Record<P, T>, key?: M) {
-    // @ts-expect-error
+    // @ts-expect-error workaround error
     return key ? state[this.params.key][key] : state[this.params.key];
   }
 

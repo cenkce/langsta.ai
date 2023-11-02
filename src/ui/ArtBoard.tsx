@@ -14,7 +14,7 @@ export function ArtBoard(
     <div
       data-theme={props.theme}
       data-component="artboard"
-      className={`artboard ${className} min-h-full rounded-none flex flex-col overflow-hidden`}
+      className={`artboard ${className} min-h-full min-w-full rounded-none flex flex-col overflow-hidden`}
     >
       <div className="card-body min-h-full card-bordered min-w-full shadow-xl">
         <h2 className="card-title">{props.title}</h2>
