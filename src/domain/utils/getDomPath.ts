@@ -3,6 +3,8 @@ export function getDomPath(el: Node) {
   const stack: string[] = [];
   let currentNode: Node | null = el;
   let textNodeIndex = 0;
+  let pos = 0;
+
   while (
     currentNode?.parentNode?.nodeName !== "body" &&
     currentNode?.parentNode !== null
@@ -22,6 +24,7 @@ export function getDomPath(el: Node) {
       ) {
         sibCount++;
       }
+      pos++;
     }
 
     if (currentNode.nodeType === Node.TEXT_NODE) {
@@ -35,5 +38,5 @@ export function getDomPath(el: Node) {
 
     currentNode = currentNode.parentElement;
   }
-  return [stack.slice(1), textNodeIndex] as const; // removes the html element
+  return { path: stack.slice(1), textNodeIndex, position: pos } as const; // removes the html element
 }

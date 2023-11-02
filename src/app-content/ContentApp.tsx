@@ -23,7 +23,5 @@ export const ContentApp = () => {
     }
   }, [content]);
 
-  // const status = useBackgroundTaskSubscription("translate-service");
-
   return <ContentNavigationMarker />;
 };
