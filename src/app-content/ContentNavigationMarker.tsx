@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from "react";
-import { getSelectedText } from "../domain/utils/getSelectedText";
+import { getSelectedText, getSelectedTextSelectors } from "../domain/utils/getSelectedText";
 import { ContentMessageDispatch } from "../domain/content/messages";
 import { useUserContentSetState } from "../domain/content/ContentContext.atom";
 import { useTranslateService } from "../domain/translation/TranslationService";
@@ -26,7 +26,10 @@ export const ContentNavigationMarker = () => {
       if (getSelectedText().trim().length > 0) {
         setUserContent((state) => ({
           ...state,
-          selectedText: getSelectedText(),
+          selectedText: {
+            text: getSelectedText(),
+            selectors: getSelectedTextSelectors(),
+          },
         }));
         setMarkerPosition({
           left: e.pageX,

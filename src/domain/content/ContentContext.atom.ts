@@ -2,6 +2,7 @@ import { useAtom } from "../../api/core/useAtom";
 import { Atom, StoreSubject } from "../../api/core/StoreSubject";
 import { LocalStorage } from "../../api/storage/LocalStorage";
 import { TaskStatus } from "../../api/task/TaskStore";
+import { TextSelector } from "../utils/getSelectedText";
 
 export const ContentStorage =
   LocalStorage.of<ContentContextState>("contentContextAtom");
@@ -14,7 +15,10 @@ export async function deleteTranslation(id: string) {
 }
 
 export type ContentContextState = {
-  selectedText: string;
+  selectedText: {
+    text: string;
+    selectors?: [anchor: TextSelector, focus: TextSelector];
+  };
   activeTabContent: {
     title: string;
     content: string;
@@ -48,7 +52,7 @@ export const ContentContextAtom = Atom.of(
   { key: "contentContextAtom" },
   new StoreSubject({
     contentContextAtom: {
-      selectedText: "",
+      selectedText: { text: "" },
       activeTabContent: {},
       translation: {},
     } as Partial<ContentContextState>,

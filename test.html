@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Find HTML Node by Partial Search Text</title>
+</head>
+<body>
+    <div id="content">
+        <p>This is a <strong>complex <em>text</em> that</strong> needs to be replaced.</p>
+        <p>Another paragraph that doesn't match the search text.</p>
+    </div>
+
+    <button onclick="findNodeByPartialSearchText()">Find Node</button>
+
+    <script>
+        function findNodeByPartialSearchText() {
+            // Specify the partial text you want to search for
+            var partial_search_text = "complex text that";
+
+            // Find the element where you want to start the search
+            var contentElement = document.getElementById("content");
+
+            // Create a function to recursively search for nodes with partial text
+            function findNodesWithPartialText(node) {
+                if (node.nodeType === Node.TEXT_NODE && node.textContent.includes(partial_search_text)) {
+                    // You found a node with partial text; do something with it
+                    console.log("Found a node with partial text:", node.parentNode);
+                } else if (node.nodeType === Node.ELEMENT_NODE) {
+                    for (var i = 0; i < node.childNodes.length; i++) {
+                        findNodesWithPartialText(node.childNodes[i]);
+                    }
+                }
+            }
+
+            // Start the search from the content element
+            findNodesWithPartialText(contentElement);
+        }
+    </script>
+</body>
+</html>
