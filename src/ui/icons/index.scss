@@ -3,6 +3,6 @@
 }
 
 .interactive-icon-common {
+  @apply text-secondary;
   cursor: pointer;
-  &:hover {}
 }

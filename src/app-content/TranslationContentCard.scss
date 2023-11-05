@@ -1,0 +1,18 @@
+.TranslationContentCard {
+  &_container {
+    @apply card w-96 bg-base-100 drop-shadow-2xl overflow-hidden max-h-80 p-6;
+  }
+
+  &_body {
+    @apply text-info text-lg font-normal overflow-y-auto overflow-x-hidden p-0;
+    user-select: none;
+  }
+
+  &_content {
+    @apply text-info text-lg font-normal overflow-y-auto overflow-x-hidden bg-opacity-30;
+  }
+
+  &_icon {
+    @apply absolute right-0 top-0 m-2 text-primary hover:scale-90 hover:animate-pulse;
+  }
+}

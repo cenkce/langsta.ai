@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+
+.ContentMarkerBadge {
+  position: absolute;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &--minimize {
+    width: 28px;
+    height: 28px;
+    border-radius: 15%;
+  }
+}

@@ -1,2 +1,1 @@
-import "./index.scss";
-export type IconProps = { onClick?: () => void };
+export type IconCommonProps = { onClick?: (e: MouseEvent) => void; className?: string };

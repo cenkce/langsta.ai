@@ -21,7 +21,6 @@ export class SimplifyContentService {
           systemMessage: simplifyContentSystemMessage(level),
         },
         (response) => {
-          console.log(response);
           res(response);
         }
       );

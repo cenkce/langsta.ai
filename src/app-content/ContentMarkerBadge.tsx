@@ -1,7 +1,5 @@
 import { useRef } from "react";
-import logoUrl from "../assets/logo.png";
-import { ImageIcon } from "../ui/icons/ImageIcon";
-import { TranslationPopover } from "./TranslationPopover";
+import { TranslationContentCard } from "./TranslationContentCard";
 
 export type ContentMarkerBadgeType = {
   id: string;
@@ -13,25 +11,16 @@ export type ContentMarkerBadgeType = {
   selectedText: string;
 };
 type ContentMarkerBadgeProps = ContentMarkerBadgeType & {
-  onClick: (marker: ContentMarkerBadgeType) => void;
+  onClose?: (marker: ContentMarkerBadgeType) => void;
 };
 
 export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
   const markerRef = useRef<HTMLDivElement | null>(null);
-  const { onClick, ...badgeData } = props;
+  const {  onClose, ...badgeData } = props;
   return (
     <>
       <div
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick(badgeData);
-          // ContentMessageDispatch({
-          //   type: "define-selected-text",
-          // });
-          // translate();
-          // hideMarker();
-        }}
-        className={'ContentMarkerBadge'}
+        className={"ContentMarkerBadge"}
         style={{
           zIndex: Number.MAX_SAFE_INTEGER,
           left: props.left,
@@ -39,10 +28,9 @@ export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
         }}
         ref={markerRef}
       >
-        <TranslationPopover>
+        <TranslationContentCard onClose={() => onClose?.(badgeData)}>
           <div>{props.selectedText}</div>
-        </TranslationPopover>
-        <ImageIcon iconUrl={logoUrl} />
+        </TranslationContentCard>
       </div>
     </>
   );

@@ -32,7 +32,6 @@ export function getDomPath(el: Node) {
     } else if (sibCount > 1) {
       stack.unshift(`*:nth-child(${sibIndex})`);
     } else {
-      console.log("currentNode.nodeType : ", currentNode.nodeType);
       stack.unshift(currentNode.nodeName.toLowerCase());
     }
 

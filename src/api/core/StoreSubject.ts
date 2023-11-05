@@ -1,4 +1,10 @@
-import { BehaviorSubject, Observable, distinctUntilChanged, map, share } from "rxjs";
+import {
+  BehaviorSubject,
+  Observable,
+  distinctUntilChanged,
+  map,
+  share,
+} from "rxjs";
 
 type AtomParams<T extends string = string> = {
   key: T;
@@ -10,10 +16,10 @@ export class Atom<
   M = T extends Record<string, any> ? keyof T : undefined,
   A extends Record<P, T> = Record<P, T>
 > {
-  static of<
-    S = any,
-    K extends string = string,
-  >(params: AtomParams<K>, store: StoreSubject<Record<K, S>>) {
+  static of<S = any, K extends string = string>(
+    params: AtomParams<K>,
+    store: StoreSubject<Record<K, S>>
+  ) {
     return new Atom<S, K>(params, store);
   }
   /**
@@ -33,27 +39,27 @@ export class Atom<
     return this._getValue(this.store.getValue(), key);
   }
 
-  get$<Y extends M>(key?: Y): Observable<T extends Record<string, any>
-  ? Y extends string
-    ? T[Y]
-    : T
-  : T> {
+  get$<Y extends M>(
+    key?: Y
+  ): Observable<
+    T extends Record<string, any> ? (Y extends string ? T[Y] : T) : T
+  > {
     return this.store.pipe(
-      map(
-        (state) =>
-          this._getValue(state, key)
-      ),
+      map((state) => this._getValue(state, key)),
       distinctUntilChanged(),
       share()
     );
   }
 
-
   set$(value: Partial<T>) {
     const state = this.store.getValue();
-    const prevValue: Partial<T> = state[this.params.key] || {};
+    const prevValue = state[this.params.key];
     const update = (
-      typeof value === "object" ? { ...prevValue, ...value } : value
+      typeof value === "object" && value !== null
+        ? Array.isArray(value)
+          ? [...value]
+          : { ...prevValue, ...value }
+        : value
     ) as T;
 
     this.store.next({
@@ -62,8 +68,8 @@ export class Atom<
 
     return this.store.asObservable();
   }
-  
-  [Symbol.dispose] (){
+
+  [Symbol.dispose]() {
     this.store.complete();
   }
 }

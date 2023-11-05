@@ -6,9 +6,17 @@ export const getSelectedTextParentElement = () =>
 
 export const getSelectedTextSelectors = () => {
   const selection = window.getSelection();
-    if (selection?.anchorNode && selection?.focusNode) {
-    const {path: anchorPath, textNodeIndex: anchorTextNodeIndex, position: anchorPosition} = getDomPath(selection.anchorNode);
-    const {path: focusPath, textNodeIndex: focusTextNodeIndex, position: focusNodePosition} = getDomPath(selection.focusNode);
+  if (selection?.anchorNode && selection?.focusNode) {
+    const {
+      path: anchorPath,
+      textNodeIndex: anchorTextNodeIndex,
+      position: anchorPosition,
+    } = getDomPath(selection.anchorNode);
+    const {
+      path: focusPath,
+      textNodeIndex: focusTextNodeIndex,
+      position: focusNodePosition,
+    } = getDomPath(selection.focusNode);
 
     const selectionRange = [
       {
@@ -26,7 +34,11 @@ export const getSelectedTextSelectors = () => {
     ] as [started: TextSelector, stopped: TextSelector];
 
     // check if the selection is backwards
-    if(anchorPosition > focusNodePosition)
+    if (
+      anchorPosition > focusNodePosition ||
+      (anchorPosition === focusNodePosition &&
+        selection.anchorOffset > selection.focusOffset)
+    )
       selectionRange.reverse();
 
     return selectionRange;

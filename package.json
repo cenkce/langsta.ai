@@ -10,8 +10,12 @@
     "preview": "vite preview",
     "test": "vitest"
   },
+  "browserslist": [
+    "last 1 version",
+    "> 1%",
+    "not dead"
+  ],
   "dependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.19",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
     "@mozilla/readability": "^0.4.4",
@@ -25,15 +29,16 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.21",
     "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/react": "^14.0.0",
     "@types/chrome": "^0.0.246",
-    "@types/node": "18",
+    "@types/node": "20.8.10",
     "@types/react": "^18.2.23",
     "@types/react-dom": "^18.2.8",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
-    "@vitejs/plugin-react": "^4.1.0",
+    "@vitejs/plugin-react": "^4.1.1",
     "autoprefixer": "^10.4.15",
     "daisyui": "^3.9.3",
     "eslint": "^8.45.0",
