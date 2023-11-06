@@ -4,8 +4,6 @@ function getId(id: string): string {
 }
 // influenced from https://github.com/farazshuja/chrome-extension-vite-vue-starter-template/blob/master/src/contentScripts/utils.ts
 export function updateStyle(id: string, content: string) {
-  if(id.indexOf('/app-content/') === -1)
-    return;
   const root = document.getElementsByTagName('extension-app-shadow-host')[0];
   const shadowEl = root?.shadowRoot;
   const newId = getId(id);
@@ -38,9 +36,6 @@ export function updateStyle(id: string, content: string) {
 }
 
 export function removeStyle(id: string) {
-  if(id.indexOf('/app-content/') === -1)
-    return;
-
   const newId = getId(id);  
   const root = document.getElementsByTagName('extension-app-shadow-host')[0];
   const shadowEl = root?.shadowRoot;

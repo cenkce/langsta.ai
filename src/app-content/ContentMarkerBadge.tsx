@@ -8,7 +8,7 @@ export type ContentMarkerBadgeType = {
   visible: boolean;
   loading: boolean;
   clicked: boolean;
-  selectedText: string;
+  text: string;
 };
 type ContentMarkerBadgeProps = ContentMarkerBadgeType & {
   onClose?: (marker: ContentMarkerBadgeType) => void;
@@ -29,7 +29,7 @@ export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
         ref={markerRef}
       >
         <TranslationContentCard onClose={() => onClose?.(badgeData)}>
-          <div>{props.selectedText}</div>
+          <div>{props.text}</div>
         </TranslationContentCard>
       </div>
     </>

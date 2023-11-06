@@ -1,25 +1,26 @@
-import {
-  useUserContentSetState,
-  useUserContentState,
-} from "../domain/content/ContentContext.atom";
+import { useUserContentSetState } from "../domain/content/ContentContext.atom";
 import {
   ContentMarkerBadge,
   ContentMarkerBadgeType,
 } from "./ContentMarkerBadge";
-import { useLayoutEffect, useState } from "react";
+import { useRef, useState } from "react";
 import {
   getSelectedText,
   getSelectedTextSelectors,
 } from "../domain/utils/getSelectedText";
+import { useGlobalClickService } from "../api/utils/useGlobalClickService";
 
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   // const { translate } = useTranslateService();
-  const [selectedText] = useUserContentState();
+  // const [selectedText] = useUserContentState();
 
-  useLayoutEffect(() => {
-    const globalClickHandler = (e: MouseEvent) => {
+  useGlobalClickService({
+    excludeTargetClassNames: ["ContentMarkerBadge"],
+    rootRef,
+    onOutsideClick: (e: MouseEvent) => {
       const selectedText = getSelectedText().trim();
       if (getSelectedText().trim().length > 0) {
         setUserContent((state) => ({
@@ -38,31 +39,18 @@ export const ContentCaptureContainer = () => {
             visible: true,
             loading: false,
             clicked: false,
-            selectedText: selectedText,
+            text: selectedText,
           },
         ]);
+      } else {
+        setMarkers([]);
       }
-    };
-    document.addEventListener("click", globalClickHandler);
-
-    // const handler = () => {
-    //   if (getSelectedText()?.length === 0) {
-    //     setMarkerPosition({
-    //       left: -60,
-    //       top: -60,
-    //     });
-    //   }
-    // };
-    // document.addEventListener("selectionchange", handler);
-    return () => {
-      // document.removeEventListener("selectionchange", handler);
-      document.removeEventListener("click", globalClickHandler);
-    };
-  }, [selectedText]);
+    },
+  });
 
   return (
     <>
-      <div className={"content-app-root"} data-theme={"cupcake"}>
+      <div ref={rootRef} className={"content-app-root"} data-theme={"cupcake"}>
         {markers
           .filter((marker) => marker.visible)
           .map((marker) => {
@@ -70,6 +58,7 @@ export const ContentCaptureContainer = () => {
               <ContentMarkerBadge
                 key={marker.id}
                 {...marker}
+
                 onClose={(ev) => {
                   setMarkers((state) =>
                     state.filter((marker) => ev.id !== marker.id)

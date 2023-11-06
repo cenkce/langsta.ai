@@ -1,0 +1,6 @@
+.Button {
+  @apply btn btn-primary font-mono text-xs btn-sm;
+  &-primary {
+    @apply btn-primary 
+  }
+}
