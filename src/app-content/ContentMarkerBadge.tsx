@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { TranslationContentCard } from "./TranslationContentCard";
+import { ImageIcon } from "../ui/icons/ImageIcon";
 
 export type ContentMarkerBadgeType = {
   id: string;
@@ -12,25 +13,37 @@ export type ContentMarkerBadgeType = {
 };
 type ContentMarkerBadgeProps = ContentMarkerBadgeType & {
   onClose?: (marker: ContentMarkerBadgeType) => void;
+  onClick?: (marker: ContentMarkerBadgeType) => void;
 };
 
 export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
   const markerRef = useRef<HTMLDivElement | null>(null);
-  const {  onClose, ...badgeData } = props;
+  const { onClose, ...badgeData } = props;
   return (
     <>
       <div
-        className={"ContentMarkerBadge"}
+        className={"ContentMarkerBadge "}
         style={{
           zIndex: Number.MAX_SAFE_INTEGER,
           left: props.left,
           top: props.top,
         }}
+        onMouseDown={(e) => e.stopPropagation()}
         ref={markerRef}
       >
-        <TranslationContentCard onClose={() => onClose?.(badgeData)}>
-          <div>{props.text}</div>
-        </TranslationContentCard>
+        {props.clicked ? (
+          <TranslationContentCard onClose={() => onClose?.(badgeData)}>
+            <div>{props.text}</div>
+          </TranslationContentCard>
+        ) : (
+          <ImageIcon
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onClick?.(badgeData);
+            }}
+            iconUrl="logo.png"
+          />
+        )}
       </div>
     </>
   );

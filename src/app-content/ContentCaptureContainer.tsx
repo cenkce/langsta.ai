@@ -8,7 +8,7 @@ import {
   getSelectedText,
   getSelectedTextSelectors,
 } from "../domain/utils/getSelectedText";
-import { useGlobalClickService } from "../api/utils/useGlobalClickService";
+import { useGlobalMouseEventHandlerService } from "../api/utils/useGlobalMouseEventHandlerService";
 
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
@@ -17,7 +17,7 @@ export const ContentCaptureContainer = () => {
   // const { translate } = useTranslateService();
   // const [selectedText] = useUserContentState();
 
-  useGlobalClickService({
+  useGlobalMouseEventHandlerService({
     excludeTargetClassNames: ["ContentMarkerBadge"],
     rootRef,
     onOutsideClick: (e: MouseEvent) => {
@@ -47,6 +47,14 @@ export const ContentCaptureContainer = () => {
       }
     },
   });
+  useGlobalMouseEventHandlerService({
+    excludeTargetClassNames: ["ContentMarkerBadge"],
+    rootRef,
+    type: 'mousedown',
+    onOutsideClick: () => {
+      setMarkers([]);
+    },
+  });
 
   return (
     <>
@@ -58,7 +66,15 @@ export const ContentCaptureContainer = () => {
               <ContentMarkerBadge
                 key={marker.id}
                 {...marker}
-
+                onClick={(ev) => {
+                  setMarkers((state) =>
+                    state.map((marker) =>
+                      ev.id === marker.id
+                        ? { ...marker, clicked: true }
+                        : marker
+                    )
+                  );
+                }}
                 onClose={(ev) => {
                   setMarkers((state) =>
                     state.filter((marker) => ev.id !== marker.id)

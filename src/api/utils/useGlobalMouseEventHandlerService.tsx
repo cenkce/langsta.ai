@@ -12,7 +12,7 @@ export function checkMousePointerInElement(
   );
 }
 
-export function useGlobalClickService({
+export function useGlobalMouseEventHandlerService({
   excludeTargetClassNames,
   rootRef,
   onOutsideClick,
