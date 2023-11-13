@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 export function checkMousePointerInElement(
   mouseX: number,
   mouseY: number,
@@ -23,8 +23,13 @@ export function useGlobalMouseEventHandlerService({
   onOutsideClick: ((e: MouseEvent) => void) | null;
   type?: "click" | "mousedown";
 }) {
+  const onOutsideClickRef = useRef(onOutsideClick);
+  onOutsideClickRef.current = onOutsideClick;
+  const excludeTargetClassNamesRef = useRef(excludeTargetClassNames);
+  excludeTargetClassNamesRef.current = excludeTargetClassNames;
+
   useEffect(() => {
-    if (onOutsideClick === null) return;
+    if (onOutsideClickRef.current === null) return;
     const clickHandler = (e: MouseEvent) => {
       if (
         (rootRef?.current &&
@@ -42,27 +47,26 @@ export function useGlobalMouseEventHandlerService({
               e.clientY,
               rootRef.current.getBoundingClientRect()
             ))) ||
-        (excludeTargetClassNames &&
+        (excludeTargetClassNamesRef.current &&
           checkIfInExcludeTarget(e.target as HTMLElement, [
-            ...excludeTargetClassNames,
+            ...excludeTargetClassNamesRef.current,
             "ignoreGlobalClick",
           ]))
       )
         return;
-      onOutsideClick(e);
+      onOutsideClickRef.current?.(e);
     };
     document.addEventListener(type, clickHandler);
     return () => {
       document.removeEventListener(type, clickHandler);
     };
-  }, [rootRef, onOutsideClick, excludeTargetClassNames]);
+  }, [rootRef?.current]);
 }
 
 export function checkIfInExcludeTarget(
   target: HTMLElement,
   excludeClassNames: string[]
 ): boolean {
-  console.log(target)
   if (
     excludeClassNames.some((classanme) => target.classList.contains(classanme))
   )

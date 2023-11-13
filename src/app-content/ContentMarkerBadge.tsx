@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { TranslationContentCard } from "./TranslationContentCard";
 import { ImageIcon } from "../ui/icons/ImageIcon";
+import { useSubscribeTranslationTask } from "../domain/content/ContentContext.atom";
 
 export type ContentMarkerBadgeType = {
   id: string;
@@ -10,15 +11,20 @@ export type ContentMarkerBadgeType = {
   loading: boolean;
   clicked: boolean;
   text: string;
+  taskId?: string
 };
 type ContentMarkerBadgeProps = ContentMarkerBadgeType & {
   onClose?: (marker: ContentMarkerBadgeType) => void;
   onClick?: (marker: ContentMarkerBadgeType) => void;
+  onTranslate?: (marker: ContentMarkerBadgeType) => void;
 };
 
 export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
   const markerRef = useRef<HTMLDivElement | null>(null);
   const { onClose, ...badgeData } = props;
+  const task = useSubscribeTranslationTask(props.taskId);
+  const loading = task?.status === 'progress';
+
   return (
     <>
       <div
@@ -32,8 +38,12 @@ export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
         ref={markerRef}
       >
         {props.clicked ? (
-          <TranslationContentCard onClose={() => onClose?.(badgeData)}>
-            <div>{props.text}</div>
+          <TranslationContentCard
+            onTranslate={() => props.onTranslate?.(badgeData)}
+            onClose={() => onClose?.(badgeData)}
+            loading={loading}
+          >
+            <pre style={{whiteSpace: 'break-spaces'}}>{task?.result || props.text}</pre>
           </TranslationContentCard>
         ) : (
           <ImageIcon

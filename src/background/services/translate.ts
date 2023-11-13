@@ -1,14 +1,15 @@
 import OpenAI from "openai";
-import { TranslateRequestMessage } from "../../services/gpt-api/messages";
+import { TranslateRequestMessage } from "../../api/services/gpt-api/messages";
 import { openai } from "../service-worker";
 import {
   ContentContextState,
   ContentStorage,
-  TranslationTextTask,
 } from "../../domain/content/ContentContext.atom";
+import { TranslationTextTask } from "../../api/task/TranslationTextTask";
 import { TaskStore } from "../../api/task/TaskStore";
 import { from } from "rxjs";
 import { TaskMessage } from "../../api/task/TaskMessage";
+import { clone } from "ramda";
 
 TaskStore.instance
   .subscribeTaskByTagName("background-task", [
@@ -21,12 +22,12 @@ TaskStore.instance
     next(task) {
       if (task) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {id: taskId, task: taskNode,  ...rest} = task;
+        const { id: taskId, task: taskNode, ...rest } = task;
         TaskMessage({
           type: "task/update",
           payload: {
             taskId,
-            ...rest
+            ...rest,
           },
         });
       }
@@ -59,12 +60,18 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
 }
 
 export async function translateHander(message: TranslateRequestMessage) {
-  const taskAtom = TaskStore.createTaskAtom(() => from(translate(message)), {
-    tags: ["translate-service", "background-task"],
-  });
+  const { id, ...messageBody } = message;
+  const taskAtom = TaskStore.createTaskAtom(
+    () => from(translate({userMessage: messageBody.content.text, systemMessage: messageBody.systemMessage})),
+    {
+      tags: ["translate-service", "background-task"],
+      selection: clone(message)
+    },
+    id
+  );
 
   await upsertTranslationTask({
-    selectedText: message.content,
+    selectedText: message.content.text,
     status: "progress",
     taskId: taskAtom.id,
     createdAt: taskAtom.createdAt,
@@ -74,7 +81,7 @@ export async function translateHander(message: TranslateRequestMessage) {
     next(result) {
       result &&
         upsertTranslationTask({
-          selectedText: message.content,
+          selectedText: message.content.text,
           status: "completed",
           taskId: taskAtom.id,
           result: result,
@@ -84,7 +91,7 @@ export async function translateHander(message: TranslateRequestMessage) {
     error(err) {
       console.error(err);
       upsertTranslationTask({
-        selectedText: message.content,
+        selectedText: message.content.text,
         status: "error",
         taskId: taskAtom.id,
         error: err,
@@ -93,11 +100,11 @@ export async function translateHander(message: TranslateRequestMessage) {
   });
 }
 
-export async function translate(message: TranslateRequestMessage) {
+export async function translate(message: {userMessage: string, systemMessage: string}) {
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
     messages: [
       { role: "system", content: message.systemMessage },
-      { role: "user", content: message.content },
+      { role: "user", content: message.userMessage },
     ],
     model: "gpt-3.5-turbo-16k",
     temperature: 0,

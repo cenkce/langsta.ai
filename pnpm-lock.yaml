@@ -26,6 +26,9 @@ dependencies:
   openai:
     specifier: ^4.5.0
     version: 4.7.1
+  ramda:
+    specifier: ^0.29.1
+    version: 0.29.1
   react:
     specifier: 18.2.0
     version: 18.2.0
@@ -55,6 +58,9 @@ devDependencies:
   '@types/node':
     specifier: 20.8.10
     version: 20.8.10
+  '@types/ramda':
+    specifier: ^0.29.8
+    version: 0.29.8
   '@types/react':
     specifier: ^18.2.23
     version: 18.2.23
@@ -1001,6 +1007,12 @@ packages:
 
   /@types/prop-types@15.7.5:
     resolution: {integrity: sha512-JCB8C6SnDoQf0cNycqd/35A7MjcnK+ZTqE7judS6o7utxUCg6imJg3QK2qzHKszlTjcj2cn+NwMB2i96ubpj7w==}
+    dev: true
+
+  /@types/ramda@0.29.8:
+    resolution: {integrity: sha512-CmEF76RSSj4NkgFnuQ4ZK3xeq8wMnE9zQH7sr54Yy/a61WbE1qIzWYVfd7XupLbTJY9jCjgEPbv6fqMlsW8Mvw==}
+    dependencies:
+      types-ramda: 0.29.5
     dev: true
 
   /@types/react-dom@18.2.8:
@@ -3433,6 +3445,10 @@ packages:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
     dev: true
 
+  /ramda@0.29.1:
+    resolution: {integrity: sha512-OfxIeWzd4xdUNxlWhgFazxsA/nl3mS4/jGZI5n00uWOoSSFRhC1b6gl6xvmzUamgmqELraWp0J/qqVlXYPDPyA==}
+    dev: false
+
   /react-dom@18.2.0(react@18.2.0):
     resolution: {integrity: sha512-6IMTriUmvsjHUjNtEDudZfuDQUoWXVxKHhlEGSk81n4YFS+r/Kl99wXiwlVXtPBtJenozv2P+hxDsw9eA7Xo6g==}
     peerDependencies:
@@ -3913,6 +3929,10 @@ packages:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
     dev: true
 
+  /ts-toolbelt@9.6.0:
+    resolution: {integrity: sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==}
+    dev: true
+
   /tsconfig-paths@4.2.0:
     resolution: {integrity: sha512-NoZ4roiN7LnbKn9QqE1amc9DJfzvZXxF4xDavcOWt1BPkdx+m+0gJuPM+S0vCe7zTJMYUP0R8pO2XMr+Y8oLIg==}
     engines: {node: '>=6'}
@@ -3945,6 +3965,12 @@ packages:
   /type-fest@4.3.1:
     resolution: {integrity: sha512-pphNW/msgOUSkJbH58x8sqpq8uQj6b0ZKGxEsLKMUnGorRcDjrUaLS+39+/ub41JNTwrrMyJcUB8+YZs3mbwqw==}
     engines: {node: '>=16'}
+    dev: true
+
+  /types-ramda@0.29.5:
+    resolution: {integrity: sha512-u+bAYXHDPJR+amB0qMrMU/NXRB2PG8QqpO2v6j7yK/0mPZhlaaZj++ynYjnVpkPEpCkZEGxNpWY3X7qyLCGE3w==}
+    dependencies:
+      ts-toolbelt: 9.6.0
     dev: true
 
   /typescript-plugin-css-modules@5.0.2(typescript@5.2.2):

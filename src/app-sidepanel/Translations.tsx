@@ -1,8 +1,8 @@
 import {
-  TranslationTextTask,
   deleteTranslation,
   useUserContentState
 } from "../domain/content/ContentContext.atom";
+import { TranslationTextTask } from "../api/task/TranslationTextTask";
 import { ContentMessageDispatch } from "../domain/content/messages";
 import { FlexRow } from "../ui/FlexRow";
 import { LoadingIcon } from "../ui/icons/LoadingIcon";
@@ -12,7 +12,7 @@ import styles from "./SidepanelApp.module.scss";
 export const Translations = () => {
   const [userContent] = useUserContentState();
   const tasks = Object.values(userContent?.translation || {});
-
+  console.log(userContent);
   return tasks
     .sort((a, b) => b.createdAt - a.createdAt)
     .map((task) => {
@@ -38,6 +38,7 @@ const TranslationRow = ({
   onDelete: (taskId: string) => void;
   task: TranslationTextTask;
 }) => {
+
   return (
     <div className={`${styles.translationItem} collapse collapse-arrow bg-base-200 `} style={{ fontSize: "12px" }}>
       <input type="radio" name={"sidebar-translations"} />

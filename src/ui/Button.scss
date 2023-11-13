@@ -3,4 +3,8 @@
   &-primary {
     @apply btn-primary 
   }
+
+  &_disabled {
+    @apply btn-disabled tab-disabled input-disabled;
+  }
 }

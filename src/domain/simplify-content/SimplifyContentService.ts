@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { TargetLanguageLevel } from "../student/TargetLanguageLevel";
-import { sendGPTRequest } from "../../services/gpt-api/sendGPTRequest";
+import { sendGPTRequest } from "../../api/services/gpt-api/sendGPTRequest";
 import { simplifyContentSystemMessage } from "./simplifySystemMessage";
 
 export const useSimplifyContentService = () => {

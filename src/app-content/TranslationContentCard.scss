@@ -8,10 +8,16 @@
   }
 
   &_content {
-    @apply text-info text-lg font-normal overflow-y-auto overflow-x-hidden bg-opacity-30;
+    @apply text-info text-sm font-normal overflow-y-auto overflow-x-hidden bg-opacity-30;
   }
 
   &_icon {
     @apply absolute right-0 top-0 m-2 text-primary hover:scale-90 hover:animate-pulse;
+  }
+
+  &_disabled {
+    > button {
+      @apply btn-disabled tab-disabled input-disabled;
+    }
   }
 }

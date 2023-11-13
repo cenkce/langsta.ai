@@ -45,7 +45,7 @@ test("should create task and get its result using tag", () => {
         if (task?.status === "completed") {
           expect(task.id).toBe(id);
           expect(task.result).toBe(1);
-          expect(statuses).toStrictEqual(["progress", "progress", "completed"]);
+          expect(statuses).toStrictEqual(["idle", "progress", "progress", "completed"]);
           res();
         }
       });

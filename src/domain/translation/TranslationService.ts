@@ -1,20 +1,27 @@
+import { nanoid } from "nanoid";
 import { TranslatePropmpts } from "../../prompts/translate";
-import { sendGPTRequest } from "../../services/gpt-api/sendGPTRequest";
+import { TranslateRequestMessage } from "../../api/services/gpt-api/messages";
+import { sendGPTRequest } from "../../api/services/gpt-api/sendGPTRequest";
+import { ContentContextState } from "../content/ContentContext.atom";
 
 export const useTranslateService = () => {
-  const translate = (text: string) => {
-    if (text)
-      sendGPTRequest(createTranslateTextMessage(text));
+  const translate = (selection: ContentContextState['selectedText']) => {
+    const id = nanoid();
+    if (selection)
+      sendGPTRequest(createTranslateTextMessage(selection, id));
+
+    return id;
   };
   return {
     translate,
   };
 };
 
-export function createTranslateTextMessage(text: string){
+export function createTranslateTextMessage(selection: ContentContextState['selectedText'], id?: string){
   return {
     type: "gpt/translate",
-    content: text,
+    content: selection,
+    id,
     systemMessage: TranslatePropmpts.translate_text_string,
-  } as const;
+  } as TranslateRequestMessage;
 }

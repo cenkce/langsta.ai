@@ -37,9 +37,17 @@ export type TaskNode<
 };
 
 export type TaskStatus = "completed" | "idle" | "progress" | "error";
-export const TaskStatuses = ["completed", "idle", "progress", "error"] as TaskStatus[];
+export const TaskStatuses = [
+  "completed",
+  "idle",
+  "progress",
+  "error",
+] as TaskStatus[];
 
-type TaskStoreState<R = unknown, P extends Record<string, unknown> | undefined = undefined> = {
+type TaskStoreState<
+  R = unknown,
+  P extends Record<string, unknown> | undefined = undefined
+> = {
   tasks: Map<string, TaskNode<R, P>>;
   nodesByTag: Map<string, Set<string>>;
   recentTaskId?: string;
@@ -48,18 +56,23 @@ type TasksSubject = StoreSubject<TaskStoreState>;
 export type TaskNodeParams<
   R,
   P extends Record<string, unknown> | undefined = undefined
-> = Omit<TaskNode<R, P>, "id" | "createdAt">;
+> = Omit<TaskNode<R, P>, "id" | "createdAt"> & { id?: string };
 export class TaskAtom<
   R = unknown,
   P extends Record<string, unknown> | undefined = undefined
 > {
-  private id: string = nanoid();
+  private id: string;
   #createdAt = Date.now();
-  
+
   constructor(store: TasksSubject, private nodeParams: TaskNodeParams<R, P>) {
+    this.id = this.nodeParams?.id || nanoid();
     const state = store.getValue();
     const nodes = new Map(state.tasks);
-    const node = { ...this.nodeParams, id: this.id, createdAt: this.createdAt } as TaskNode;
+    const node = {
+      ...this.nodeParams,
+      id: this.id,
+      createdAt: this.createdAt,
+    } as TaskNode;
     nodes.set(this.id, node);
 
     const newTasks = new Map(store.getValue().tasks);
@@ -67,7 +80,7 @@ export class TaskAtom<
     store.next({
       ...state,
       tasks: newTasks,
-      recentTaskId: this.id
+      recentTaskId: this.id,
     });
   }
 
@@ -91,7 +104,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
   static {
     this._instance = new TaskStore();
   }
-  
+
   static get instance() {
     return this._instance;
   }
@@ -103,13 +116,16 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
   updateNode(id: string, update: Partial<TaskNode<unknown, any>>) {
     const tasks = new Map(this.value.tasks);
     const currentNode = tasks.get(id);
-    
+
     // shallow check
     if (
       Object.keys(update).some((key) => {
         return (
           currentNode &&
-          Object.is((currentNode as Record<string, unknown>)[key], (update as Record<string, unknown>)[key])
+          Object.is(
+            (currentNode as Record<string, unknown>)[key],
+            (update as Record<string, unknown>)[key]
+          )
         );
       })
     )
@@ -126,7 +142,6 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
       tagMap.add(`${updateNode.status}_${id}`);
       nodesByTag.set(tag, tagMap);
     });
-
 
     this.next({ tasks, nodesByTag, recentTaskId: id });
   }
@@ -146,19 +161,24 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     return this.pipe(
       map(
         ({ tasks, recentTaskId }) => {
-          if(!recentTaskId)
-            return null;
-
+          if (!recentTaskId) return null;
 
           const taskNode = tasks.get(recentTaskId);
-          if(taskNode && statuses.includes(taskNode.status) && taskNode.params?.tags.includes(tag)){
-            return taskNode
+          if (
+            taskNode &&
+            statuses.includes(taskNode.status) &&
+            taskNode.params?.tags.includes(tag)
+          ) {
+            return taskNode;
           }
 
-          return null
+          return null;
         },
         distinctUntilChanged<TaskNode<unknown, any>[]>((prev, current) => {
-          return !!current && current.some((taskNode, i) => Object.is(taskNode, prev[i]));
+          return (
+            !!current &&
+            current.some((taskNode, i) => Object.is(taskNode, prev[i]))
+          );
         })
       ),
       share()
@@ -168,11 +188,12 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
   static createTaskAtom<
     R = unknown,
     P extends Record<string, unknown> | undefined = undefined
-  >(task: Task<R, P>, params?: TaskParams<P>) {
+  >(task: Task<R, P>, params?: TaskParams<P>, id?: string) {
     const atom = new TaskAtom<R, P>(TaskStore._instance, {
       task,
       params,
       status: "idle",
+      id
     });
 
     const node = atom.getNode();

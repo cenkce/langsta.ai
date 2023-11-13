@@ -1,8 +1,10 @@
+import { ContentContextState } from "../../../domain/content/ContentContext.atom";
 
 export type TranslateRequestMessage = {
   type: 'gpt/translate',
   systemMessage: string,
-  content: string;
+  id?: string,
+  content: ContentContextState['selectedText'];
 };
 
 export type SimplyfyRequestMessage = {

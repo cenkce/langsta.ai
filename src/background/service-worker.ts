@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { ContentMessageEventEmitter } from "../domain/content/ContentMessageEventEmitter";
-import { GPTMessagesEventEmitter } from "../services/gpt-api/sendGPTRequest";
+import { GPTMessagesEventEmitter } from "../api/services/gpt-api/sendGPTRequest";
 import { translateHander } from "./services/translate";
 import { TaskStore } from "../api/task/TaskStore";
 import { createTranslateTextMessage } from "../domain/translation/TranslationService";

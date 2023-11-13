@@ -30,12 +30,12 @@ function useAtom<T = any>(
 function useAtom<T = any>(
   atom: Atom<T>,
   noStateUpdate: boolean = false,
-  equityCHeck?: (newState: T, state: T) => boolean
+  pipes?: (newState: T, state: T) => boolean
 ) {
   const [state, setState] = useState<T>(atom.getValue());
   const stateRef = useRef(state);
-  const equityCHeckRef = useRef(equityCHeck);
-  equityCHeckRef.current = equityCHeck
+  const equityCHeckRef = useRef(pipes);
+  equityCHeckRef.current = pipes
   stateRef.current = state;
 
   useEffect(() => {
