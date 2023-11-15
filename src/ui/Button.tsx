@@ -5,26 +5,53 @@ import { FlexRow } from "./FlexRow";
 import { LoadingIcon } from "./icons/LoadingIcon";
 
 type ButtonVariant =
-  | "neutral"
-  | "primary"
-  | "secondary"
-  | "accent"
+  | "circle"
+  | "outline"
+  | "square"
   | "ghost"
   | "link";
+
+type ButtonSize =
+  | "wide"
+  | "md"
+  | "sm"
+  | "lg"
+  | "xs";
+
+type ButtonColor =
+  | "info"
+  | "accent"
+  | "error"
+  | "success"
+  | "neutral"
+  | "primary"
+  | "warning"
+  | "secondary";
+ 
 export const Button = (
   props: PropsWithChildren<{
     onClick?: (e: MouseEvent) => void;
     variant?: ButtonVariant;
+    size?: ButtonSize;
     disabled?: boolean;
     loading?: boolean;
+    color?: ButtonColor;
+    className?: string;
   }>
 ) => {
   return (
     <button
       className={classNames(
+        props.className,
         `Button`,
         !!props.disabled || !!props.loading,
-        "Button_disabled"
+        "btn-disabled",
+        !!props.size,
+        `btn-${props.size}`,
+        !!props.variant,
+        `btn-${props.variant}`,
+        !!props.color,
+        `btn-${props.color}`,
       )}
       onClick={props.onClick}
     >

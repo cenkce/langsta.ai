@@ -16,6 +16,7 @@ export function updateStyle(id: string, content: string) {
     style = document.createElement('style');
     style.id = newId;
     style.setAttribute('type', 'text/css');
+    style?.setAttribute('data-vite-dev-id', id);
 
     style.innerHTML = content;
     if (window.location.href.includes('chrome-extension://')) {
@@ -31,6 +32,7 @@ export function updateStyle(id: string, content: string) {
       shadowEl?.appendChild(style);
     }
   } else {
+    style?.setAttribute('data-vite-dev-id', id);
     style.innerHTML = content;
   }
 }

@@ -24,7 +24,7 @@
   &-active--true {
     @apply tab-active;
     &::after {
-      @apply bg-primary-focus;
+      @apply bg-primary-content;
       height: 5px;
     }
   }

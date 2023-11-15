@@ -40,6 +40,28 @@ export const TranslationContentCard = (
             loading={props.loading}
             disabled={props.disabled}
             onClick={props.onTranslate}
+            size="xs"
+            // className="btn btn-xs btn-outline btn-error"
+            variant="outline"
+            color="error"
+          >
+            Simpler
+          </Button>
+          <Button
+            loading={props.loading}
+            disabled={props.disabled}
+            onClick={props.onTranslate}
+            size="xs"
+            variant="link"
+          >
+            Open Sidebar
+          </Button>
+          <Button
+            loading={props.loading}
+            disabled={props.disabled}
+            onClick={props.onTranslate}
+            size="xs"
+            variant="link"
           >
             Translate
           </Button>

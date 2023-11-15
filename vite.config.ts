@@ -6,7 +6,7 @@ import eslint from "vite-plugin-eslint";
 
 export const isDev = process.env.NODE_ENV !== 'production';
 
-const cssrefresher = () => ({ // from https://github.com/crxjs/chrome-extension-tools/discussions/239 
+export const cssrefresher = () => ({ // from https://github.com/crxjs/chrome-extension-tools/discussions/239 
   name: 'merge-css-shadow-dom',
   enforce: 'post',
   apply: 'serve',
@@ -31,12 +31,16 @@ const cssrefresher = () => ({ // from https://github.com/crxjs/chrome-extension-
 } as PluginOption);
 export default defineConfig({
   plugins: [
-    react({ include: ["**/*.tsx", "**/*.scss"] }),
-    cssrefresher(),
+    react({ include: ["**/*.tsx", "**/*.ts", "**/*.scss"] }),
     crx({ manifest: manifest as ManifestV3Export }),
     eslint(),
+    cssrefresher(),
     // this plugin removes base style tag.
   ],
+  build: {
+    rollupOptions: {
+    }
+  },
   css: {
     modules: {
       generateScopedName: "[name]__[local]--[hash:base64:5]",

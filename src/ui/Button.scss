@@ -1,10 +1,64 @@
 .Button {
-  @apply btn btn-primary font-mono text-xs btn-sm;
-  &-primary {
-    @apply btn-primary 
+  @apply btn font-mono;
+
+  &-square {
+    @apply btn-square;
+  }
+  &-circle {
+    @apply btn-circle;
+  }
+  &-wide {
+    @apply btn-wide;
+  }
+  &-xs {
+    @apply btn-xs;
+  }
+  &-sm {
+    @apply btn-sm;
+  }
+  &-md {
+    @apply btn-md;
+  }
+  &-lg {
+    @apply btn-lg;
   }
 
-  &_disabled {
-    @apply btn-disabled tab-disabled input-disabled;
+  &-outline {
+    @apply btn-outline;
+  }
+  &-link {
+    @apply btn-link hover:opacity-80 hover:no-underline;
+  }
+
+  &-active {
+    @apply btn-active;
+  }
+  &-disabled {
+    @apply btn-disabled;
+  }
+
+  &-primary {
+    @apply btn-primary; 
+  }
+  &-secondary {
+    @apply btn-secondary;
+  }
+  &-neutral {
+    @apply btn-neutral;
+  }
+  &-warning {
+    @apply btn-warning;
+  }
+  &-success {
+    @apply btn-success;
+  }
+  &-error {
+    @apply btn-error;
+  }
+  &-info {
+    @apply btn-info;
+  }
+  &-accent {
+    @apply btn-accent;
   }
 }
