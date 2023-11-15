@@ -4,6 +4,7 @@ import { GPTMessagesEventEmitter } from "../api/services/gpt-api/sendGPTRequest"
 import { translateHander } from "./services/translate";
 import { TaskStore } from "../api/task/TaskStore";
 import { createTranslateTextMessage } from "../domain/translation/TranslationService";
+import { openSidePanel } from "../api/helper/openSidePanel";
 
 export const openai = new OpenAI({
   apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
@@ -41,15 +42,17 @@ GPTMessagesEventEmitter.addListener(async (message) => {
 });
 
 ContentMessageEventEmitter.addListener(async (message, sender) => {
-  if (message.type === "define-selected-text") {
+  if (message.type === "open-side-panel") {
     try {
       // @ts-ignore
-      await chrome.sidePanel.open({ tabId: sender.tab?.id });
-      await chrome.sidePanel.setOptions({
-        tabId: sender.tab?.id,
-        path: "sidepanel.html",
-        enabled: true,
-      });
+      openSidePanel(sender.tab?.id);
+    } catch (error) {
+      console.error(error);
+    }
+  } else if (message.type === "define-selected-text") {
+    try {
+      // @ts-ignore
+      openSidePanel(sender.tab?.id);
     } catch (error) {
       console.error(error);
     }

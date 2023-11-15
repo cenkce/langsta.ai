@@ -9,6 +9,10 @@ export type DefineSelectedTextMessage = {
   type: 'define-selected-text'
 };
 
+export type OpenSidePanelMessage = {
+  type: 'open-side-panel'
+};
+
 export type DeleteTask = {
   type: 'backend/delete-task',
   payload: {
@@ -16,6 +20,6 @@ export type DeleteTask = {
   }
 };
 
-export type ContentContextMessages = ExtractTabContentMessage | DefineSelectedTextMessage | DeleteTask;
+export type ServiceWorkerContentMessages = ExtractTabContentMessage | DefineSelectedTextMessage | DeleteTask | OpenSidePanelMessage;
 
-export const ContentMessageDispatch = chrome.runtime.sendMessage<ContentContextMessages>;
+export const ServiceWorkerContentMessageDispatch = chrome.runtime.sendMessage<ServiceWorkerContentMessages>;

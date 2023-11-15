@@ -26,5 +26,4 @@ export const setSelectedText = (
   } catch (error) {
     console.error(error);
   }
-  
 };

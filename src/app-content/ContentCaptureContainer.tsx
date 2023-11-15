@@ -14,6 +14,7 @@ import {
 import { useGlobalMouseEventHandlerService } from "../api/utils/useGlobalMouseEventHandlerService";
 import { TabMessages } from "../api/messaging/sendMessagetoCurrentTab";
 import { useTranslateService } from "../domain/translation/TranslationService";
+import { ServiceWorkerContentMessageDispatch } from "../domain/content/messages";
 
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
@@ -102,14 +103,19 @@ export const ContentCaptureContainer = () => {
           return (
             <ContentMarkerBadge
               key={marker.id}
-              onTranslate={() => {
+              onAction={(data, action) => {
+                if(action === 'sidebar'){
+                  ServiceWorkerContentMessageDispatch({type: 'open-side-panel'});
+                  return;
+                }
                 const taskId = selection.selectedText && translate(selection.selectedText);
                 if(!taskId)
                   return;
                 const newMarkers = [...markers];
                 newMarkers[i] = {
-                  ...marker,
-                  taskId
+                  ...data,
+                  taskId,
+                  action
                 }
                 setMarkers(newMarkers);
               }}

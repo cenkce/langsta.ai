@@ -3,7 +3,7 @@ import {
   useUserContentState
 } from "../domain/content/ContentContext.atom";
 import { TranslationTextTask } from "../api/task/TranslationTextTask";
-import { ContentMessageDispatch } from "../domain/content/messages";
+import { ServiceWorkerContentMessageDispatch } from "../domain/content/messages";
 import { FlexRow } from "../ui/FlexRow";
 import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
@@ -21,7 +21,7 @@ export const Translations = () => {
           key={task.taskId}
           onDelete={(id) => {
             deleteTranslation(id);
-            ContentMessageDispatch({
+            ServiceWorkerContentMessageDispatch({
               type: "backend/delete-task",
               payload: {
                 task: id,

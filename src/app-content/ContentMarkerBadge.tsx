@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { TranslationContentCard } from "./TranslationContentCard";
+import { TranslationContentActions, TranslationContentCard } from "./TranslationContentCard";
 import { ImageIcon } from "../ui/icons/ImageIcon";
 import { useSubscribeTranslationTask } from "../domain/content/ContentContext.atom";
 
@@ -12,18 +12,20 @@ export type ContentMarkerBadgeType = {
   clicked: boolean;
   text: string;
   taskId?: string;
+  action?: TranslationContentActions
 };
 type ContentMarkerBadgeProps = ContentMarkerBadgeType & {
   onClose?: (marker: ContentMarkerBadgeType) => void;
   onClick?: (marker: ContentMarkerBadgeType) => void;
-  onTranslate?: (marker: ContentMarkerBadgeType) => void;
+  onAction?: (marker: ContentMarkerBadgeType, action: TranslationContentActions) => void;
 };
 
 export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
   const markerRef = useRef<HTMLDivElement | null>(null);
-  const { onClose, ...badgeData } = props;
+  const { onClose, onClick, onAction, ...badgeData } = props;
   const task = useSubscribeTranslationTask(props.taskId);
   const loading = task?.status === "progress";
+  console.log()
   useEffect(() => {
     if (markerRef.current) {
       const handler = () => {
@@ -62,9 +64,11 @@ export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
     >
       {props.clicked ? (
         <TranslationContentCard
-          onTranslate={() => props.onTranslate?.(badgeData)}
+          onAction={(action) => onAction?.(badgeData, action)}
           onClose={() => onClose?.(badgeData)}
           loading={loading}
+          action={props.action}
+          disabled={loading}
         >
           <pre style={{ whiteSpace: "break-spaces" }}>
             {task?.result || props.text}
@@ -74,8 +78,9 @@ export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
         <ImageIcon
           onClick={(e) => {
             e.stopPropagation();
-            props.onClick?.(badgeData);
+            onClick?.(badgeData);
           }}
+          className="TranslationContentCard_badge"
           iconUrl="logo.png"
         />
       )}

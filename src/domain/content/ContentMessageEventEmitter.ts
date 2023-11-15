@@ -2,8 +2,8 @@ import {
   ExtensionEventEmitter,
   MessageEvent,
 } from "../../api/core/MessageEvent";
-import { ContentContextMessages } from "./messages";
+import { ServiceWorkerContentMessages } from "./messages";
 
 export const ContentMessageEventEmitter = new ExtensionEventEmitter<
-  MessageEvent<ContentContextMessages>
+  MessageEvent<ServiceWorkerContentMessages>
 >(chrome.runtime.onMessage);

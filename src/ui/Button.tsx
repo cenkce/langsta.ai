@@ -49,10 +49,11 @@ export const Button = (
         !!props.size,
         `btn-${props.size}`,
         !!props.variant,
-        `btn-${props.variant}`,
+        `btn-${props.variant} Button-${props.variant}`,
         !!props.color,
         `btn-${props.color}`,
       )}
+      disabled={props.disabled}
       onClick={props.onClick}
     >
       <FlexRow>
