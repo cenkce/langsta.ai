@@ -43,13 +43,13 @@ export const Button = (
     <button
       className={classNames(
         props.className,
-        `Button`,
+        `Button btn`,
         !!props.disabled || !!props.loading,
         "btn-disabled",
         !!props.size,
-        `btn-${props.size}`,
+        `size-${props.size}`,
         !!props.variant,
-        `btn-${props.variant} Button-${props.variant}`,
+        `btn-${props.variant}`,
         !!props.color,
         `btn-${props.color}`,
       )}

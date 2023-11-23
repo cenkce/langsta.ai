@@ -26,6 +26,11 @@ export const ContentApp = () => {
   return (
     <ShadowDom parentElement={parentElement} mode={__DEV__ ? 'open' : 'closed'}>
       <style>
+      {`
+      :host {
+        font-size: 20px !important;
+      }
+      `}
         {Object.values(styles).join('\n\n')}
       </style>
       <ContentCaptureContainer  />

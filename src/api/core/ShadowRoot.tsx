@@ -16,6 +16,7 @@ export function ShadowDom({
   const [shadowHost] = useState(() =>
     document.createElement("extension-app-shadow-host")
   );
+  shadowHost.id = "extension-app-shadow-host";
 
   const [shadowRoot] = useState(() =>
     shadowHost.attachShadow({ mode })

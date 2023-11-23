@@ -25,7 +25,7 @@ export const ContentMarkerBadge = (props: ContentMarkerBadgeProps) => {
   const { onClose, onClick, onAction, ...badgeData } = props;
   const task = useSubscribeTranslationTask(props.taskId);
   const loading = task?.status === "progress";
-  console.log()
+  
   useEffect(() => {
     if (markerRef.current) {
       const handler = () => {

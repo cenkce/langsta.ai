@@ -1,50 +1,64 @@
 import {
   deleteTranslation,
-  useUserContentState
+  useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { TranslationTextTask } from "../api/task/TranslationTextTask";
-import { ServiceWorkerContentMessageDispatch } from "../domain/content/messages";
+import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 import { FlexRow } from "../ui/FlexRow";
 import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
 import styles from "./SidepanelApp.module.scss";
+import { Button } from "../ui/Button";
+import { currentTabMessageDispatch } from "../domain/content/currentTabMessageDispatch";
 
 export const Translations = () => {
   const [userContent] = useUserContentState();
   const tasks = Object.values(userContent?.translation || {});
-  console.log(userContent);
   return tasks
     .sort((a, b) => b.createdAt - a.createdAt)
     .map((task) => {
       return (
         <TranslationRow
           key={task.taskId}
+          onShowSelection={(task) =>{
+            console.log(task);
+            currentTabMessageDispatch({
+              type: 'select-content',
+              task: task
+            })
+          }}
           onDelete={(id) => {
             deleteTranslation(id);
-            ServiceWorkerContentMessageDispatch({
+            serviceWorkerContentMessageDispatch({
               type: "backend/delete-task",
               payload: {
                 task: id,
               },
             });
           }}
-          task={task} />
+          task={task}
+        />
       );
     });
 };
 const TranslationRow = ({
-  task, onDelete,
+  task,
+  onDelete,
+  onShowSelection
 }: {
   onDelete: (taskId: string) => void;
+  onShowSelection: (taskId: TranslationTextTask) => void;
   task: TranslationTextTask;
 }) => {
-
   return (
-    <div className={`${styles.translationItem} collapse collapse-arrow bg-base-200 `} style={{ fontSize: "12px" }}>
+    <div
+      className={`${styles.translationItem} collapse collapse-arrow bg-base-200 `}
+      style={{ fontSize: "12px" }}
+    >
       <input type="radio" name={"sidebar-translations"} />
       <div className={styles.title}>
         <pre style={{ whiteSpace: "break-spaces" }}>
-          {task?.selectedText.trim().replaceAll("\n", "\n\n")}
+          {task?.selection?.text.trim().replaceAll("\n", "\n\n")}
         </pre>
       </div>
       <div className="collapse-content">
@@ -60,8 +74,16 @@ const TranslationRow = ({
         )}
       </div>
       <FlexRow className="place-content-between">
-        <TrashIcon onClick={() => onDelete(task.taskId || "")}></TrashIcon>
-        <div>{new Date(task.createdAt).toLocaleString()}</div>
+        <TrashIcon
+          className="btn btn-circle btn-xs text-error p-1 box-content scale-75"
+          onClick={() => onDelete(task.taskId || "")}
+        ></TrashIcon>
+        <Button onClick={() => onShowSelection(task)} size="xs" variant="ghost" color="primary">
+          Show Selection
+        </Button>
+        <div className="btn-primary">
+          {new Date(task.createdAt).toLocaleString()}
+        </div>
       </FlexRow>
     </div>
   );

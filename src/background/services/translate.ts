@@ -61,17 +61,18 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
 
 export async function translateHander(message: TranslateRequestMessage) {
   const { id, ...messageBody } = message;
+  console.log(message)
   const taskAtom = TaskStore.createTaskAtom(
     () => from(translate({userMessage: messageBody.content.text, systemMessage: messageBody.systemMessage})),
     {
       tags: ["translate-service", "background-task"],
-      selection: clone(message)
+      selection: clone(messageBody.content.selectors)
     },
     id
   );
 
   await upsertTranslationTask({
-    selectedText: message.content.text,
+    selection: message.content,
     status: "progress",
     taskId: taskAtom.id,
     createdAt: taskAtom.createdAt,
@@ -81,7 +82,7 @@ export async function translateHander(message: TranslateRequestMessage) {
     next(result) {
       result &&
         upsertTranslationTask({
-          selectedText: message.content.text,
+          selection: message.content,
           status: "completed",
           taskId: taskAtom.id,
           result: result,
@@ -91,7 +92,7 @@ export async function translateHander(message: TranslateRequestMessage) {
     error(err) {
       console.error(err);
       upsertTranslationTask({
-        selectedText: message.content.text,
+        selection: message.content,
         status: "error",
         taskId: taskAtom.id,
         error: err,

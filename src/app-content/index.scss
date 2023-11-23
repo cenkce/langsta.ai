@@ -3,6 +3,120 @@
 @tailwind utilities;
 @tailwind variants;
 
+@function remToPx($rm) {
+  @return calc(#{$rm} * var(--ui-root-font-size));
+}
+:host {
+  --ui-root-font-size: 14px;
+}
+
+.size-xs {
+  height: remToPx(1.5);
+  min-height: remToPx(1.5);
+  padding-left: remToPx(0.5);
+  padding-right: remToPx(0.5);
+  font-size: remToPx(0.75);
+}
+
+.btn-square:where(.size-xs) {
+  height: remToPx(1.5);
+  width: remToPx(1.5);
+  padding: 0px;
+}
+
+.btn-circle:where(.size-xs) {
+  height: remToPx(1.5);
+  width: remToPx(1.5);
+  border-radius: 9999px;
+  padding: 0px;
+}
+
+.size-sm {
+  height: remToPx(2);
+  min-height: remToPx(2);
+  padding-left: remToPx(0.75);
+  padding-right: remToPx(0.75);
+  font-size: remToPx(0.875);
+}
+
+.btn-square:where(.size-sm) {
+  height: remToPx(2);
+  width: remToPx(2);
+  padding: 0px;
+}
+
+.btn-circle:where(.size-sm) {
+  height: remToPx(2);
+  width: remToPx(2);
+  border-radius: 9999px;
+  padding: 0px;
+}
+
+.size-md {
+  height: remToPx(3);
+  min-height: remToPx(3);
+  padding-left: remToPx(1);
+  padding-right: remToPx(1);
+  font-size: remToPx(0.875);
+}
+
+.btn-square:where(.size-md) {
+  height: remToPx(3);
+  width: remToPx(3);
+  padding: 0px;
+}
+
+.btn-circle:where(.size-md) {
+  height: remToPx(3);
+  width: remToPx(3);
+  border-radius: 9999px;
+  padding: 0px;
+}
+
+.size-lg {
+  height: remToPx(4);
+  min-height: remToPx(4);
+  padding-left: remToPx(1.5);
+  padding-right: remToPx(1.5);
+  font-size: remToPx(1.125);
+}
+
+.btn-square:where(.size-lg) {
+  height: remToPx(4);
+  width: remToPx(4);
+  padding: 0px;
+}
+
+.btn-circle:where(.size-lg) {
+  height: remToPx(4);
+  width: remToPx(4);
+  border-radius: 9999px;
+  padding: 0px;
+}
+
+.size-wide {
+  width: remToPx(16);
+}
+.size-xl {
+  height: remToPx(4.5);
+  min-height: remToPx(4.5);
+  padding-left: remToPx(1.75);
+  padding-right: remToPx(1.75);
+  font-size: remToPx(1.225);
+}
+
+.btn-square:where(.size-lg) {
+  height: remToPx(4.5);
+  width: remToPx(4.5);
+  padding: 0px;
+}
+
+.btn-circle:where(.size-lg) {
+  height: remToPx(4.5);
+  width: remToPx(4.5);
+  border-radius: 9999px;
+  padding: 0px;
+}
 
 .ContentMarkerBadge {
   position: absolute;
@@ -15,4 +129,8 @@
     height: 28px;
     border-radius: 15%;
   }
+}
+
+:host {
+  @apply text-[14px]
 }

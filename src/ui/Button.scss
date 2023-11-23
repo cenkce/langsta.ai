@@ -1,5 +1,5 @@
 .Button {
-  @apply btn font-mono;
+  @apply font-mono;
 
   &-square {
     @apply btn-square;
@@ -27,7 +27,8 @@
     @apply btn-outline;
   }
   &-link {
-    @apply hover:opacity-80 hover:no-underline;
+    @apply hover:opacity-80 hover:no-underline border-none;
+    outline: none !important;
   }
 
   &-active {

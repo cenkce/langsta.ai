@@ -1,8 +1,9 @@
-import { TaskStatus } from "./TaskStore";
+import type { TranslateRequestMessage } from "../services/gpt-api/messages";
+import type { TaskStatus } from "./TaskStore";
 
 
 export type TranslationTextTask = {
-  selectedText: string;
+  selection: TranslateRequestMessage['content'];
   taskId?: string;
   result?: string;
   error?: string;

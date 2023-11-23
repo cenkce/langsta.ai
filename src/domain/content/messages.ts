@@ -22,4 +22,4 @@ export type DeleteTask = {
 
 export type ServiceWorkerContentMessages = ExtractTabContentMessage | DefineSelectedTextMessage | DeleteTask | OpenSidePanelMessage;
 
-export const ServiceWorkerContentMessageDispatch = chrome.runtime.sendMessage<ServiceWorkerContentMessages>;
+export const serviceWorkerContentMessageDispatch = chrome.runtime.sendMessage<ServiceWorkerContentMessages>;

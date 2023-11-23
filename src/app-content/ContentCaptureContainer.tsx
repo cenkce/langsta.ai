@@ -12,9 +12,10 @@ import {
   getSelectedTextSelectors,
 } from "../domain/utils/getSelectedText";
 import { useGlobalMouseEventHandlerService } from "../api/utils/useGlobalMouseEventHandlerService";
-import { TabMessages } from "../api/messaging/sendMessagetoCurrentTab";
+import { TabMessages } from "../domain/content/currentTabMessageDispatch";
 import { useTranslateService } from "../domain/translation/TranslationService";
-import { ServiceWorkerContentMessageDispatch } from "../domain/content/messages";
+import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
+import { createContentSelection } from "../domain/utils/createContentSelection";
 
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
@@ -73,26 +74,65 @@ export const ContentCaptureContainer = () => {
   });
 
   useEffect(() => {
+    const scrollToTarget = (element: HTMLElement) => {
+      if (!element) {
+        throw new Error('Traget element not found');
+        return undefined;
+      }
+
+      element.scrollIntoView({inline: 'center'});
+    };
     const messageHandler = (message: TabMessages) => {
       if (message.type === "select-content") {
-        setMarkers((markers) => {
-          return [
-            ...markers,
-            {
-              text: message.task.result || message.task.selectedText,
-              taskId: message.task.taskId,
-              id: Date.now().toString(),
-              left: 0,
-              top: 0,
-              visible: true,
-              loading: false,
-              clicked: false,
-            },
-          ];
-        });
+        if (message.task.selection.selectors) {
+          try {
+            const [anchorElement] = createContentSelection(
+              message.task.selection.selectors
+            );
+            scrollToTarget(anchorElement);
+
+            setMarkers(() => {
+              return [
+                {
+                  // TODO: Only get taskid from message and find the task in content app and use it instead.
+                  text: message.task.result || message.task.selection.text,
+                  taskId: message.task.taskId,
+                  id: message.task.taskId || Date.now().toString(),
+                  left: 0,
+                  top: 0,
+                  visible: true,
+                  loading: false,
+                  clicked: false,
+                },
+              ];
+            });
+          } catch (error) {
+            console.error(error);
+          }
+        } else
+          setMarkers((markers) => {
+            return [
+              ...markers,
+              {
+                // TODO: Only get taskid from message and find the task in content app and use it instead.
+                text: message.task.result || message.task.selection.text,
+                taskId: message.task.taskId,
+                id: message.task.taskId || Date.now().toString(),
+                left: 0,
+                top: 0,
+                visible: true,
+                loading: false,
+                clicked: false,
+              },
+            ];
+          });
       }
     };
     chrome.runtime.onMessage.addListener(messageHandler);
+
+    return () => {
+      chrome.runtime.onMessage.removeListener(messageHandler);
+    }
   }, []);
 
   return (
@@ -104,19 +144,21 @@ export const ContentCaptureContainer = () => {
             <ContentMarkerBadge
               key={marker.id}
               onAction={(data, action) => {
-                if(action === 'sidebar'){
-                  ServiceWorkerContentMessageDispatch({type: 'open-side-panel'});
+                if (action === "sidebar") {
+                  serviceWorkerContentMessageDispatch({
+                    type: "open-side-panel",
+                  });
                   return;
                 }
-                const taskId = selection.selectedText && translate(selection.selectedText);
-                if(!taskId)
-                  return;
+                const taskId =
+                  selection.selectedText && translate(selection.selectedText);
+                if (!taskId) return;
                 const newMarkers = [...markers];
                 newMarkers[i] = {
                   ...data,
                   taskId,
-                  action
-                }
+                  action,
+                };
                 setMarkers(newMarkers);
               }}
               {...marker}

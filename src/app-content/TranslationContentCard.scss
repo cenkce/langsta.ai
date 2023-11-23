@@ -1,7 +1,7 @@
 .TranslationContentCard {
   &_container {
-    @apply card bg-base-100 drop-shadow-2xl overflow-hidden max-h-80 p-6;
-    width: 35rem;
+    @apply card bg-base-100 drop-shadow-2xl overflow-hidden max-h-72 p-6 max-w-xl;
+    min-width: 20em;
   }
 
   &_body {
