@@ -16,6 +16,7 @@ import { TabMessages } from "../domain/content/currentTabMessageDispatch";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 import { createContentSelection } from "../domain/utils/createContentSelection";
+import { clearUtmFromUrl } from "../api/utils/clearUtmInUrl";
 
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
@@ -45,6 +46,7 @@ export const ContentCaptureContainer = () => {
           selectedText: {
             text: selectedText,
             selectors: getSelectedTextSelectors(),
+            siteName: clearUtmFromUrl(window.location.href)
           },
         }));
         setMarkers((markers) => [
@@ -77,7 +79,6 @@ export const ContentCaptureContainer = () => {
     const scrollToTarget = (element: HTMLElement) => {
       if (!element) {
         throw new Error('Traget element not found');
-        return undefined;
       }
 
       element.scrollIntoView({inline: 'center'});

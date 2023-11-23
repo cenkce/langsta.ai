@@ -9,12 +9,18 @@ import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
 import styles from "./SidepanelApp.module.scss";
 import { Button } from "../ui/Button";
-import { currentTabMessageDispatch } from "../domain/content/currentTabMessageDispatch";
+import { currentTabMessageDispatch, useCurrentTabData } from "../domain/content/currentTabMessageDispatch";
 
 export const Translations = () => {
   const [userContent] = useUserContentState();
+  const tabData = useCurrentTabData();
   const tasks = Object.values(userContent?.translation || {});
+
   return tasks
+    .filter((task) => {
+      const url = new URL(tabData.current?.url || '');
+      return (task.selection.siteName?.indexOf(url.host) || -1) > -1
+    })
     .sort((a, b) => b.createdAt - a.createdAt)
     .map((task) => {
       return (

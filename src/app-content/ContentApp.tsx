@@ -6,7 +6,7 @@ import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { useAtom } from "../api/core/useAtom";
 import { useMemo } from "react";
 import { ShadowDom } from "../api/core/ShadowRoot";
-import { ContentCaptureContainer } from "./ContentCaptureContainer";
+import { ContentCaptureContainer } from "./SelectionHandlingContainer";
 import { StyleContextAtom } from "./styles";
 
 export const ContentApp = () => {
