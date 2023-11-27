@@ -9,29 +9,26 @@ import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
 import styles from "./SidepanelApp.module.scss";
 import { Button } from "../ui/Button";
-import { currentTabMessageDispatch, useCurrentTabData } from "../domain/content/currentTabMessageDispatch";
+import { currentTabMessageDispatch } from "../domain/content/currentTabMessageDispatch";
 
-export const Translations = () => {
+export const Translations = (props: {
+  onFilter?: (translation: TranslationTextTask) => boolean;
+}) => {
   const [userContent] = useUserContentState();
-  const tabData = useCurrentTabData();
   const tasks = Object.values(userContent?.translation || {});
 
-  return tasks
-    .filter((task) => {
-      const url = new URL(tabData.current?.url || '');
-      return (task.selection.siteName?.indexOf(url.host) || -1) > -1
-    })
+  return (props.onFilter ? tasks.filter(props.onFilter) : tasks)
     .sort((a, b) => b.createdAt - a.createdAt)
     .map((task) => {
       return (
         <TranslationRow
           key={task.taskId}
-          onShowSelection={(task) =>{
+          onShowSelection={(task) => {
             console.log(task);
             currentTabMessageDispatch({
-              type: 'select-content',
-              task: task
-            })
+              type: "select-content",
+              task: task,
+            });
           }}
           onDelete={(id) => {
             deleteTranslation(id);
@@ -50,7 +47,7 @@ export const Translations = () => {
 const TranslationRow = ({
   task,
   onDelete,
-  onShowSelection
+  onShowSelection,
 }: {
   onDelete: (taskId: string) => void;
   onShowSelection: (taskId: TranslationTextTask) => void;
@@ -64,7 +61,7 @@ const TranslationRow = ({
       <input type="radio" name={"sidebar-translations"} />
       <div className={styles.title}>
         <pre style={{ whiteSpace: "break-spaces" }}>
-          {task?.selection?.text.trim().replaceAll("\n", "\n\n")}
+          {task?.selection?.text.trim().replaceAll("\n", "\r\n")}
         </pre>
       </div>
       <div className="collapse-content">
@@ -75,7 +72,7 @@ const TranslationRow = ({
           </FlexRow>
         ) : (
           <pre className={`${styles.content} text-neutral-600`}>
-            {task.result?.trim().replaceAll("\n", "\n\n")}
+            {task.result?.trim().replaceAll("\n", "\r\n")}
           </pre>
         )}
       </div>
@@ -83,8 +80,13 @@ const TranslationRow = ({
         <TrashIcon
           className="btn btn-circle btn-xs text-error p-1 box-content scale-75"
           onClick={() => onDelete(task.taskId || "")}
-        ></TrashIcon>
-        <Button onClick={() => onShowSelection(task)} size="xs" variant="ghost" color="primary">
+        />
+        <Button
+          onClick={() => onShowSelection(task)}
+          size="xs"
+          variant="ghost"
+          color="primary"
+        >
           Show Selection
         </Button>
         <div className="btn-primary">

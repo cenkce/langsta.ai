@@ -16,7 +16,7 @@ import { TabMessages } from "../domain/content/currentTabMessageDispatch";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 import { createContentSelection } from "../domain/utils/createContentSelection";
-import { clearUtmFromUrl } from "../api/utils/clearUtmInUrl";
+import { sanitizeUrl } from "../api/utils/clearUtmInUrl";
 
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
@@ -46,7 +46,7 @@ export const ContentCaptureContainer = () => {
           selectedText: {
             text: selectedText,
             selectors: getSelectedTextSelectors(),
-            siteName: clearUtmFromUrl(window.location.href)
+            siteName: sanitizeUrl(window.location.href)
           },
         }));
         setMarkers((markers) => [

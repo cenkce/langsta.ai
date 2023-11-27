@@ -31,7 +31,7 @@ export const ContentApp = () => {
         font-size: 20px !important;
       }
       `}
-        {Object.values(styles).join('\n\n')}
+        {Object.values(styles).join('\r\n')}
       </style>
       <ContentCaptureContainer  />
     </ShadowDom>

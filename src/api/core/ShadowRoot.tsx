@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 // based from : https://medium.com/outreach-prague/develop-chrome-extensions-using-react-typescript-and-shadow-dom-1e112935a735
 export function ShadowDom({
   parentElement,
-  position = "beforebegin",
   mode = "open",
   children,
 }: {
@@ -29,7 +28,7 @@ export function ShadowDom({
     return () => {
       shadowHost.remove();
     };
-  }, [parentElement, shadowHost, position]);
+  }, [parentElement, shadowHost]);
 
   return ReactDOM.createPortal(children, shadowRoot);
 }

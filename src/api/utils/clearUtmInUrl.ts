@@ -1,17 +1,37 @@
-function isNotUtm(param: string) { return param.slice(0, 4) !== 'utm_'; }
+function isUtm(param: string) {
+  return param.slice(0, 4) === "utm_";
+}
 
-export const clearUtmFromUrl = (urlstr?: string) => {
-  if(!urlstr){
-    throw 'Empty url string provided';
-  }
-  const url = new URL(urlstr);
-  const params = url.search.slice(1).split('&');
-  const newParams = params.filter(isNotUtm);
-  if (newParams.length < params.length) {
-    const search = newParams.length ? '?' + newParams.join('&') : '';
-    const sanitizedUrl = url.pathname + search + location.hash;
-    return sanitizedUrl;
+export const clearUtmFromUrl = (url?: URL) => {
+  if (!url) {
+    throw "Empty url string provided";
   }
 
-  return urlstr;
+  url.searchParams?.forEach(
+    (_, key) => isUtm(key) && url.searchParams.delete(key)
+  );
+
+  return url;
+};
+
+export const clearHashFromUrl = (url?: URL) => {
+  if (!url) {
+    throw "Empty url string provided";
+  }
+  url.hash = "";
+
+  url.searchParams?.forEach(
+    (_, key) => isUtm(key) && url.searchParams.delete(key)
+  );
+
+  return url;
+};
+
+export function sanitizeUrl(url: string): string {
+  const urlins = new URL(url)
+
+  clearUtmFromUrl(urlins);
+  clearHashFromUrl(urlins);
+
+  return urlins.toString();
 }
