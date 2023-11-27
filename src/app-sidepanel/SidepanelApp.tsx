@@ -19,12 +19,13 @@ export const SidepanelApp = () => {
 
   return (
     <ArtBoard
-      title="Langsta"
-      subtitle="Self-taught Language Asistant"
+      title="Translations"
+      subtitle="Displaying translations all or by domain, or page url"
       theme="cupcake"
     >
       <div className={styles.container}>
         <TabContainer
+          className={"p-0 #important"}
           content={[
             {
               id: "1",
@@ -60,7 +61,6 @@ const PageTranslations = () => {
   return (
     <Translations
       onFilter={(task) => {
-        console.log(task.selection.siteName, tabUrl)
         return !!tabData.current?.url && !!task.selection.siteName && task.selection.siteName === tabUrl;
       }}
     />

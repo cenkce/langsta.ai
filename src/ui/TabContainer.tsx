@@ -1,5 +1,6 @@
 import { ComponentType, useState } from "react";
 import styles from "./TabContainer.module.scss";
+import { classNames } from "../api/utils/classNames";
 
 type TabContent<P extends Record<string, unknown> = Record<string, unknown>> = {
   id: string;
@@ -9,7 +10,7 @@ type TabContent<P extends Record<string, unknown> = Record<string, unknown>> = {
   props?: P;
 };
 
-type TabContainerProps = { content: TabContent[] };
+type TabContainerProps = { content: TabContent[]; className?: string; };
 export const TabContainer = (props: TabContainerProps) => {
   const [selectedTabId, setSelecteTabId] = useState(props.content[0].id);
   const selectedTab = props.content.find((tab) => tab.id === selectedTabId);
@@ -32,7 +33,7 @@ export const TabContainer = (props: TabContainerProps) => {
           );
         })}
       </div>
-      <div className="p-5 min-h-full">
+      <div className={classNames("p-5 min-h-full", props.className)}>
         {TabContent ? (
           <TabContent header={selectedTab.title} {...selectedTab.props} />
         ) : null}

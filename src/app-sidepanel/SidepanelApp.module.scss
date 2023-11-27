@@ -1,13 +1,26 @@
 .translationItem {
+  > :global.collapse:not(:is(:global(.collapse-open))) {
+    :local(.content) {
+      display: none;
+    }
+    :local(.title) {
+      overflow: hidden;
+    }
+    max-height: 140px;
+    :global(.collapse-content) {
+      overflow: hidden;
+    }
+  }
   @apply p-3 
     border-solid 
     border-b-current 
-    border-b-2;
+    border-b-[0.25px];
 
   svg {
     @apply stroke-current;
   }
 }
+
 .title {
   @apply collapse-title;
   pre {
@@ -17,7 +30,7 @@
 }
 
 .container {
-  @apply flex flex-col flex-wrap w-full overflow-x-auto;
+  @apply flex flex-col flex-wrap w-full overflow-x-auto min-h-full;
 }
 
 .content {
