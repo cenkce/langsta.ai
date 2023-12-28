@@ -1,7 +1,7 @@
 import "./index.scss";
 import "./TranslationContentCard.scss";
 
-import { Atom, StoreSubject } from "../api/core/StoreSubject";
+import { Atom, StoreSubject } from "@streamium/atom";
 
 export const StyleContextAtom = Atom.of(
   { key: "styleContextAtom" },

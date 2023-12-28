@@ -3,7 +3,7 @@ import {
   ContentStorage,
 } from "../domain/content/ContentContext.atom";
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
-import { useAtom } from "../api/core/useAtom";
+import { useAtom } from "@streamium/atom";
 import { useMemo } from "react";
 import { ShadowDom } from "../api/core/ShadowRoot";
 import { ContentCaptureContainer } from "./SelectionHandlingContainer";

@@ -8,7 +8,8 @@
   },
   "type": "module",
   "scripts": {
-    "app:dev": "pnpm --filter chrome-extension dev"
+    "app:dev": "pnpm --filter chrome-extension dev",
+    "atom": "pnpm --filter streamium-atom"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
