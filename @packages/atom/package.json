@@ -1,11 +1,12 @@
 {
-  "name": "@streamium/atom",
+  "name": "@helsinki/atom",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "main": "dist/main.js",
   "devDependencies": {

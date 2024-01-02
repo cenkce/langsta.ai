@@ -1,9 +1,9 @@
 import { LevelsIcon, IconLevelMid, IconLevelHigh } from "../ui/LevelsIcon";
 import { TabContainer } from "../ui/TabContainer";
-import { useAtom } from "@streamium/atom";
 import { SettingsAtom } from "../domain/user/SettingsModel";
 import { TargetLanguageLevel } from "../domain/student/TargetLanguageLevel";
 import { ApiSettingsForm } from "./ApiSettingsForm";
+import { useAtom } from "@helsinki/atom";
 
 export const solutions = [
   {

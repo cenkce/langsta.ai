@@ -9,8 +9,8 @@ import {
   share,
   takeUntil,
 } from "rxjs";
-import { StoreSubject } from "../core/StoreSubject";
 import { nanoid } from "nanoid";
+import { StoreSubject } from "@helsinki/atom";
 
 export type Task<
   R = unknown, //Response

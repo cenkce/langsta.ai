@@ -1,4 +1,4 @@
-import { useAtom } from "../@streamium/atom";
+import { useAtom } from "../@helsinki/atom";
 import { Atom, StoreSubject } from "../../api/core/StoreSubject";
 import { LocalStorage } from "../../api/storage/LocalStorage";
 import { TextSelector } from "../utils/getSelectedText";

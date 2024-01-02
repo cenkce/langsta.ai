@@ -11,14 +11,16 @@ type AtomParams<T extends string = string> = {
 };
 
 export class Atom<
-  T = any,
-  P extends string = string,
-  M = T extends Record<string, any> ? keyof T : undefined,
-  A extends Record<P, T> = Record<P, T>
+  TState = any,
+  TName extends string = string,
+  _InternalM extends keyof TState | undefined = TState extends Record<string, any>
+    ? keyof TState
+    : undefined,
+  _InternalA extends Record<TName, TState> = Record<TName, TState>,
 > {
   static of<S = any, K extends string = string>(
     params: AtomParams<K>,
-    store: StoreSubject<Record<K, S>>
+    store: StoreSubject<Record<K, S>>,
   ) {
     return new Atom<S, K>(params, store);
   }
@@ -26,32 +28,34 @@ export class Atom<
    * Use Atom.of() instead
    */
   protected constructor(
-    private params: AtomParams<P>,
-    private store: StoreSubject<A>
+    private params: AtomParams<TName>,
+    private store: StoreSubject<_InternalA>,
   ) {}
 
-  private _getValue(state: Record<P, T>, key?: M) {
-    // @ts-expect-error workaround error
-    return key ? state[this.params.key][key] : state[this.params.key];
+  private _getValue(state: Record<TName, TState>, key?: _InternalM) {
+    if (key) {
+      return state[this.params.key][key];
+    } else return state[this.params.key];
   }
 
-  getValue(key?: M) {
+  getValue(key?: _InternalM) {
     return this._getValue(this.store.getValue(), key);
   }
 
-  get$<Y extends M>(
-    key?: Y
+  get$<Y extends _InternalM>(
+    key?: Y,
   ): Observable<
-    T extends Record<string, any> ? (Y extends string ? T[Y] : T) : T
+    TState extends Record<string, any> ? (Y extends string ? TState[Y] : TState) : TState
   > {
     return this.store.pipe(
       map((state) => this._getValue(state, key)),
+      // @ts-ignore
       distinctUntilChanged(),
-      share()
+      share(),
     );
   }
 
-  set$(value: Partial<T>) {
+  set$(value: Partial<TState>) {
     const state = this.store.getValue();
     const prevValue = state[this.params.key];
     const update = (
@@ -60,11 +64,11 @@ export class Atom<
           ? [...value]
           : { ...prevValue, ...value }
         : value
-    ) as T;
+    ) as TState;
 
     this.store.next({
       [this.params.key]: update,
-    } as A);
+    } as _InternalA);
 
     return this.store.asObservable();
   }
@@ -75,6 +79,9 @@ export class Atom<
 }
 
 export class StoreSubject<T> extends BehaviorSubject<T> {
+  static of<T = unknown>(initialData: T) {
+    return new StoreSubject<T>(initialData);
+  }
   next(value: T): void {
     if (!this._internalOnVerifyChange) super.next(value);
     else if (this._internalOnVerifyChange(this.value, value)) super.next(value);
@@ -82,7 +89,3 @@ export class StoreSubject<T> extends BehaviorSubject<T> {
 
   _internalOnVerifyChange?: (prevState: T, newState: T) => boolean;
 }
-
-export const createStore = <T = any>(initialData: T) => {
-  return new StoreSubject<T>(initialData);
-};

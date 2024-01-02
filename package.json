@@ -9,7 +9,8 @@
   "type": "module",
   "scripts": {
     "app:dev": "pnpm --filter chrome-extension dev",
-    "atom": "pnpm --filter streamium-atom"
+    "atom": "pnpm --filter @helsinki/atom",
+    "test": "vitest"
   },
   "devDependencies": {
     "eslint": "^8.45.0",
@@ -20,7 +21,8 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0"
+    "lint-staged": "^15.2.0",
+    "vitest": "1.1.1"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [

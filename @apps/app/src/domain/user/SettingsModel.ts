@@ -1,6 +1,6 @@
-import { Atom, StoreSubject } from "../../api/core/StoreSubject";
 import { LocalStorage } from "../../api/storage/LocalStorage";
 import { TargetLanguageLevel } from "../student/TargetLanguageLevel";
+import { StoreSubject, Atom} from "@helsinki/atom";
 
 export const SettingsAtom = Atom.of(
   { key: "settings" },
