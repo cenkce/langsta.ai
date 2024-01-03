@@ -172,12 +172,33 @@ importers:
       typescript:
         specifier: 5.2.2
         version: 5.2.2
-      vite:
-        specifier: ^5.0.10
-        version: 5.0.10(@types/node@20.8.10)(sass@1.69.5)
       vitest:
         specifier: ^1.1.0
         version: 1.1.0(@types/node@20.8.10)(sass@1.69.5)
+
+  '@packages/utilities':
+    devDependencies:
+      '@testing-library/react':
+        specifier: ^14.1.2
+        version: 14.1.2(react-dom@18.2.0)(react@18.2.0)
+      '@types/react':
+        specifier: ^18.2.23
+        version: 18.2.45
+      '@types/react-dom':
+        specifier: ^18.2.8
+        version: 18.2.18
+      react:
+        specifier: ^18.2.0
+        version: 18.2.0
+      react-dom:
+        specifier: 18.2.0
+        version: 18.2.0(react@18.2.0)
+      typescript:
+        specifier: 5.2.2
+        version: 5.2.2
+      vitest:
+        specifier: ^1.1.0
+        version: 1.1.1
 
 packages:
 

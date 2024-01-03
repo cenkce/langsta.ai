@@ -10,6 +10,8 @@ test("should set state of Atom", async () => {
     { key: "mockAtom" },
     new StoreSubject({ mockAtom: { state: 1 } }),
   );
+  const n = MockAtom.get$("state");
+  n.subscribe((v) => { v })
 
   const { result } = renderHook(() => useAtom(MockAtom));
 

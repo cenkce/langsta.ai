@@ -17,7 +17,7 @@ import { Atom } from "./StoreSubject";
  * var atom = Atom.of({key: "settings"}, new StoreSubject({settings: {}}));
  * const [value, setValue] = useAtom(atom);
  */
-function useAtom<T = any>(
+function useAtom<T = unknown>(
   atom: Atom<T>,
   noStateUpdate?: false | undefined,
   equityCHeck?: (newState: T, state: T) => boolean
@@ -32,7 +32,8 @@ function useAtom<T = any>(
   noStateUpdate: boolean = false,
   pipes?: (newState: T, state: T) => boolean
 ) {
-  const [state, setState] = useState<T>(atom.getValue());
+  const value = atom.getValue() as T;
+  const [state, setState] = useState<T>(value);
   const stateRef = useRef(state);
   const equityCHeckRef = useRef(pipes);
   equityCHeckRef.current = pipes
@@ -60,7 +61,7 @@ function useAtom<T = any>(
   }, [atom, noStateUpdate]);
 
   const setNewState = useCallback((newState: ((state: T) => T) | T) => {
-    const update = newState instanceof Function ? newState(atom.getValue()) : newState;
+    const update = newState instanceof Function ? newState(atom.getValue() as T) : newState;
     atom.set$(update);
   }, [atom]);
 

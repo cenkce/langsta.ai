@@ -4,10 +4,7 @@ import { describe, expect, it } from "vitest";
 
 describe("StoreSubject", () => {
   it("should create a new Atom and set or get new values", async () => {
-    const store = new StoreSubject<{
-      "atom-name": { state: string; state2?: number };
-      "another-state": { state: string };
-    }>({
+    const store = new StoreSubject({
       "atom-name": { state: "state-value", state2: 1 },
       "another-state": { state: "state-value" },
     });
@@ -64,6 +61,8 @@ describe("StoreSubject", () => {
       const values: number[] = [];
       const stream$ = atom.get$();
       const subscription = stream$.subscribe((value) => {
+        if(!value)
+          throw new Error('should not emoty the value');
         expect(value).toBe([0, 1][value]);
         values.push(value);
         if (value === 1) {

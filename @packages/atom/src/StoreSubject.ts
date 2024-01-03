@@ -13,9 +13,20 @@ type AtomParams<T extends string = string> = {
 export class Atom<
   TState = any,
   TName extends string = string,
-  _InternalM extends keyof TState | undefined = TState extends Record<string, any>
+  /**
+   * @internal
+   * Don't use externally
+   */
+  _InternalM extends keyof TState | undefined = TState extends Record<
+    string,
+    unknown
+  >
     ? keyof TState
     : undefined,
+  /**
+   * @internal
+   * Don't use externally
+   */
   _InternalA extends Record<TName, TState> = Record<TName, TState>,
 > {
   static of<S = any, K extends string = string>(
@@ -32,27 +43,35 @@ export class Atom<
     private store: StoreSubject<_InternalA>,
   ) {}
 
-  private _getValue(state: Record<TName, TState>, key?: _InternalM) {
+  private _getValue<Y extends _InternalM>(
+    state: Record<TName, TState>,
+    key?: Y,
+  ) {
     if (key) {
-      return state[this.params.key][key];
-    } else return state[this.params.key];
+      return state[this.params.key][key] as TState extends Record<string, any>
+        ? Y extends string
+          ? TState[Y]
+          : TState
+        : undefined;
+    } else return state[this.params.key] as TState;
   }
 
   getValue(key?: _InternalM) {
     return this._getValue(this.store.getValue(), key);
   }
 
-  get$<Y extends _InternalM>(
-    key?: Y,
-  ): Observable<
-    TState extends Record<string, any> ? (Y extends string ? TState[Y] : TState) : TState
-  > {
+  get$<Y extends _InternalM>(key?: Y) {
     return this.store.pipe(
       map((state) => this._getValue(state, key)),
-      // @ts-ignore
       distinctUntilChanged(),
       share(),
-    );
+    ) as Observable<
+      TState extends Record<string, any>
+        ? Y extends string
+          ? TState[Y]
+          : TState
+        : TState
+    >;
   }
 
   set$(value: Partial<TState>) {

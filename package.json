@@ -10,6 +10,7 @@
   "scripts": {
     "app:dev": "pnpm --filter chrome-extension dev",
     "atom": "pnpm --filter @helsinki/atom",
+    "utilities": "pnpm --filter @helsinki/utilities",
     "test": "vitest"
   },
   "devDependencies": {
