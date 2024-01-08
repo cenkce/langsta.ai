@@ -1,8 +1,8 @@
 import { MouseEvent, PropsWithChildren } from "react";
 import "./Button.scss";
-import { classNames } from "../api/utils/classNames";
 import { FlexRow } from "./FlexRow";
 import { LoadingIcon } from "./icons/LoadingIcon";
+import { classNames } from "@espoojs/utils";
 
 type ButtonVariant =
   | "circle"

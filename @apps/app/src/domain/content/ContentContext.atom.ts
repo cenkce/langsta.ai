@@ -1,9 +1,8 @@
-import { useAtom } from "../@helsinki/atom";
-import { Atom, StoreSubject } from "../../api/core/StoreSubject";
 import { LocalStorage } from "../../api/storage/LocalStorage";
 import { TextSelector } from "../utils/getSelectedText";
 import { useEffect, useState } from "react";
 import { TranslationTextTask } from "../../api/task/TranslationTextTask";
+import { Atom, StoreSubject, useAtom } from "@espoojs/atom";
 
 export const ContentStorage =
   LocalStorage.of<ContentContextState>("contentContextAtom");

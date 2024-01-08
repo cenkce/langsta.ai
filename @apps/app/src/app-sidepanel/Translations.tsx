@@ -10,8 +10,8 @@ import { TrashIcon } from "../ui/icons/TrashIcon";
 import styles from "./SidepanelApp.module.scss";
 import { Button } from "../ui/Button";
 import { currentTabMessageDispatch } from "../domain/content/currentTabMessageDispatch";
-import { classNames } from "../api/utils/classNames";
 import { useState } from "react";
+import { classNames } from "@espoojs/utils";
 
 export const Translations = (props: {
   onFilter?: (translation: TranslationTextTask) => boolean;

@@ -14,7 +14,6 @@ test("should set state of Atom", async () => {
   n.subscribe((v) => { v })
 
   const { result } = renderHook(() => useAtom(MockAtom));
-
   act(() => {
     result.current[1]({ state: 2 });
   });

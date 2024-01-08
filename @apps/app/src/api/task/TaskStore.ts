@@ -10,7 +10,7 @@ import {
   takeUntil,
 } from "rxjs";
 import { nanoid } from "nanoid";
-import { StoreSubject } from "@helsinki/atom";
+import { StoreSubject } from "@espoojs/atom";
 
 export type Task<
   R = unknown, //Response

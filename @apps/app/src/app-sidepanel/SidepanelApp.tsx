@@ -1,5 +1,5 @@
+import { sanitizeUtmUrl } from "@espoojs/utils";
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
-import { sanitizeUrl } from "../api/utils/clearUtmInUrl";
 import {
   ContentContextAtom,
   ContentStorage,
@@ -57,7 +57,7 @@ export const SidepanelApp = () => {
 
 const PageTranslations = () => {
   const tabData = useCurrentTabData();
-  const tabUrl = tabData.current?.url && sanitizeUrl(new URL(tabData.current?.url || "").toString());
+  const tabUrl = tabData.current?.url && sanitizeUtmUrl(new URL(tabData.current?.url || "").toString());
   return (
     <Translations
       onFilter={(task) => {
@@ -68,7 +68,7 @@ const PageTranslations = () => {
 };
 const DomainTranslations = () => {
   const tabData = useCurrentTabData();
-  const tabUrl = tabData.current?.url && sanitizeUrl(new URL(tabData.current?.url || "").toString());
+  const tabUrl = tabData.current?.url && sanitizeUtmUrl(new URL(tabData.current?.url || "").toString());
 
   return (
     <Translations

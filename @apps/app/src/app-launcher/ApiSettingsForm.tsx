@@ -1,4 +1,4 @@
-import { useAtom } from "@helsinki/atom";
+import { useAtom } from "@espoojs/atom";
 import shallowEqual from "../api/utils/shallowEqual";
 import { SettingsAtom, SettingsState } from "../domain/user/SettingsModel";
 import { ReactNode, useEffect, useRef, useState } from "react";

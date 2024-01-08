@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { CloseIcon } from "../ui/icons/CloseIcon";
 import { Button } from "../ui/Button";
-import { classNames } from "../api/utils/classNames";
+import { classNames } from "@espoojs/utils";
 
 export type TranslationContentActions = 'sidebar' | 'translate' | 'summarise' | 'simplify';
 

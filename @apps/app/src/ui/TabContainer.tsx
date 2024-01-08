@@ -1,6 +1,6 @@
 import { ComponentType, useState } from "react";
 import styles from "./TabContainer.module.scss";
-import { classNames } from "../api/utils/classNames";
+import { classNames } from "@espoojs/utils";
 
 type TabContent<P extends Record<string, unknown> = Record<string, unknown>> = {
   id: string;

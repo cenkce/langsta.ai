@@ -1,7 +1,7 @@
 import "./index.scss";
 import "./TranslationContentCard.scss";
 
-import { Atom, StoreSubject } from "@helsinki/atom";
+import { Atom, StoreSubject } from "@espoojs/atom";
 
 export const StyleContextAtom = Atom.of(
   { key: "styleContextAtom" },

@@ -11,9 +11,7 @@ describe("StoreSubject", () => {
     return new Promise<void>((res) => {
       const atom = Atom.of(
         { key: "atom-name" },
-        store as unknown as StoreSubject<{
-          "atom-name": { state: string; state2?: number } | undefined;
-        }>,
+        store,
       );
       atom
         .get$("state2")
@@ -54,22 +52,21 @@ describe("StoreSubject", () => {
   
   it("should create a new primitive Atom and set or get new values", () => {
     return new Promise<void>((done) => {
-      const store = new StoreSubject({
-        "state-name": 0,
-      });
+      const store = new StoreSubject<{"state-name": number }>({ "state-name": 0 });
       const atom = Atom.of({ key: "state-name" }, store);
-      const values: number[] = [];
       const stream$ = atom.get$();
-      const subscription = stream$.subscribe((value) => {
-        if(!value)
-          throw new Error('should not emoty the value');
-        expect(value).toBe([0, 1][value]);
-        values.push(value);
-        if (value === 1) {
-          expect(values).toEqual([0, 1]);
-          subscription.unsubscribe();
-          done();
-        }
+      const values: number[] = []
+      const subscription = stream$.pipe(take(1)).subscribe({
+        next(value){
+            values.push(value)
+            if (value === 1) {
+              subscription.unsubscribe();
+            }
+          },
+          complete: () => {
+            expect(values).toBe([0, 1]);
+            done();
+          }
       });
   
       atom.set$(1);

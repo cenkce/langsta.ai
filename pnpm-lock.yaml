@@ -35,6 +35,9 @@ importers:
       lint-staged:
         specifier: ^15.2.0
         version: 15.2.0
+      rimraf:
+        specifier: 5.0.5
+        version: 5.0.5
       vitest:
         specifier: 1.1.1
         version: 1.1.1
@@ -81,9 +84,12 @@ importers:
       '@crxjs/vite-plugin':
         specifier: ^2.0.0-beta.21
         version: 2.0.0-beta.21
-      '@helsinki/atom':
+      '@espoojs/atom':
         specifier: '*'
         version: link:../../@packages/atom
+      '@espoojs/utils':
+        specifier: '*'
+        version: link:../../@packages/utilities
       '@testing-library/jest-dom':
         specifier: ^6.1.3
         version: 6.1.5(vitest@1.1.0)
@@ -172,9 +178,6 @@ importers:
       typescript:
         specifier: 5.2.2
         version: 5.2.2
-      vitest:
-        specifier: ^1.1.0
-        version: 1.1.0(@types/node@20.8.10)(sass@1.69.5)
 
   '@packages/utilities':
     devDependencies:
@@ -4050,6 +4053,14 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+    dev: true
+
+  /rimraf@5.0.5:
+    resolution: {integrity: sha512-CqDakW+hMe/Bz202FPEymy68P+G50RfMQK+Qo5YUqc9SPipvbGjCGKd0RSKEelbsfQuw3g5NZDSrlZZAJurH1A==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      glob: 10.3.10
     dev: true
 
   /rollup@2.78.1:

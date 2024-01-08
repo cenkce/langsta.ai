@@ -11,13 +11,14 @@ import {
   getSelectedText,
   getSelectedTextSelectors,
 } from "../domain/utils/getSelectedText";
-import { useGlobalMouseEventHandlerService } from "../api/utils/useGlobalMouseEventHandlerService";
 import { TabMessages } from "../domain/content/currentTabMessageDispatch";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 import { createContentSelection } from "../domain/utils/createContentSelection";
-import { sanitizeUrl } from "../api/utils/clearUtmInUrl";
-
+import {
+  sanitizeUtmUrl,
+  useGlobalMouseEventHandlerService,
+} from "@espoojs/utils";
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);
@@ -46,7 +47,7 @@ export const ContentCaptureContainer = () => {
           selectedText: {
             text: selectedText,
             selectors: getSelectedTextSelectors(),
-            siteName: sanitizeUrl(window.location.href)
+            siteName: sanitizeUtmUrl(window.location.href),
           },
         }));
         setMarkers((markers) => [
@@ -78,17 +79,17 @@ export const ContentCaptureContainer = () => {
   useEffect(() => {
     const scrollToTarget = (element: HTMLElement) => {
       if (!element) {
-        throw new Error('Traget element not found');
+        throw new Error("Traget element not found");
       }
 
-      element.scrollIntoView({inline: 'center'});
+      element.scrollIntoView({ inline: "center" });
     };
     const messageHandler = (message: TabMessages) => {
       if (message.type === "select-content") {
         if (message.task.selection.selectors) {
           try {
             const [anchorElement] = createContentSelection(
-              message.task.selection.selectors
+              message.task.selection.selectors,
             );
             scrollToTarget(anchorElement);
 
@@ -133,7 +134,7 @@ export const ContentCaptureContainer = () => {
 
     return () => {
       chrome.runtime.onMessage.removeListener(messageHandler);
-    }
+    };
   }, []);
 
   return (
@@ -166,13 +167,13 @@ export const ContentCaptureContainer = () => {
               onClick={(ev) => {
                 setMarkers((state) =>
                   state.map((marker) =>
-                    ev.id === marker.id ? { ...marker, clicked: true } : marker
-                  )
+                    ev.id === marker.id ? { ...marker, clicked: true } : marker,
+                  ),
                 );
               }}
               onClose={(ev) => {
                 setMarkers((state) =>
-                  state.filter((marker) => ev.id !== marker.id)
+                  state.filter((marker) => ev.id !== marker.id),
                 );
               }}
               // onClick={() => translate(marker.selectedText)}

@@ -3,7 +3,7 @@ import { TabContainer } from "../ui/TabContainer";
 import { SettingsAtom } from "../domain/user/SettingsModel";
 import { TargetLanguageLevel } from "../domain/student/TargetLanguageLevel";
 import { ApiSettingsForm } from "./ApiSettingsForm";
-import { useAtom } from "@helsinki/atom";
+import { useAtom } from "@espoojs/atom";
 
 export const solutions = [
   {

@@ -9,8 +9,8 @@
   "type": "module",
   "scripts": {
     "app:dev": "pnpm --filter chrome-extension dev",
-    "atom": "pnpm --filter @helsinki/atom",
-    "utilities": "pnpm --filter @helsinki/utilities",
+    "atom": "pnpm --filter @espoojs/atom",
+    "utilities": "pnpm --filter @espoojs/utils",
     "test": "vitest"
   },
   "devDependencies": {
@@ -23,7 +23,8 @@
     "eslint-plugin-prettier": "^5.1.2",
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
-    "vitest": "1.1.1"
+    "vitest": "1.1.1",
+    "rimraf": "5.0.5"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [

@@ -27,7 +27,7 @@ export const clearHashFromUrl = (url?: URL) => {
   return url;
 };
 
-export function sanitizeUrl(url: string): string {
+export function sanitizeUtmUrl(url: string): string {
   const urlins = new URL(url)
 
   clearUtmFromUrl(urlins);
