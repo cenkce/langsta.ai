@@ -1,5 +1,5 @@
 import { ExtensionEventEmitter, MessageEvent } from "../core/MessageEvent";
-import { TaskStatus } from "./TaskStore";
+import { TaskStatus } from "@espoojs/task";
 
 export type TaskUpdate = { taskId: string; status: TaskStatus; tag?: string[], createdAt: number, error?: unknown };
 export type TaskUpdateMessage = {

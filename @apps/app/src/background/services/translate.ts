@@ -6,7 +6,7 @@ import {
   ContentStorage,
 } from "../../domain/content/ContentContext.atom";
 import { TranslationTextTask } from "../../api/task/TranslationTextTask";
-import { TaskStore } from "../../api/task/TaskStore";
+import { TaskStore } from "@espoojs/task";
 import { from } from "rxjs";
 import { TaskMessage } from "../../api/task/TaskMessage";
 import { clone } from "ramda";
@@ -61,14 +61,20 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
 
 export async function translateHander(message: TranslateRequestMessage) {
   const { id, ...messageBody } = message;
-  console.log(message)
+  console.log(message);
   const taskAtom = TaskStore.createTaskAtom(
-    () => from(translate({userMessage: messageBody.content.text, systemMessage: messageBody.systemMessage})),
+    () =>
+      from(
+        translate({
+          userMessage: messageBody.content.text,
+          systemMessage: messageBody.systemMessage,
+        }),
+      ),
     {
       tags: ["translate-service", "background-task"],
-      selection: clone(messageBody.content.selectors)
+      selection: clone(messageBody.content.selectors),
     },
-    id
+    id,
   );
 
   await upsertTranslationTask({
@@ -101,7 +107,10 @@ export async function translateHander(message: TranslateRequestMessage) {
   });
 }
 
-export async function translate(message: {userMessage: string, systemMessage: string}) {
+export async function translate(message: {
+  userMessage: string;
+  systemMessage: string;
+}) {
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
     messages: [
       { role: "system", content: message.systemMessage },

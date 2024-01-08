@@ -1,12 +1,11 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
-import { useAtom } from "../core/useAtom";
 import { LocalStorage } from "./LocalStorage";
-import { Atom } from "../core/StoreSubject";
+import { Atom, useAtom } from "@espoojs/atom";
 
 export function useLocalstorageSync<StorageT extends Record<string, unknown> = Record<string, unknown>>(
   props: PropsWithChildren<{
     debugKey?: string;
-    storageAtom: Atom<Record<string, unknown>>;
+    storageAtom: Atom;
     contentStorage: LocalStorage<StorageT>;
   }>
 ) {

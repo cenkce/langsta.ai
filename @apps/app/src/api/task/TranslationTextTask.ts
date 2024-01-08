@@ -1,5 +1,5 @@
 import type { TranslateRequestMessage } from "../services/gpt-api/messages";
-import type { TaskStatus } from "./TaskStore";
+import type { TaskStatus } from "@espoojs/task";
 
 
 export type TranslationTextTask = {

@@ -39,7 +39,7 @@ const contentStore = new StoreSubject({
     selectedText: { text: "" },
     activeTabContent: {},
     translation: {},
-  } as Partial<ContentContextState>,
+  } as ContentContextState,
 });
 
 export const ContentContextAtom = Atom.of(

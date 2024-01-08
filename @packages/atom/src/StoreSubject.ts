@@ -6,12 +6,11 @@ import {
   share,
 } from "rxjs";
 
-type AtomParams<T extends string = string> = {
-  key: T;
-};
-
-export class Atom<TState extends {[key: string]: any} = any, TName extends string = string> {
-  static of<T extends {[key: string]: any}, N extends string>(
+export class Atom<
+  TState extends { [key: string]: any } = any,
+  TName extends string = any
+> {
+  static of<T extends { [key: string]: any }, N extends string>(
     params: { key: N },
     store: StoreSubject<T>,
   ) {
@@ -21,23 +20,20 @@ export class Atom<TState extends {[key: string]: any} = any, TName extends strin
    * Use Atom.of() instead
    */
   protected constructor(
-    private params: AtomParams<TName>,
+    private params: {
+      key: TName;
+    },
     private store: StoreSubject<TState>,
   ) {}
 
-  private _getValue<
-    Y extends keyof TState[TName]
-  >(
-    state: TState,
-    key?: Y,
-  ) {
+  private _getValue<Y extends keyof TState[TName]>(state: TState, key?: Y) {
     if (key) {
-      return state[this.params.key][key]
+      return state[this.params.key][key];
     } else return state[this.params.key] as TState;
   }
 
   getValue(
-    key?: TState[TName] extends {[key: string]: any}
+    key?: TState[TName] extends { [key: string]: any }
       ? keyof TState[TName]
       : undefined,
   ) {
@@ -45,7 +41,7 @@ export class Atom<TState extends {[key: string]: any} = any, TName extends strin
   }
 
   get$<
-    Y extends TState[TName] extends {[key: string]: any}
+    Y extends TState[TName] extends { [key: string]: any }
       ? keyof TState[TName]
       : undefined,
   >(key?: Y) {
@@ -53,7 +49,9 @@ export class Atom<TState extends {[key: string]: any} = any, TName extends strin
       map((state) => this._getValue(state, key)),
       distinctUntilChanged(),
       share(),
-    ) as Observable<Y extends keyof TState[TName]  ? TState[TName][Y] : TState[TName]>;
+    ) as Observable<
+      Y extends keyof TState[TName] ? TState[TName][Y] : TState[TName]
+    >;
   }
 
   set$(value: Partial<TState[TName]>) {
@@ -80,7 +78,7 @@ export class Atom<TState extends {[key: string]: any} = any, TName extends strin
   }
 }
 
-export class StoreSubject<T> extends BehaviorSubject<T> {
+export class StoreSubject<T = any> extends BehaviorSubject<T> {
   static of<T = unknown>(initialData: T) {
     return new StoreSubject<T>(initialData);
   }

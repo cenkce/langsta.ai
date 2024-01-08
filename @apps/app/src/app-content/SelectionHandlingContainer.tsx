@@ -20,7 +20,7 @@ import {
   useGlobalMouseEventHandlerService,
 } from "@espoojs/utils";
 export const ContentCaptureContainer = () => {
-  const setUserContent = useUserContentSetState();
+  const [,setUserContent] = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [selection] = useUserContentState();

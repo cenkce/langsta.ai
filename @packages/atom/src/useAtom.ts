@@ -58,7 +58,7 @@ function useAtom<
     [atom],
   );
 
-  return noStateUpdate === true ? setNewState : ([state, setNewState] as const);
+  return [state, setNewState] as const;
 }
 
 export { useAtom };
