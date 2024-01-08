@@ -68,6 +68,7 @@ export class Atom<TState extends {[key: string]: any} = any, TName extends strin
     ) as TState;
 
     this.store.next({
+      ...state,
       [this.params.key]: update,
     } as TState);
 
