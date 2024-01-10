@@ -19,8 +19,9 @@ import {
   sanitizeUtmUrl,
   useGlobalMouseEventHandlerService,
 } from "@espoojs/utils";
+import { parseContent } from "../domain/content/parseContent";
 export const ContentCaptureContainer = () => {
-  const [,setUserContent] = useUserContentSetState();
+  const [, setUserContent] = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [selection] = useUserContentState();
@@ -149,6 +150,18 @@ export const ContentCaptureContainer = () => {
                 if (action === "sidebar") {
                   serviceWorkerContentMessageDispatch({
                     type: "open-side-panel",
+                  });
+                  return;
+                } else if (action === "study-mode") {
+                  const content = parseContent();
+                  console.log('content : ', content);
+                  if (!content) return;
+                  setUserContent((state) => ({
+                    ...state,
+                    activeTabContent: content,
+                  }));
+                  serviceWorkerContentMessageDispatch({
+                    type: "open-study-mode-side-panel",
                   });
                   return;
                 }

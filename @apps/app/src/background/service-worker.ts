@@ -12,6 +12,7 @@ export const openai = new OpenAI({
 });
 
 chrome.runtime.onInstalled.addListener(() => {
+  chrome.sidePanel.setOptions({ path: 'side-panel.html' });
   chrome.contextMenus.create({
     id: "wordsplorer",
     title: "Wordsplorer",
@@ -48,7 +49,14 @@ ContentMessageEventEmitter.addListener(async (message, sender) => {
     } catch (error) {
       console.error(error);
     }
-  } else if (message.type === "define-selected-text") {
+  } else if (message.type === "open-study-mode-side-panel") {
+    try {
+      openSidePanel(sender.tab?.id, 'sidepanel-study-mode.html');
+    } catch (error) {
+      console.error(error);
+    }
+  }
+   else if (message.type === "define-selected-text") {
     try {
       openSidePanel(sender.tab?.id);
     } catch (error) {

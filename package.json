@@ -8,7 +8,7 @@
   },
   "type": "module",
   "scripts": {
-    "app": "pnpm --filter chrome-extension",
+    "app": "env-cmd pnpm --filter chrome-extension",
     "atom": "pnpm --filter @espoojs/atom",
     "task": "pnpm --filter @espoojs/task",
     "utilities": "pnpm --filter @espoojs/utils",
@@ -25,7 +25,8 @@
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
     "vitest": "1.1.1",
-    "rimraf": "5.0.5"
+    "rimraf": "5.0.5",
+    "env-cmd": "10.1.0"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [

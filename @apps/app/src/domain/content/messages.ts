@@ -13,6 +13,10 @@ export type OpenSidePanelMessage = {
   type: 'open-side-panel'
 };
 
+export type OpenReadModePanelMessage = {
+  type: 'open-study-mode-side-panel'
+};
+
 export type DeleteTask = {
   type: 'backend/delete-task',
   payload: {
@@ -20,6 +24,6 @@ export type DeleteTask = {
   }
 };
 
-export type ServiceWorkerContentMessages = ExtractTabContentMessage | DefineSelectedTextMessage | DeleteTask | OpenSidePanelMessage;
+export type ServiceWorkerContentMessages = OpenReadModePanelMessage | ExtractTabContentMessage | DefineSelectedTextMessage | DeleteTask | OpenSidePanelMessage;
 
 export const serviceWorkerContentMessageDispatch = chrome.runtime.sendMessage<ServiceWorkerContentMessages>;

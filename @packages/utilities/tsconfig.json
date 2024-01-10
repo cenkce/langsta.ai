@@ -15,6 +15,7 @@
     "allowJs": false,
     "declaration": true,
     "declarationMap": true,
+    "jsx": "react-jsx",
 
     /* Linting */
     "strict": true,

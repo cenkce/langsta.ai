@@ -48,7 +48,7 @@ export function useGlobalMouseEventHandlerService({
               rootRef.current.getBoundingClientRect()
             ))) ||
         (excludeTargetClassNamesRef.current &&
-          checkIfInExcludeTarget(e.target as HTMLElement, [
+          checkIfInExcludedTarget(e.target as HTMLElement, [
             ...excludeTargetClassNamesRef.current,
             "ignoreGlobalClick",
           ]))
@@ -63,7 +63,7 @@ export function useGlobalMouseEventHandlerService({
   }, [rootRef?.current]);
 }
 
-export function checkIfInExcludeTarget(
+export function checkIfInExcludedTarget(
   target: HTMLElement,
   excludeClassNames: string[]
 ): boolean {
@@ -72,6 +72,6 @@ export function checkIfInExcludeTarget(
   )
     return true;
   if (target.parentElement)
-    return checkIfInExcludeTarget(target.parentElement, excludeClassNames);
+    return checkIfInExcludedTarget(target.parentElement, excludeClassNames);
   return false;
 }

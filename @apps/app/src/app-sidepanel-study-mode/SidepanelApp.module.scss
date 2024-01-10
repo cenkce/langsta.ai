@@ -1,0 +1,82 @@
+@media only screen and (max-width: 600px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+:root, :root[data-theme="light"] {
+  --text-font-family: 'Roboto', sans-serif;
+  --text-color: #555;
+  --background-color: #f5f5f5;
+  --table-border-color: #ccc;
+  --odd-row-color: #f5f5f5;
+  --even-row-color: var(--background-color);
+
+  --code-font-family: 'Courier New', monospace;
+  --code-background-color: var(--background-color);
+  --code-font-color: var(--text-color);
+  font-size: 18px;
+}
+
+
+:root[data-theme="dark"] {
+  --text-font-family: 'Montserrat', sans-serif;
+  --text-color: #fff;
+  --background-color: #333;
+  --table-border-color: #ccc;
+  --odd-row-color: #f5f5f5;
+  --even-row-color: var(--background-color);
+
+  --code-font-family: 'Courier New', monospace;
+  --code-background-color: var(--background-color);
+  --code-font-color: var(--text-color);
+}
+
+body {
+  font-family: var(--text-font-family);
+  color: var(--text-color);
+  background-color: var(--background-color);
+  line-height: 1.5;
+}
+
+h1, h2, h3 {
+  font-family: var(--text-font-family);
+  font-weight: bold;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+p {
+  font-family: 'Open Sans', sans-serif;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-color: var(--table-border-color);
+}
+
+tbody tr:nth-child(odd) {
+  background-color: var(--odd-row-color);
+}
+
+tbody tr:nth-child(even) {
+  background-color: var(--even-row-color);
+}
+
+code {
+  font-family: var(--code-font-family);
+  background-color: var(--code-background-color);
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: var(--code-font-color);
+}
+
+// More themes can be added here...

@@ -5,7 +5,7 @@ import {
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { useAtom } from "@espoojs/atom";
 import { useMemo } from "react";
-import { ShadowDom } from "../api/core/ShadowRoot";
+import { ShadowDom } from "@espoojs/utils";
 import { ContentCaptureContainer } from "./SelectionHandlingContainer";
 import { StyleContextAtom } from "./styles";
 

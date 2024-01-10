@@ -30,6 +30,7 @@ export type ContentContextState = {
     dir: string;
     siteName: string;
     lang: string;
+    publishedTime: string;
   };
   translation: Record<string, TranslationTextTask>;
 };
@@ -38,7 +39,7 @@ const contentStore = new StoreSubject({
   contentContextAtom: {
     selectedText: { text: "" },
     activeTabContent: {},
-    translation: {},
+    translation: {}
   } as ContentContextState,
 });
 

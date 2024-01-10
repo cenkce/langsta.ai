@@ -3,7 +3,7 @@ import { CloseIcon } from "../ui/icons/CloseIcon";
 import { Button } from "../ui/Button";
 import { classNames } from "@espoojs/utils";
 
-export type TranslationContentActions = 'sidebar' | 'translate' | 'summarise' | 'simplify';
+export type TranslationContentActions = 'sidebar' | 'translate' | 'summarise' | 'simplify' | 'study-mode';
 
 export const TranslationContentCard = (
   props: PropsWithChildren<{
@@ -45,6 +45,14 @@ export const TranslationContentCard = (
             color="secondary"
           >
             Open Sidebar
+          </Button>
+          <Button
+            onClick={() => props.onAction?.('study-mode')}
+            size="xs"
+            variant="outline"
+            color="secondary"
+          >
+            Read Mode
           </Button>
           <Button
             loading={props.loading && props.action === 'simplify'}
