@@ -79,4 +79,18 @@ code {
   color: var(--code-font-color);
 }
 
+.container {
+  margin: 0 auto;
+  padding: 0 8px;
+  display: flex;
+  flex-direction: row;
+}
+
+.content {
+  flex: 1;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
 // More themes can be added here...

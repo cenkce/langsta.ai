@@ -5,6 +5,7 @@ import {
   useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { ArtBoard } from "../ui/ArtBoard";
+import { StudyToolbar } from "./StudyToolBar";
 import styles from "./SidepanelApp.module.scss";
 
 export const SidepanelApp = () => {
@@ -18,10 +19,16 @@ export const SidepanelApp = () => {
 
   return (
     <ArtBoard>
-      <h1>
-      {userContent.activeTabContent.title}
-      </h1>
-      <div className={styles.container} dangerouslySetInnerHTML={{__html: userContent.activeTabContent.content}}>
+      <div className={styles.container}>
+        <StudyToolbar></StudyToolbar>
+        <main className={styles.content}>
+          <h1>{userContent.activeTabContent.title}</h1>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: userContent.activeTabContent.content,
+            }}
+          />
+        </main>
       </div>
     </ArtBoard>
   );
