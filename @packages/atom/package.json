@@ -2,11 +2,16 @@
   "name": "@espoojs/atom",
   "version": "0.1.0",
   "type": "module",
+  "author": "Cenk Cetinkaya <mail@cenkcetinkaya.com>",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsc --watch",
     "build": "rimraf dist && tsc",
     "test": "vitest",
-    "postinstall": "pnpm run build"
+    "postinstall": "pnpm run build",
+    "prepare": "pnpm run build"
   },
   "files": [
     "dist",
@@ -14,15 +19,25 @@
   ],
   "main": "dist/main.js",
   "typings": "dist/main.d.ts",
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@testing-library/react": "^14.1.2",
-    "react": "^18.2.0",
-    "react-dom": "18.2.0",
     "@types/react": "^18.2.23",
     "@types/react-dom": "^18.2.8",
     "typescript": "5.2.2"
   },
   "dependencies": {
-    "rxjs": "^7.8.1"
+    "rxjs": "7.8.1"
   }
 }

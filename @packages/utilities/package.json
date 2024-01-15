@@ -2,10 +2,14 @@
   "name": "@espoojs/utils",
   "version": "0.1.0",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsc --watch",
     "build": "rimraf dist && tsc",
     "test": "vitest",
+    "prepare": "pnpm run build",
     "postinstall": "pnpm run build"
   },
   "main": "dist/main.js",
