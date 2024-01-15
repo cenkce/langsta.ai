@@ -1,6 +1,4 @@
-import OpenAI from "openai";
 import { TranslateRequestMessage } from "../../api/services/gpt-api/messages";
-import { openai } from "../service-worker";
 import {
   ContentContextState,
   ContentStorage,
@@ -9,7 +7,8 @@ import { TranslationTextTask } from "../../api/task/TranslationTextTask";
 import { TaskStore } from "@espoojs/task";
 import { from } from "rxjs";
 import { TaskMessage } from "../../api/task/TaskMessage";
-import { clone } from "ramda";
+import { clone, omit } from "ramda";
+import { sendGPTRequest } from "./sendGPTRequest";
 
 TaskStore.instance
   .subscribeTaskByTagName("background-task", [
@@ -21,13 +20,13 @@ TaskStore.instance
   .subscribe({
     next(task) {
       if (task) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { id: taskId, task: taskNode, ...rest } = task;
+        const  taskBody = omit(['id', 'task'], task);
+        
         TaskMessage({
           type: "task/update",
           payload: {
-            taskId,
-            ...rest,
+            taskId: task.id,
+            ...taskBody,
           },
         });
       }
@@ -59,13 +58,13 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
   }
 }
 
-export async function translateHander(message: TranslateRequestMessage) {
+export async function GPTTranslateRequest(message: TranslateRequestMessage) {
   const { id, ...messageBody } = message;
-  console.log(message);
+  console.log("translateHander : ", message);
   const taskAtom = TaskStore.createTaskAtom(
     () =>
       from(
-        translate({
+        sendGPTRequest({
           userMessage: messageBody.content.text,
           systemMessage: messageBody.systemMessage,
         }),
@@ -107,29 +106,4 @@ export async function translateHander(message: TranslateRequestMessage) {
   });
 }
 
-export async function translate(message: {
-  userMessage: string;
-  systemMessage: string;
-}) {
-  const params: OpenAI.Chat.ChatCompletionCreateParams = {
-    messages: [
-      { role: "system", content: message.systemMessage },
-      { role: "user", content: message.userMessage },
-    ],
-    model: "gpt-3.5-turbo-16k",
-    temperature: 0,
-    max_tokens: 1024,
-    top_p: 1,
-    frequency_penalty: 0,
-    presence_penalty: 0,
-  };
-  try {
-    const completion: OpenAI.Chat.ChatCompletion =
-      await openai.chat.completions.create(params);
-    // return JSON.parse(completion.choices[0].message.content || "") as string;
-    return completion.choices[0].message.content || "";
-  } catch (error) {
-    console.error(error);
-    return "";
-  }
-}
+

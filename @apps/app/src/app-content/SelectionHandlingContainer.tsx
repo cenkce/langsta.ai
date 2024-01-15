@@ -154,7 +154,6 @@ export const ContentCaptureContainer = () => {
                   return;
                 } else if (action === "study-mode") {
                   const content = parseContent();
-                  console.log('content : ', content);
                   if (!content) return;
                   setUserContent((state) => ({
                     ...state,

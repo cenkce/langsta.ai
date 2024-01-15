@@ -7,6 +7,8 @@ import {
 import { ArtBoard } from "../ui/ArtBoard";
 import { StudyToolbar } from "./StudyToolBar";
 import styles from "./SidepanelApp.module.scss";
+import { useTranslateService } from "../domain/translation/TranslationService";
+import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 
 export const SidepanelApp = () => {
   useLocalstorageSync({
@@ -15,12 +17,28 @@ export const SidepanelApp = () => {
     contentStorage: ContentStorage,
   });
 
-  const [userContent] = useUserContentState();
+  useLocalstorageSync({
+    debugKey: "settings-sidepanel",
+    storageAtom: SettingsAtom,
+    contentStorage: SettingsStorage,
+  });
 
+  const { simplify, summarise } = useTranslateService();
+  const [userContent] = useUserContentState();
+  const tasks = Object.values(userContent?.translation || {});
+  console.log(tasks);
   return (
     <ArtBoard>
       <div className={styles.container}>
-        <StudyToolbar></StudyToolbar>
+        <StudyToolbar
+          onClick={(link) => {
+            if (link === "Summarise") {
+              summarise(userContent.activeTabContent.textContent);
+            } else if (link === "Simplify") {
+              simplify(userContent.activeTabContent.textContent);
+            }
+          }}
+        />
         <main className={styles.content}>
           <h1>{userContent.activeTabContent.title}</h1>
           <div

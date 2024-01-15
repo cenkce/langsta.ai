@@ -10,7 +10,15 @@ export type TranslateRequestMessage = {
 export type SimplyfyRequestMessage = {
   type: 'gpt/simplify',
   systemMessage: string,
+  id?: string,
   content: string;
 };
 
-export type GPTMessages = TranslateRequestMessage | SimplyfyRequestMessage;
+export type SummariseContentRequestMessage = {
+  type: 'gpt/simplify',
+  systemMessage: string,
+  id?: string,
+  content: string;
+};
+
+export type GPTApiRequestMessages = TranslateRequestMessage | SimplyfyRequestMessage | SummariseContentRequestMessage;

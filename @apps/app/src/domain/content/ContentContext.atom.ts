@@ -33,6 +33,7 @@ export type ContentContextState = {
     publishedTime: string;
   };
   translation: Record<string, TranslationTextTask>;
+  contentTasks: Record<string, TranslationTextTask>;
 };
 
 const contentStore = new StoreSubject({

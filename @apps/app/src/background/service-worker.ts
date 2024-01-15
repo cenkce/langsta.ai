@@ -1,10 +1,11 @@
 import OpenAI from "openai";
 import { ContentMessageEventEmitter } from "../domain/content/ContentMessageEventEmitter";
 import { GPTMessagesEventEmitter } from "../api/services/gpt-api/sendGPTRequest";
-import { translateHander } from "./services/translate";
+import { GPTTranslateRequest } from "./services/translate";
 // import { createTranslateTextMessage } from "../domain/translation/TranslationService";
 import { openSidePanel } from "../api/helper/openSidePanel";
 import { TaskStore } from "@espoojs/task";
+import { GPTContentRequest } from "./services/content";
 
 export const openai = new OpenAI({
   apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
@@ -38,7 +39,9 @@ chrome.runtime.onInstalled.addListener(() => {
 
 GPTMessagesEventEmitter.addListener(async (message) => {
   if (message.type === "gpt/translate") {
-    translateHander(message);
+    GPTTranslateRequest(message);
+  } else if (message.type === "gpt/simplify") {
+    GPTContentRequest(message);
   }
 });
 

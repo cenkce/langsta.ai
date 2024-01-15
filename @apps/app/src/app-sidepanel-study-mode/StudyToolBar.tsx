@@ -1,7 +1,6 @@
 import { Stack, Tooltip, UnstyledButton, rem } from "@mantine/core";
 import { Icon } from "react-feather";
 import styles from "./StudyToolBar.module.css";
-import { useState } from "react";
 import {
   IconTextDecrease,
   IconTextIncrease,
@@ -20,13 +19,14 @@ interface NavbarLinkProps {
   onClick?(): void;
 }
 
-const mockdata = [
+const StudyTools = [
   { icon: IconTextDecrease, label: 'Text Decrease' },
   { icon: IconTextIncrease, label: 'Text Increase' },
   { icon: IconColumns2, label: 'Narrower Layout' },
   { icon: IconColumns3, label: 'Wider Layout' },
   { icon: IconTransferOut, label: 'Extract words' },
   { icon: IconPageBreak, label: 'Summarise' },
+  { icon: IconPageBreak, label: 'Simplify' },
   { icon: IconStar, label: 'Favorite' },
   { icon: IconCards, label: 'Flashcards' },
 ];
@@ -42,15 +42,14 @@ export function ToolbarButton({ icon: Icon, label, active, onClick }: NavbarLink
 }
 
 
-export function StudyToolbar() {
-  const [active, setActive] = useState(2);
-
-  const links = mockdata.map((link, index) => (
+export function StudyToolbar(props: {onClick: (link: string) => void }) {
+  const links = StudyTools.map((link) => (
     <ToolbarButton
       {...link}
       key={link.label}
-      active={index === active}
-      onClick={() => setActive(index)}
+      onClick={() => {
+        props.onClick(link.label);
+      }}
     />
   ));
 
