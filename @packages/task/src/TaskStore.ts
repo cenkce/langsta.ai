@@ -212,15 +212,6 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
         });
 
         return stream$.pipe(
-          finalize(() => {
-            this._instance.updateNode(atom.getId(), {
-              status: "completed",
-            });
-          }),
-          catchError((err, caught) => {
-            this._instance.updateNode(atom.getId(), { error: err });
-            return caught;
-          }),
           takeUntil(
             this.forceCancelSubject.pipe(
               filter((incomingId) => {
@@ -231,6 +222,15 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
           map((response) => {
             this._instance.updateNode(atom.getId(), { result: response });
             return response;
+          }),
+          catchError((err) => {
+            this._instance.updateNode(atom.getId(), { error: err });
+            throw err;
+          }),
+          finalize(() => {
+            this._instance.updateNode(atom.getId(), {
+              status: "completed",
+            });
           })
         );
       },

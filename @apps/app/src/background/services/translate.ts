@@ -5,44 +5,13 @@ import {
 } from "../../domain/content/ContentContext.atom";
 import { TranslationTextTask } from "../../api/task/TranslationTextTask";
 import { TaskStore } from "@espoojs/task";
-import { from } from "rxjs";
-import { TaskMessage } from "../../api/task/TaskMessage";
-import { clone, omit } from "ramda";
+import { clone } from "ramda";
 import { sendGPTRequest } from "./sendGPTRequest";
-
-TaskStore.instance
-  .subscribeTaskByTagName("background-task", [
-    "idle",
-    "error",
-    "progress",
-    "completed",
-  ])
-  .subscribe({
-    next(task) {
-      if (task) {
-        const  taskBody = omit(['id', 'task'], task);
-        
-        TaskMessage({
-          type: "task/update",
-          payload: {
-            taskId: task.id,
-            ...taskBody,
-          },
-        });
-      }
-    },
-    error(err) {
-      console.error(err);
-    },
-    complete() {
-      console.debug("translate-service is completed");
-    },
-  });
 
 async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
   if (!update.taskId) return;
   try {
-    const taskStates = await ContentStorage?.read("translation");
+    const taskStates = (await ContentStorage?.read("translation")) || {};
     const newTaskStates = taskStates[update.taskId]
       ? ({
           ...taskStates,
@@ -63,12 +32,10 @@ export async function GPTTranslateRequest(message: TranslateRequestMessage) {
   console.log("translateHander : ", message);
   const taskAtom = TaskStore.createTaskAtom(
     () =>
-      from(
-        sendGPTRequest({
-          userMessage: messageBody.content.text,
-          systemMessage: messageBody.systemMessage,
-        }),
-      ),
+      sendGPTRequest({
+        userMessage: messageBody.content.text,
+        systemMessage: messageBody.systemMessage,
+      }),
     {
       tags: ["translate-service", "background-task"],
       selection: clone(messageBody.content.selectors),
@@ -105,5 +72,3 @@ export async function GPTTranslateRequest(message: TranslateRequestMessage) {
     },
   });
 }
-
-

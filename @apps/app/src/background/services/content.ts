@@ -1,4 +1,3 @@
-import { from } from "rxjs";
 import { sendGPTRequest } from "./sendGPTRequest";
 import { omit } from "ramda";
 import {
@@ -12,18 +11,16 @@ export const GPTContentRequest = async (
   message: SummariseContentRequestMessage | SimplyfyRequestMessage,
 ) => {
   const messageBody = omit(["id"], message);
-  console.log("translateHander : ", message);
+  console.log("GPTContentRequest : ", message);
   const taskAtom = TaskStore.createTaskAtom(
     () =>
-      from(
-        sendGPTRequest({
-          userMessage: messageBody.content,
-          systemMessage: messageBody.systemMessage,
-        }),
-      ),
+      sendGPTRequest({
+        userMessage: messageBody.content,
+        systemMessage: messageBody.systemMessage,
+      }),
     {
-      tags: ["translate-service", "background-task"],
-      type: message.type
+      tags: ["content-service", "background-task"],
+      type: message.type,
     },
     message.id,
   );
@@ -39,12 +36,17 @@ export const GPTContentRequest = async (
     next(result) {
       result &&
         upsertContentTask({
-          status: "completed",
+          status: "progress",
           taskId: taskAtom.id,
           result: result,
         });
     },
-    complete() {},
+    complete() {
+      upsertContentTask({
+        status: "completed",
+        taskId: taskAtom.id,
+      });
+    },
     error(err) {
       console.error(err);
       upsertContentTask({

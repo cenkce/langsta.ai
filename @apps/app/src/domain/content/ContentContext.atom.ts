@@ -61,8 +61,7 @@ export const useSubscribeTranslationTask = (id?: string) => {
   const [task, setTask] = useState<TranslationTextTask | undefined>();
   useEffect(() => {
     if (id) {
-      const subs = contentStore.subscribe(({ contentContextAtom: { translation } }) => {
-        
+      const subs = ContentContextAtom.get$('translation').subscribe((translation) => {
         if (id && translation?.[id]) {
           setTask(translation[id]);
         }

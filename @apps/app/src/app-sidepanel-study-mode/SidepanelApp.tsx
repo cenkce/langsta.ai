@@ -9,8 +9,10 @@ import { StudyToolbar } from "./StudyToolBar";
 import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
+import { useState } from "react";
 
 export const SidepanelApp = () => {
+  const [taskId, setTaskId] = useState<string | undefined>(undefined);
   useLocalstorageSync({
     debugKey: "content-sidepanel-study-mode",
     storageAtom: ContentContextAtom,
@@ -25,17 +27,22 @@ export const SidepanelApp = () => {
 
   const { simplify, summarise } = useTranslateService();
   const [userContent] = useUserContentState();
-  const tasks = Object.values(userContent?.translation || {});
-  console.log(tasks);
+  const tasks = Object.values(userContent?.contentTasks || {});
+  const task = tasks.find((task) => {
+    return task.taskId === taskId;
+  });
+
+  console.log("content task", task);
+
   return (
     <ArtBoard>
       <div className={styles.container}>
         <StudyToolbar
           onClick={(link) => {
             if (link === "Summarise") {
-              summarise(userContent.activeTabContent.textContent);
+              setTaskId(summarise(userContent.activeTabContent.textContent));
             } else if (link === "Simplify") {
-              simplify(userContent.activeTabContent.textContent);
+              setTaskId(simplify(userContent.activeTabContent.textContent));
             }
           }}
         />
@@ -43,7 +50,10 @@ export const SidepanelApp = () => {
           <h1>{userContent.activeTabContent.title}</h1>
           <div
             dangerouslySetInnerHTML={{
-              __html: userContent.activeTabContent.content,
+              __html:
+                task?.status === "completed"
+                  ? task.result || ""
+                  : userContent.activeTabContent.content,
             }}
           />
         </main>
