@@ -1,14 +1,11 @@
 import { sanitizeUtmUrl } from "@espoojs/utils";
-import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
-import {
-  ContentContextAtom,
-  ContentStorage,
-} from "../domain/content/ContentContext.atom";
 import { useCurrentTabData } from "../domain/content/currentTabMessageDispatch";
 import { ArtBoard } from "../ui/ArtBoard";
 import { TabContainer } from "../ui/TabContainer";
 import styles from "./SidepanelApp.module.scss";
 import { Translations } from "./Translations";
+import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
+import { ContentContextAtom, ContentStorage } from "../domain/content/ContentContext.atom";
 
 export const SidepanelApp = () => {
   useLocalstorageSync({

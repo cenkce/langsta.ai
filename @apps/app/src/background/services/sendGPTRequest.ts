@@ -6,7 +6,6 @@ export function sendGPTRequest(message: {
   userMessage: string;
   systemMessage: string;
 }) {
-  console.log("sendGPTRequest ", message);
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
     messages: [
       { role: "system", content: message.systemMessage },
@@ -14,7 +13,6 @@ export function sendGPTRequest(message: {
     ],
     model: "gpt-3.5-turbo-16k",
     temperature: 0,
-    max_tokens: 1024 * 30,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
@@ -23,14 +21,11 @@ export function sendGPTRequest(message: {
   const completion = openai.chat.completions.create(params);
 
   return new Observable<string>((subscriber) => {
-    let body = "";
-
     completion
       .then(async (stream) => {
         for await (const part of stream) {
           if (part.choices[0].delta?.content) {
-            body += part.choices[0].delta.content;
-            subscriber.next(body);
+            subscriber.next(part.choices[0].delta.content);
           }
         }
       })

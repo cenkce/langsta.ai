@@ -16,7 +16,7 @@ import { classNames } from "@espoojs/utils";
 export const Translations = (props: {
   onFilter?: (translation: TranslationTextTask) => boolean;
 }) => {
-  const [userContent] = useUserContentState();
+  const userContent = useUserContentState();
   const tasks = Object.values(userContent?.translation || {});
   const [selectedTranslation, setSelectedTranslation] = useState<
     string | undefined

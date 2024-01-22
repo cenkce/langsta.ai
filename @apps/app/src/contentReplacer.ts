@@ -14,7 +14,7 @@ export function findContentNode(
       Object.keys(replacementDetails).forEach((key) => {
         const textContent = nodeList[x].textContent;
         if (textContent !== null && textContent.length > 20) {
-          console.log(key);
+          console.debug(key);
         }
       });
     } else

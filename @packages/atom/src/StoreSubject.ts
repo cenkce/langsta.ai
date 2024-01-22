@@ -3,7 +3,6 @@ import {
   Observable,
   distinctUntilChanged,
   map,
-  share,
 } from "rxjs";
 
 export class Atom<
@@ -48,7 +47,6 @@ export class Atom<
     return this.store.pipe(
       map((state) => this._getValue(state, key)),
       distinctUntilChanged(),
-      share(),
     ) as Observable<
       Y extends keyof TState[TName] ? TState[TName][Y] : TState[TName]
     >;

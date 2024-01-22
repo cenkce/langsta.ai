@@ -29,7 +29,6 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
 
 export async function GPTTranslateRequest(message: TranslateRequestMessage) {
   const { id, ...messageBody } = message;
-  console.log("translateHander : ", message);
   const taskAtom = TaskStore.createTaskAtom(
     () =>
       sendGPTRequest({

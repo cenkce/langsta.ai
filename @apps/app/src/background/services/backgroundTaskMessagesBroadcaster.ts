@@ -16,12 +16,11 @@ TaskStore.instance
   .subscribe({
     next(task) {
       if (task) {
-        const taskBody = omit(['id', 'task'], task);
+        const taskBody = omit(['task'], task);
 
         TaskMessage({
           type: "task/update",
           payload: {
-            taskId: task.id,
             ...taskBody,
           },
         });

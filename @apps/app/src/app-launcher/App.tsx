@@ -1,11 +1,9 @@
-import {
-  ContentContextAtom, ContentStorage,
-} from "../domain/content/ContentContext.atom";
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { ArtBoard } from "../ui/ArtBoard";
 import { LauncherPopOver } from "./LauncherPopOver";
 import "./App.css";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
+import { ContentContextAtom, ContentStorage } from "../domain/content/ContentContext.atom";
 
 function App() {
   useLocalstorageSync({

@@ -11,6 +11,7 @@
     "app": "env-cmd pnpm --filter chrome-extension",
     "atom": "pnpm --filter @espoojs/atom",
     "task": "pnpm --filter @espoojs/task",
+    "packages": "pnpm --filter @espoojs/*",
     "utilities": "pnpm --filter @espoojs/utils",
     "test": "vitest"
   },

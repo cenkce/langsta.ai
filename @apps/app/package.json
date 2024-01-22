@@ -37,7 +37,7 @@
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
-    "@crxjs/vite-plugin": "^2.0.0-beta.21",
+    "@crxjs/vite-plugin": "^2.0.0-beta.23",
     "@espoojs/atom": "*",
     "@espoojs/task": "*",
     "@espoojs/utils": "*",
@@ -46,7 +46,7 @@
     "@types/chrome": "^0.0.256",
     "@types/node": "20.8.10",
     "@types/ramda": "^0.29.9",
-    "@types/react": "^18.2.47",
+    "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
@@ -61,7 +61,7 @@
     "type-fest": "^4.9.0",
     "typescript": "5.2.2",
     "typescript-plugin-css-modules": "^5.0.2",
-    "vite": "^5.0.11",
+    "vite": "^5.0.12",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^1.1.3"
   }

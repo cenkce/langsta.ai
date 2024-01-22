@@ -13,8 +13,6 @@ import { useAtom } from "@espoojs/atom";
 export const useTranslateService = () => {
   const [settings] = useAtom(SettingsAtom);
 
-  console.log(settings);
-  
   const translate = (selection: ContentContextState["selectedText"]) => {
     const id = nanoid();
     if (selection)
@@ -26,7 +24,6 @@ export const useTranslateService = () => {
   };
   const summarise = (content: string) => {
     const id = nanoid();
-    console.log(settings.nativelanguage, settings.level)
 
     if (content && settings.nativelanguage && settings.level)
       sendGPTRequest(
@@ -102,7 +99,7 @@ export function createSummariseRequestMessage(options: {
   id?: string;
 }) {
   return {
-    type: "gpt/simplify",
+    type: "gpt/summarise",
     content: options.content,
     id: options.id || nanoid(),
     systemMessage: TranslatePropmpts({

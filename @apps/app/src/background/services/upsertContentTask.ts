@@ -7,7 +7,6 @@ import { ContentTask } from "../../api/task/ContentTask";
 export async function upsertContentTask(update: Partial<ContentTask>) {
   if (!update.taskId) return;
   try {
-    console.log("update : ", update)
     const taskStates = await ContentStorage?.read("contentTasks") || {};
     const newTaskStates = taskStates[update.taskId]
       ? ({

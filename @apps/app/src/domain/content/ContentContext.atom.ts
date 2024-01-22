@@ -3,6 +3,8 @@ import { TextSelector } from "../utils/getSelectedText";
 import { useEffect, useState } from "react";
 import { TranslationTextTask } from "../../api/task/TranslationTextTask";
 import { Atom, StoreSubject, useAtom } from "@espoojs/atom";
+import { ContentTask } from "../../api/task/ContentTask";
+import shallowEqual from "../../api/utils/shallowEqual";
 
 export const ContentStorage =
   LocalStorage.of<ContentContextState>("contentContextAtom");
@@ -33,7 +35,7 @@ export type ContentContextState = {
     publishedTime: string;
   };
   translation: Record<string, TranslationTextTask>;
-  contentTasks: Record<string, TranslationTextTask>;
+  contentTasks: Record<string, ContentTask>;
 };
 
 const contentStore = new StoreSubject({
@@ -50,11 +52,11 @@ export const ContentContextAtom = Atom.of(
 );
 
 export const useUserContentState = () => {
-  return useAtom(ContentContextAtom);
+  return useAtom(ContentContextAtom, { ignoreUpdateKeys: ["contentTasks", "translation"], equalityCheck: shallowEqual })[0];
 };
 
 export const getSelectionByText = () => {
-  contentStore.getValue().contentContextAtom.selectedText?.selectors
+  return contentStore.getValue().contentContextAtom.selectedText?.selectors
 }
 
 export const useSubscribeTranslationTask = (id?: string) => {
@@ -62,6 +64,7 @@ export const useSubscribeTranslationTask = (id?: string) => {
   useEffect(() => {
     if (id) {
       const subs = ContentContextAtom.get$('translation').subscribe((translation) => {
+        
         if (id && translation?.[id]) {
           setTask(translation[id]);
         }
@@ -74,5 +77,5 @@ export const useSubscribeTranslationTask = (id?: string) => {
 };
 
 export const useUserContentSetState = () => {
-  return useAtom(ContentContextAtom, true);
+  return useAtom(ContentContextAtom, { noStateUpdate: true })[1];
 };

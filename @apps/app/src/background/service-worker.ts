@@ -6,6 +6,7 @@ import { GPTTranslateRequest } from "./services/translate";
 import { openSidePanel } from "../api/helper/openSidePanel";
 import { TaskStore } from "@espoojs/task";
 import { GPTContentRequest } from "./services/content";
+import "./services/backgroundTaskMessagesBroadcaster";
 
 export const openai = new OpenAI({
   apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
@@ -25,7 +26,6 @@ chrome.runtime.onInstalled.addListener(() => {
     title: "Translate selection",
     contexts: ["selection"]
   });
-  // chrome.tabs.create({ url: "page.html" });
 });
 
 
@@ -40,7 +40,7 @@ chrome.runtime.onInstalled.addListener(() => {
 GPTMessagesEventEmitter.addListener(async (message) => {
   if (message.type === "gpt/translate") {
     GPTTranslateRequest(message);
-  } else if (message.type === "gpt/simplify") {
+  } else if (message.type === "gpt/simplify" || message.type === "gpt/summarise") {
     GPTContentRequest(message);
   }
 });

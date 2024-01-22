@@ -15,7 +15,7 @@ export type SimplyfyRequestMessage = {
 };
 
 export type SummariseContentRequestMessage = {
-  type: 'gpt/simplify',
+  type: 'gpt/summarise',
   systemMessage: string,
   id?: string,
   content: string;

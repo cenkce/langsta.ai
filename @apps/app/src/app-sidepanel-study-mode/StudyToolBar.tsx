@@ -1,5 +1,4 @@
 import { Stack, Tooltip, UnstyledButton, rem } from "@mantine/core";
-import { Icon } from "react-feather";
 import styles from "./StudyToolBar.module.css";
 import {
   IconTextDecrease,
@@ -9,17 +8,23 @@ import {
   IconStar,
   IconCards,
   IconColumns2,
+  IconHome2,
+  TablerIconsProps,
 } from '@tabler/icons-react';
 import { IconColumns3 } from "@tabler/icons-react";
+import { FC } from "react";
 
 interface NavbarLinkProps {
-  icon: Icon;
+  icon: FC<TablerIconsProps>;
+  disabled?: boolean;
   label: string;
   active?: boolean;
   onClick?(): void;
 }
 
-const StudyTools = [
+
+const StudyToolIcons = [
+  { icon: IconHome2, label: 'Content' },
   { icon: IconTextDecrease, label: 'Text Decrease' },
   { icon: IconTextIncrease, label: 'Text Increase' },
   { icon: IconColumns2, label: 'Narrower Layout' },
@@ -29,12 +34,16 @@ const StudyTools = [
   { icon: IconPageBreak, label: 'Simplify' },
   { icon: IconStar, label: 'Favorite' },
   { icon: IconCards, label: 'Flashcards' },
-];
+] as const;
 
-export function ToolbarButton({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
+type StudyToolIconsTexts = typeof StudyToolIcons[number]['label'];
+// type StudyToolIcon =  { icon: FC<TablerIconsProps>, label: StudyToolIconsTexts };
+
+
+export function ToolbarButton({ icon: Icon, label, active, onClick, disabled }: NavbarLinkProps) {
   return (
     <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
-      <UnstyledButton onClick={onClick} className={styles.link} data-active={active || undefined}>
+      <UnstyledButton disabled={disabled} onClick={onClick} className={styles.link} data-active={active || undefined}>
         <Icon style={{ width: rem(20), height: rem(20), stroke: "1.5px" }} />
       </UnstyledButton>
     </Tooltip>
@@ -42,11 +51,13 @@ export function ToolbarButton({ icon: Icon, label, active, onClick }: NavbarLink
 }
 
 
-export function StudyToolbar(props: {onClick: (link: string) => void }) {
-  const links = StudyTools.map((link) => (
+export function StudyToolbar(props: {disabled: boolean; selectedLink: StudyToolIconsTexts; onClick: (link: StudyToolIconsTexts) => void }) {
+  const links = StudyToolIcons.map((link) => (
     <ToolbarButton
       {...link}
+      active={link.label === props.selectedLink}
       key={link.label}
+      disabled={props.disabled}
       onClick={() => {
         props.onClick(link.label);
       }}

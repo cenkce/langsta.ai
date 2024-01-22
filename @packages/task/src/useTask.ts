@@ -12,15 +12,16 @@ export const useTaskSubscribeById = (id?: string) => {
 
   useEffect(() => {
     if(id) {
-      const task = TaskStore.instance.subscribeTaskById(id);
-      const subs = task.subscribe((node) => {
-        if(node)
-          setSetTask(node)
-      })
+      const task$ = TaskStore.instance.subscribeTaskById(id);
+      const subs = task$.subscribe((node) => {
+        if(node) {
+          setSetTask(node);
+        }
+      });
 
       return () => subs.unsubscribe();
     }
-  }, [id])
+  }, [id]);
 
   return task;
 }

@@ -21,20 +21,11 @@ import {
 } from "@espoojs/utils";
 import { parseContent } from "../domain/content/parseContent";
 export const ContentCaptureContainer = () => {
-  const [, setUserContent] = useUserContentSetState();
+  const setUserContent = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const [selection] = useUserContentState();
+  const selection = useUserContentState();
   const { translate } = useTranslateService();
-
-  // const [content] = useAtom(ContentContextAtom);
-  // selectedText.
-  // useEffect(() => {
-  //   if (content.selectedText?.text.trim() && content.selectedText.selectors) {
-  //     // const [anchor, focus] = content.selectedText.selectors;
-  //     // setSelectedText(anchor, focus);
-  //   }
-  // }, [content.selectedText?.text]);
 
   // TODO: Add support for multiple mouse events
   useGlobalMouseEventHandlerService({

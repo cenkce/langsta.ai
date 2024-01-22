@@ -1,18 +1,28 @@
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
-import {
-  ContentContextAtom,
-  ContentStorage,
-  useUserContentState,
-} from "../domain/content/ContentContext.atom";
 import { ArtBoard } from "../ui/ArtBoard";
 import { StudyToolbar } from "./StudyToolBar";
 import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
-import { useState } from "react";
+import { ComponentProps, useEffect, useRef, useState } from "react";
+import { IconFidgetSpinner } from "@tabler/icons-react";
+import { TaskNode, TaskStore } from "@espoojs/task";
+import {
+  ContentContextAtom,
+  ContentStorage,
+  useUserContentState,
+} from "../domain/content/ContentContext.atom";
+import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
+import { OperatorFunction, filter, map } from "rxjs";
+
+type studyToolNames = ComponentProps<typeof StudyToolbar>["selectedLink"];
 
 export const SidepanelApp = () => {
-  const [taskId, setTaskId] = useState<string | undefined>(undefined);
+  const [taskId, setTaskId] = useState<
+    { [key in studyToolNames]?: string } | undefined
+  >();
+  const [[taskResult, taskStatus] = [], setTask] = useState<[result: string, status: string]>();
+
   useLocalstorageSync({
     debugKey: "content-sidepanel-study-mode",
     storageAtom: ContentContextAtom,
@@ -25,35 +35,83 @@ export const SidepanelApp = () => {
     contentStorage: SettingsStorage,
   });
 
-  const { simplify, summarise } = useTranslateService();
-  const [userContent] = useUserContentState();
-  const tasks = Object.values(userContent?.contentTasks || {});
-  const task = tasks.find((task) => {
-    return task.taskId === taskId;
-  });
+  useTasksSyncByTagName("background-task");
+  const [selectedLink, setSelectedLink] = useState<studyToolNames>("Content");
 
-  console.log("content task", task);
+  useEffect(() => {
+    const currentTaskId = taskId?.[selectedLink];
+    if (currentTaskId) {
+      const subscription = TaskStore.instance
+        .subscribeTaskById(currentTaskId)
+        .pipe(
+          filter((task) => {
+            return task !== undefined
+          }) as OperatorFunction<TaskNode | undefined, TaskNode>,
+          map((task) => {
+            return [task.result, task.status] as const;
+          }),
+          // bufferTime(1000),
+        )
+        .subscribe(([result, status]) => {
+          if (!result) {
+            return;
+          }
+          setTask(([existingRes] = ['', '']) => {
+            // const mergedResult = result.reduce((acc, [res]) => {
+            //   return acc + res;
+            // }, existingRes);
+            // const recentStatus = result[result.length - 1][1];
+            return [existingRes + result, status] as [string, string];
+          });
+        });
+
+      return () => subscription.unsubscribe();
+    }
+  }, [selectedLink, taskId]);
+
+  const { simplify, summarise } = useTranslateService();
+  const userContent = useUserContentState();
+  // const task = useTaskSubscribeById(taskId?.["Simplify"]);
+  const isDisabled = taskStatus === "progress";
+
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <ArtBoard>
       <div className={styles.container}>
         <StudyToolbar
+          selectedLink={selectedLink}
+          disabled={isDisabled}
           onClick={(link) => {
             if (link === "Summarise") {
-              setTaskId(summarise(userContent.activeTabContent.textContent));
+              !taskId?.["Summarise"] &&
+                setTaskId((state = {}) => ({
+                  ...state,
+                  Summarise: summarise(
+                    userContent.activeTabContent.textContent
+                  ),
+                }));
             } else if (link === "Simplify") {
-              setTaskId(simplify(userContent.activeTabContent.textContent));
+              !taskId?.["Simplify"] &&
+                setTaskId((state = {}) => ({
+                  ...state,
+                  Simplify: simplify(
+                    userContent.activeTabContent.textContent
+                  ),
+                }));
             }
+            setSelectedLink(link);
           }}
         />
         <main className={styles.content}>
-          <h1>{userContent.activeTabContent.title}</h1>
+          <h1>
+            {taskStatus === "progress" && <IconFidgetSpinner />}
+            {/* {userContent.activeTabContent.title} */}
+          </h1>
           <div
+            ref={contentRef}
             dangerouslySetInnerHTML={{
-              __html:
-                task?.status === "completed"
-                  ? task.result || ""
-                  : userContent.activeTabContent.content,
+              __html: taskResult ? taskResult || "" : userContent.activeTabContent.content,
             }}
           />
         </main>

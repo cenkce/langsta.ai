@@ -11,7 +11,6 @@ export const GPTContentRequest = async (
   message: SummariseContentRequestMessage | SimplyfyRequestMessage,
 ) => {
   const messageBody = omit(["id"], message);
-  console.log("GPTContentRequest : ", message);
   const taskAtom = TaskStore.createTaskAtom(
     () =>
       sendGPTRequest({
