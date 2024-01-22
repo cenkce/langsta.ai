@@ -4,6 +4,7 @@ import {
   catchError,
   distinctUntilChanged,
   filter,
+  finalize,
   map,
   share,
   takeUntil,
@@ -222,6 +223,11 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
         });
 
         return stream$.pipe(
+          finalize(() => {
+            this._instance.updateNode(atom.getId(), {
+              status: "completed",
+            });
+          }),
           takeUntil(
             this.forceCancelSubject.pipe(
               filter((incomingId) => {
@@ -237,11 +243,6 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
             this._instance.updateNode(atom.getId(), { error: err });
             throw err;
           })
-          // finalize(() => {
-          //   this._instance.updateNode(atom.getId(), {
-          //     status: "completed",
-          //   });
-          // })
         );
       },
     };

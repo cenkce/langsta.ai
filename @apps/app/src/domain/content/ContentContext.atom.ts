@@ -16,6 +16,18 @@ export async function deleteTranslation(id: string) {
   ContentStorage.write("translation", newTranslations);
 }
 
+export type StudyContentType = {
+  url: string;
+  title: string;
+  summary?: string;
+  simplifiedSummary?: string;
+  tags?: string[];
+  createdAt: number;
+  updatedAt: number;
+  words: string[];
+  level: string;
+}
+
 export type ContentContextState = {
   selectedText: {
     text: string;
@@ -36,39 +48,52 @@ export type ContentContextState = {
   };
   translation: Record<string, TranslationTextTask>;
   contentTasks: Record<string, ContentTask>;
+  studyContent: Record<string, ContentTask>;
 };
 
 const contentStore = new StoreSubject({
   contentContextAtom: {
     selectedText: { text: "" },
     activeTabContent: {},
-    translation: {}
+    translation: {},
+    studyContent: {},
   } as ContentContextState,
 });
 
 export const ContentContextAtom = Atom.of(
   { key: "contentContextAtom" },
-  contentStore
+  contentStore,
 );
 
 export const useUserContentState = () => {
-  return useAtom(ContentContextAtom, { ignoreUpdateKeys: ["contentTasks", "translation"], equalityCheck: shallowEqual })[0];
+  return useAtom(ContentContextAtom, {
+    ignoreUpdateKeys: ["contentTasks", "translation"],
+    equalityCheck: shallowEqual,
+  })[0];
+};
+
+export const useStudyContentState = () => {
+  return useAtom(ContentContextAtom, {
+    subscribeKey: 'studyContent',
+    equalityCheck: shallowEqual,
+  });
 };
 
 export const getSelectionByText = () => {
-  return contentStore.getValue().contentContextAtom.selectedText?.selectors
-}
+  return contentStore.getValue().contentContextAtom.selectedText?.selectors;
+};
 
 export const useSubscribeTranslationTask = (id?: string) => {
   const [task, setTask] = useState<TranslationTextTask | undefined>();
   useEffect(() => {
     if (id) {
-      const subs = ContentContextAtom.get$('translation').subscribe((translation) => {
-        
-        if (id && translation?.[id]) {
-          setTask(translation[id]);
-        }
-      });
+      const subs = ContentContextAtom.get$("translation").subscribe(
+        (translation) => {
+          if (id && translation?.[id]) {
+            setTask(translation[id]);
+          }
+        },
+      );
 
       return () => subs.unsubscribe();
     }

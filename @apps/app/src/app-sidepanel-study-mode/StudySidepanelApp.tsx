@@ -21,7 +21,8 @@ export const SidepanelApp = () => {
   const [taskId, setTaskId] = useState<
     { [key in studyToolNames]?: string } | undefined
   >();
-  const [[taskResult, taskStatus] = [], setTask] = useState<[result: string, status: string]>();
+  const [[taskResult, taskStatus] = [], setTask] =
+    useState<[result: string, status: string]>();
 
   useLocalstorageSync({
     debugKey: "content-sidepanel-study-mode",
@@ -45,24 +46,30 @@ export const SidepanelApp = () => {
         .subscribeTaskById(currentTaskId)
         .pipe(
           filter((task) => {
-            return task !== undefined
+            return task !== undefined;
           }) as OperatorFunction<TaskNode | undefined, TaskNode>,
           map((task) => {
             return [task.result, task.status] as const;
           }),
           // bufferTime(1000),
         )
-        .subscribe(([result, status]) => {
-          if (!result) {
-            return;
-          }
-          setTask(([existingRes] = ['', '']) => {
-            // const mergedResult = result.reduce((acc, [res]) => {
-            //   return acc + res;
-            // }, existingRes);
-            // const recentStatus = result[result.length - 1][1];
-            return [existingRes + result, status] as [string, string];
-          });
+        .subscribe({
+          next: ([result, status]) => {
+            console.log("status : ", status);
+            if(status === "completed") {
+              subscription.unsubscribe();
+            }
+            if (!result) {
+              return;
+            }
+            setTask(([existingRes] = ["", ""]) => {
+              // const mergedResult = result.reduce((acc, [res]) => {
+              //   return acc + res;
+              // }, existingRes);
+              // const recentStatus = result[result.length - 1][1];
+              return [existingRes + result, status] as [string, string];
+            });
+          },
         });
 
       return () => subscription.unsubscribe();
@@ -88,16 +95,14 @@ export const SidepanelApp = () => {
                 setTaskId((state = {}) => ({
                   ...state,
                   Summarise: summarise(
-                    userContent.activeTabContent.textContent
+                    userContent.activeTabContent.textContent,
                   ),
                 }));
             } else if (link === "Simplify") {
               !taskId?.["Simplify"] &&
                 setTaskId((state = {}) => ({
                   ...state,
-                  Simplify: simplify(
-                    userContent.activeTabContent.textContent
-                  ),
+                  Simplify: simplify(userContent.activeTabContent.textContent),
                 }));
             }
             setSelectedLink(link);
@@ -111,7 +116,9 @@ export const SidepanelApp = () => {
           <div
             ref={contentRef}
             dangerouslySetInnerHTML={{
-              __html: taskResult ? taskResult || "" : userContent.activeTabContent.content,
+              __html: taskResult
+                ? taskResult || ""
+                : userContent.activeTabContent.content,
             }}
           />
         </main>

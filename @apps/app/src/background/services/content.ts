@@ -5,7 +5,6 @@ import {
   SummariseContentRequestMessage,
 } from "../../api/services/gpt-api/messages";
 import { TaskStore } from "@espoojs/task";
-import { upsertContentTask } from "./upsertContentTask";
 
 export const GPTContentRequest = async (
   message: SummariseContentRequestMessage | SimplyfyRequestMessage,
@@ -18,41 +17,15 @@ export const GPTContentRequest = async (
         systemMessage: messageBody.systemMessage,
       }),
     {
-      tags: ["content-service", "background-task"],
+      tags: ["content-service", "background-task", message.type],
       type: message.type,
     },
     message.id,
   );
 
-  await upsertContentTask({
-    content: message.content,
-    status: "progress",
-    taskId: taskAtom.id,
-    createdAt: taskAtom.createdAt,
-  });
-
   taskAtom.plugAtom$(taskAtom.chargeAtom$()).subscribe({
-    next(result) {
-      result &&
-        upsertContentTask({
-          status: "progress",
-          taskId: taskAtom.id,
-          result: result,
-        });
-    },
-    complete() {
-      upsertContentTask({
-        status: "completed",
-        taskId: taskAtom.id,
-      });
-    },
     error(err) {
       console.error(err);
-      upsertContentTask({
-        status: "error",
-        taskId: taskAtom.id,
-        error: err,
-      });
     },
   });
 };

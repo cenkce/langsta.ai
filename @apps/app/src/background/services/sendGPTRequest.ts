@@ -33,6 +33,7 @@ export function sendGPTRequest(message: {
         subscriber.error(error);
       })
       .finally(() => {
+        console.debug("task finally");
         subscriber.complete();
       });
   });
