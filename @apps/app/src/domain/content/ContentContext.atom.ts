@@ -7,7 +7,7 @@ import { ContentTask } from "../../api/task/ContentTask";
 import shallowEqual from "../../api/utils/shallowEqual";
 
 export const ContentStorage =
-  LocalStorage.of<ContentContextState>("contentContextAtom");
+  LocalStorage.of<UserContentState>("contentContextAtom");
 
 export async function deleteTranslation(id: string) {
   const translations = await ContentStorage.read("translation");
@@ -20,20 +20,21 @@ export type StudyContentType = {
   url: string;
   title: string;
   summary?: string;
-  simplifiedSummary?: string;
+  simplify?: string;
   tags?: string[];
-  createdAt: number;
-  updatedAt: number;
-  words: string[];
+  createdAt: string;
+  updatedAt: string;
+  words?: string[];
   level: string;
-}
+  flashcards?: { word: string; translation: string }[];
+};
 
-export type ContentContextState = {
+export type UserContentState = {
   selectedText: {
     text: string;
     selectors?: [anchor: TextSelector, focus: TextSelector];
     siteName?: string;
-  };
+  } | undefined;
   activeTabContent: {
     title: string;
     content: string;
@@ -45,25 +46,34 @@ export type ContentContextState = {
     siteName: string;
     lang: string;
     publishedTime: string;
-  };
-  translation: Record<string, TranslationTextTask>;
-  contentTasks: Record<string, ContentTask>;
-  studyContent: Record<string, ContentTask>;
+  } | undefined;
+  translation: Record<string, TranslationTextTask> | undefined;
+  contentTasks: Record<string, ContentTask> | undefined;
 };
 
-const contentStore = new StoreSubject({
+const contentStore = new StoreSubject<{
+  contentContextAtom: UserContentState;
+  studyContent: {
+    [url: string]: StudyContentType;
+  };
+}>({
   contentContextAtom: {
-    selectedText: { text: "" },
-    activeTabContent: {},
-    translation: {},
-    studyContent: {},
-  } as ContentContextState,
+    selectedText: undefined,
+    activeTabContent: undefined,
+    translation: undefined,
+    contentTasks: undefined,
+  },
+  studyContent: {} as {
+    [url: string]: StudyContentType;
+  },
 });
 
 export const ContentContextAtom = Atom.of(
   { key: "contentContextAtom" },
   contentStore,
 );
+
+export const StudyContentAtom = Atom.of({ key: "studyContent" }, contentStore);
 
 export const useUserContentState = () => {
   return useAtom(ContentContextAtom, {
@@ -73,8 +83,7 @@ export const useUserContentState = () => {
 };
 
 export const useStudyContentState = () => {
-  return useAtom(ContentContextAtom, {
-    subscribeKey: 'studyContent',
+  return useAtom(StudyContentAtom, {
     equalityCheck: shallowEqual,
   });
 };

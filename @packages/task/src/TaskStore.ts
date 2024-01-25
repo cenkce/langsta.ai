@@ -14,18 +14,18 @@ import { StoreSubject } from "@espoojs/atom";
 
 export type Task<
   R = unknown, //Response
-  P extends Record<string, unknown> | undefined = undefined // Params
+  P extends Record<string, unknown> | undefined = undefined, // Params
 > = (params: TaskParams<P>) => Observable<R>;
 export type DefaultTaskParams = {
   tags: string[];
   reserveTags?: boolean;
 };
 export type TaskParams<
-  T extends Record<string, unknown> | undefined = undefined
+  T extends Record<string, unknown> | undefined = undefined,
 > = T extends undefined ? DefaultTaskParams : DefaultTaskParams & T;
 export type TaskNode<
   R = unknown,
-  P extends Record<string, unknown> | undefined = undefined
+  P extends Record<string, unknown> | undefined = undefined,
 > = {
   task: Task<R, P>;
   params?: TaskParams<P>;
@@ -46,7 +46,7 @@ export const TaskStatuses = [
 
 type TaskStoreState<
   R = unknown,
-  P extends Record<string, unknown> | undefined = undefined
+  P extends Record<string, unknown> | undefined = undefined,
 > = {
   tasks: Map<string, TaskNode<R, P>>;
   nodesByTag: Map<string, Set<string>>;
@@ -55,16 +55,19 @@ type TaskStoreState<
 type TasksSubject = StoreSubject<TaskStoreState>;
 export type TaskNodeParams<
   R,
-  P extends Record<string, unknown> | undefined = undefined
+  P extends Record<string, unknown> | undefined = undefined,
 > = Omit<TaskNode<R, P>, "id" | "createdAt"> & { id?: string };
 export class TaskAtom<
   R = unknown,
-  P extends Record<string, unknown> | undefined = undefined
+  P extends Record<string, unknown> | undefined = undefined,
 > {
   private id: string;
   #createdAt = Date.now();
 
-  constructor(store: TasksSubject, private nodeParams: TaskNodeParams<R, P>) {
+  constructor(
+    store: TasksSubject,
+    private nodeParams: TaskNodeParams<R, P>,
+  ) {
     this.id = this.nodeParams?.id || nanoid();
     const state = store.getValue();
     const nodes = new Map(state.tasks);
@@ -98,7 +101,7 @@ export class TaskAtom<
 }
 
 export class TaskStore extends StoreSubject<TaskStoreState> {
-  private static _instance;
+  private static _instance: TaskStore;
   private static forceCancelSubject = new Subject<string>();
 
   static {
@@ -123,7 +126,11 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     this.updateNode(node.id, node, true);
   }
 
-  updateNode(id: string, update: Partial<TaskNode<unknown, any>>, force = false) {
+  updateNode(
+    id: string,
+    update: Partial<TaskNode<unknown, any>>,
+    force = false,
+  ) {
     const tasks = new Map(this.value.tasks);
     const currentNode = tasks.get(id);
 
@@ -135,7 +142,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
           currentNode &&
           !Object.is(
             (currentNode as Record<string, unknown>)[key],
-            (update as Record<string, unknown>)[key]
+            (update as Record<string, unknown>)[key],
           )
         );
       }) === false
@@ -162,12 +169,16 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
   }
 
   subscribeTaskById(id: string) {
-    return this.pipe(map(({ tasks }) => tasks.get(id)), distinctUntilChanged());
+    return this.pipe(
+      map(({ tasks }) => tasks.get(id)),
+      distinctUntilChanged(),
+      share(),
+    );
   }
 
   subscribeTaskByTagName(
     tag: string,
-    statuses: TaskStatus[] = ["idle", "progress"]
+    statuses: TaskStatus[] = ["idle", "progress"],
   ) {
     return this.pipe(
       map(
@@ -190,21 +201,21 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
             !!current &&
             current.some((taskNode, i) => Object.is(taskNode, prev[i]))
           );
-        })
+        }),
       ),
-      share()
+      share(),
     );
   }
 
   static createTaskAtom<
     R = unknown,
-    P extends Record<string, unknown> | undefined = undefined
+    P extends Record<string, unknown> | undefined = undefined,
   >(task: Task<R, P>, params?: TaskParams<P>, id?: string) {
     const atom = new TaskAtom<R, P>(TaskStore._instance, {
       task,
       params,
       status: "idle",
-      id
+      id,
     });
 
     const node = atom.getNode();
@@ -232,8 +243,8 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
             this.forceCancelSubject.pipe(
               filter((incomingId) => {
                 return incomingId === atom.getId();
-              })
-            )
+              }),
+            ),
           ),
           map((response) => {
             this._instance.updateNode(atom.getId(), { result: response });
@@ -242,7 +253,8 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
           catchError((err) => {
             this._instance.updateNode(atom.getId(), { error: err });
             throw err;
-          })
+          }),
+          share(),
         );
       },
     };

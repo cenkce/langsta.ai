@@ -6,7 +6,7 @@ describe("StoreSubject", () => {
   it("should create a new Atom and set or get new values", async () => {
     const store = new StoreSubject({
       "atom-name": { state: "state-value", state2: 1 },
-      "another-state": { state: "state-value" },
+      "another-state": { state3: "state-value" },
     });
     return new Promise<void>((res) => {
       const atom = Atom.of({ key: "atom-name" }, store);

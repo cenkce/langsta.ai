@@ -6,14 +6,14 @@ import {
   TranslateRequestMessage,
 } from "../../api/services/gpt-api/messages";
 import { sendGPTRequest } from "../../api/services/gpt-api/sendGPTRequest";
-import { ContentContextState } from "../content/ContentContext.atom";
+import { UserContentState } from "../content/ContentContext.atom";
 import { SettingsAtom } from "../user/SettingsModel";
 import { useAtom } from "@espoojs/atom";
 
 export const useTranslateService = () => {
   const [settings] = useAtom(SettingsAtom);
 
-  const translate = (selection: ContentContextState["selectedText"]) => {
+  const translate = (selection: UserContentState["selectedText"]) => {
     const id = nanoid();
     if (selection)
       sendGPTRequest(
@@ -22,7 +22,9 @@ export const useTranslateService = () => {
 
     return id;
   };
-  const summarise = (content: string) => {
+  const summarise = (content?: string) => {
+    if(!content )
+      return;
     const id = nanoid();
 
     if (content && settings.nativelanguage && settings.level)
@@ -37,7 +39,9 @@ export const useTranslateService = () => {
 
     return id;
   };
-  const simplify = (content: string) => {
+  const simplify = (content?: string) => {
+    if(!content )
+      return;
     const id = nanoid();
     if (content && settings.nativelanguage && settings.level)
       sendGPTRequest(
@@ -61,7 +65,7 @@ export const useTranslateService = () => {
 export function createTranslateTextMessage(options: {
   language: string;
   level?: string;
-  selection: ContentContextState["selectedText"];
+  selection: UserContentState["selectedText"];
   id?: string;
 }) {
   return {

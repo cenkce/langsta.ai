@@ -1,28 +1,30 @@
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { ArtBoard } from "../ui/ArtBoard";
-import { StudyToolbar } from "./StudyToolBar";
+import {
+  StudyToolContentSlugs,
+  StudyToolIconsSlugs,
+  StudyToolbar,
+} from "./StudyToolBar";
 import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
-import { ComponentProps, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconFidgetSpinner } from "@tabler/icons-react";
-import { TaskNode, TaskStore } from "@espoojs/task";
+import { TaskNode, TaskStatus, TaskStore } from "@espoojs/task";
 import {
   ContentContextAtom,
   ContentStorage,
+  useStudyContentState,
   useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
-import { OperatorFunction, filter, map } from "rxjs";
-
-type studyToolNames = ComponentProps<typeof StudyToolbar>["selectedLink"];
+import { OperatorFunction, filter, scan } from "rxjs";
 
 export const SidepanelApp = () => {
   const [taskId, setTaskId] = useState<
-    { [key in studyToolNames]?: string } | undefined
+    { [key in StudyToolContentSlugs]?: string } | undefined
   >();
-  const [[taskResult, taskStatus] = [], setTask] =
-    useState<[result: string, status: string]>();
+  const [taskStatus, setTaskStatus] = useState<TaskStatus>();
 
   useLocalstorageSync({
     debugKey: "content-sidepanel-study-mode",
@@ -37,10 +39,17 @@ export const SidepanelApp = () => {
   });
 
   useTasksSyncByTagName("background-task");
-  const [selectedLink, setSelectedLink] = useState<studyToolNames>("Content");
+  const [selectedLink, setSelectedLink] =
+    useState<StudyToolIconsSlugs>("content");
+  const [selectedContent, setSelectedContent] =
+    useState<StudyToolContentSlugs>("content");
+  const [studyState, setStudyState] = useStudyContentState();
+  const userContent = useUserContentState();
+  const userContentRef = useRef(userContent);
+  userContentRef.current = userContent;
 
   useEffect(() => {
-    const currentTaskId = taskId?.[selectedLink];
+    const currentTaskId = taskId?.[selectedContent];
     if (currentTaskId) {
       const subscription = TaskStore.instance
         .subscribeTaskById(currentTaskId)
@@ -48,41 +57,46 @@ export const SidepanelApp = () => {
           filter((task) => {
             return task !== undefined;
           }) as OperatorFunction<TaskNode | undefined, TaskNode>,
-          map((task) => {
-            return [task.result, task.status] as const;
-          }),
-          // bufferTime(1000),
+          scan<TaskNode, [string, TaskNode] | []>((acc, task) => {
+            return [(acc[0] || "")  + (task.result || "" ), task];
+          }, []),
         )
         .subscribe({
-          next: ([result, status]) => {
-            console.log("status : ", status);
-            if(status === "completed") {
-              subscription.unsubscribe();
-            }
-            if (!result) {
-              return;
-            }
-            setTask(([existingRes] = ["", ""]) => {
-              // const mergedResult = result.reduce((acc, [res]) => {
-              //   return acc + res;
-              // }, existingRes);
-              // const recentStatus = result[result.length - 1][1];
-              return [existingRes + result, status] as [string, string];
-            });
+          next: ([result, task]) => {
+            const siteName = userContentRef?.current?.selectedText?.siteName;
+            const resultKey = task?.params?.tags.includes("gpt/simplify")
+              ? "simplify"
+              : "summary";
+             console.log("result", result);
+            result &&
+              siteName &&
+              setStudyState((state) => ({
+                ...state,
+                [siteName]: {
+                  ...state[siteName],
+                  [resultKey]: result,
+                  updatedAt: new Date().toISOString(),
+                  createdAt: new Date().toISOString(),
+                  level: "",
+                  title: "",
+                  url: siteName,
+                },
+              }));
+            task?.status && setTaskStatus(task?.status);
+            if(task?.status === "completed") 
+              setTaskId((state) => ({ ...state, [selectedContent]: undefined }));
           },
         });
 
       return () => subscription.unsubscribe();
     }
-  }, [selectedLink, taskId]);
+  }, [selectedContent, taskId]);
 
   const { simplify, summarise } = useTranslateService();
-  const userContent = useUserContentState();
   // const task = useTaskSubscribeById(taskId?.["Simplify"]);
   const isDisabled = taskStatus === "progress";
-
   const contentRef = useRef<HTMLDivElement | null>(null);
-
+  const contentUrl = userContent?.selectedText?.siteName || "";
   return (
     <ArtBoard>
       <div className={styles.container}>
@@ -90,36 +104,51 @@ export const SidepanelApp = () => {
           selectedLink={selectedLink}
           disabled={isDisabled}
           onClick={(link) => {
-            if (link === "Summarise") {
-              !taskId?.["Summarise"] &&
+            if (link === "summary") {
+              !taskId?.[link] &&
                 setTaskId((state = {}) => ({
                   ...state,
-                  Summarise: summarise(
-                    userContent.activeTabContent.textContent,
+                  summary: summarise(
+                    userContentRef.current?.activeTabContent?.textContent,
                   ),
                 }));
-            } else if (link === "Simplify") {
-              !taskId?.["Simplify"] &&
+            } else if (link === "simplify") {
+              !taskId?.[link] &&
                 setTaskId((state = {}) => ({
                   ...state,
-                  Simplify: simplify(userContent.activeTabContent.textContent),
+                  simplify: simplify(
+                    userContentRef.current?.activeTabContent?.textContent,
+                  ),
                 }));
             }
             setSelectedLink(link);
+            if (
+              link === "content" ||
+              link === "summary" ||
+              link === "simplify" ||
+              link === "words" ||
+              link === "flashcards"
+            )
+              setSelectedContent(link);
           }}
         />
         <main className={styles.content}>
           <h1>
             {taskStatus === "progress" && <IconFidgetSpinner />}
-            {/* {userContent.activeTabContent.title} */}
+            {userContent?.activeTabContent?.title || "No title"}
           </h1>
           <div
             ref={contentRef}
-            dangerouslySetInnerHTML={{
-              __html: taskResult
-                ? taskResult || ""
-                : userContent.activeTabContent.content,
-            }}
+            dangerouslySetInnerHTML={
+              selectedContent !== "flashcards" && selectedContent !== "words"
+                ? {
+                    __html:
+                      selectedContent === "content"
+                        ? userContent?.activeTabContent?.content || ""
+                        : studyState[contentUrl]?.[selectedContent] || "",
+                  }
+                : { __html: "" }
+            }
           />
         </main>
       </div>

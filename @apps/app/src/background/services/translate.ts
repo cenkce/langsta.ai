@@ -1,6 +1,6 @@
 import { TranslateRequestMessage } from "../../api/services/gpt-api/messages";
 import {
-  ContentContextState,
+  UserContentState,
   ContentStorage,
 } from "../../domain/content/ContentContext.atom";
 import { TranslationTextTask } from "../../api/task/TranslationTextTask";
@@ -16,11 +16,11 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
       ? ({
           ...taskStates,
           [update.taskId]: { ...taskStates[update.taskId], ...update },
-        } as ContentContextState["translation"])
+        } as UserContentState["translation"])
       : ({
           ...taskStates,
           [update.taskId]: { ...update },
-        } as ContentContextState["translation"]);
+        } as UserContentState["translation"]);
     await ContentStorage.write("translation", newTaskStates);
   } catch (error) {
     console.error(error);
