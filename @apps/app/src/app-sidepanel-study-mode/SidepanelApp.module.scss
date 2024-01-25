@@ -81,16 +81,64 @@ code {
 
 .container {
   margin: 0 auto;
-  padding: 0 8px;
   display: flex;
   flex-direction: row;
+  overflow: auto;
+  max-height: 100%;
 }
 
 .content {
   flex: 1;
-  max-width: 500px;
   margin: 0 auto;
   padding: 0 16px;
+}
+
+.textSize-xs {
+  font-size: 12px;
+}
+
+.textSize-sm {
+  font-size: 14px;
+}
+
+.textSize-md {
+  font-size: 16px;
+}
+
+.textSize-lg {
+  font-size: 18px;
+}
+
+.textSize-xl {
+  font-size: 20px;
+}
+
+.textSize-xxl {
+  font-size: 22px;
+}
+
+.layoutSize-xs {
+  max-width: 40%;
+}
+
+.layoutSize-sm {
+  max-width: 50%;
+}
+
+.layoutSize-md {
+  max-width: 60%;
+}
+
+.layoutSize-lg {
+  max-width: 70%;
+}
+
+.layoutSize-xlg {
+  max-width: 80%;
+}
+
+.layoutSize-xxlg {
+  max-width: 90%;
 }
 
 // More themes can be added here...

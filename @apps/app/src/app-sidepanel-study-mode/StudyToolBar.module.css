@@ -1,15 +1,17 @@
 
 .navbar {
   width: rem(80px);
-  height: rem(750px);
+  max-height: 100%;
+  overflow: auto;
   padding: var(--mantine-spacing-md);
   display: flex;
   flex-direction: column;
+  position: sticky;
+  top: 0;
   border-right: rem(1px) solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
 }
 
 .navbarMain {
-  margin-top: rem(50px);
 }
 
 .link {

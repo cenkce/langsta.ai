@@ -3,9 +3,7 @@
 @tailwind utilities;
 @tailwind variants;
 
-@function remToPx($rm) {
-  @return calc(#{$rm} * var(--ui-root-font-size));
-}
+
 :host {
   --ui-root-font-size: 14px;
 }
