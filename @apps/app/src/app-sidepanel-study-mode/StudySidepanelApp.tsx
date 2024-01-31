@@ -1,9 +1,8 @@
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import {
-  StudyToolContentSlugs,
-  StudyToolIconsSlugs,
-  StudyToolbar,
-} from "./StudyToolBar";
+  ContentReadActionsBar,
+  ContentReadActionsSlugsType,
+} from "./ContentReadActionsBar";
 import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
@@ -19,21 +18,18 @@ import {
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
 import { OperatorFunction, filter, scan } from "rxjs";
 import { classNames } from "@espoojs/utils";
-
-const ContentSlugs = [
-  "content",
-  "summary",
-  "simplify",
-  "words",
-  "flashcards",
-] as const;
+import { useEventListener } from "@mantine/hooks";
+import {
+  ContentStudyActionsBar,
+  ContentStudyActionsIconsSlugsType,
+} from "./ContentStudyActionsBar copy";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
 
 export const SidepanelApp = () => {
   const [taskId, setTaskId] = useState<
-    { [key in StudyToolContentSlugs]?: string } | undefined
+    { [key in ContentStudyActionsIconsSlugsType]?: string } | undefined
   >();
   const [taskStatus, setTaskStatus] = useState<TaskStatus>();
   const [textSize, setTextSize] = useState<number>(2);
@@ -52,17 +48,18 @@ export const SidepanelApp = () => {
   });
 
   useTasksSyncByTagName("background-task");
-  const [selectedLink, setSelectedLink] =
-    useState<StudyToolIconsSlugs>("content");
-  const [selectedContent, setSelectedContent] =
-    useState<StudyToolContentSlugs>("content");
+  const [selectedReadActions, setSelectedReadActions] = useState<
+    ContentReadActionsSlugsType | undefined
+  >();
+  const [selectedStudyAction, setSelectedStudyAction] =
+    useState<ContentStudyActionsIconsSlugsType>("content");
   const [studyState, setStudyState] = useStudyContentState();
   const userContent = useUserContentState();
   const userContentRef = useRef(userContent);
   userContentRef.current = userContent;
 
   useEffect(() => {
-    const currentTaskId = taskId?.[selectedContent];
+    const currentTaskId = taskId?.[selectedStudyAction];
     if (currentTaskId) {
       const subscription = TaskStore.instance
         .subscribeTaskById(currentTaskId)
@@ -99,40 +96,26 @@ export const SidepanelApp = () => {
             if (task?.status === "completed")
               setTaskId((state) => ({
                 ...state,
-                [selectedContent]: undefined,
+                [selectedStudyAction]: undefined,
               }));
           },
         });
 
       return () => subscription.unsubscribe();
     }
-  }, [selectedContent, taskId]);
-
-  console.log(layoutSize, layoutSizes[layoutSize]);
+  }, [selectedStudyAction, taskId]);
 
   const { simplify, summarise } = useTranslateService();
   // const task = useTaskSubscribeById(taskId?.["Simplify"]);
   const isDisabled = taskStatus === "progress";
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  // const contentRef = useRef<HTMLDivElement | null>(null);
   const contentUrl = userContent?.selectedText?.siteName || "";
-  const toolBarClickHandler = (link: StudyToolIconsSlugs) => {
-    if (link === "summary") {
-      !taskId?.[link] &&
-        setTaskId((state = {}) => ({
-          ...state,
-          summary: summarise(
-            userContentRef.current?.activeTabContent?.textContent,
-          ),
-        }));
-    } else if (link === "simplify") {
-      !taskId?.[link] &&
-        setTaskId((state = {}) => ({
-          ...state,
-          simplify: simplify(
-            userContentRef.current?.activeTabContent?.textContent,
-          ),
-        }));
-    } else if (link === "text-decrease") {
+  const contentFromCache = studyState[contentUrl];
+  const hasSummary = !!contentFromCache?.summary;
+  const hasSimplifed = !!contentFromCache?.simplify;
+
+  const readActionsClickHandler = (link: ContentReadActionsSlugsType) => {
+    if (link === "text-decrease") {
       setTextSize((state) => (state > 0 ? state - 1 : state));
     } else if (link === "text-increase") {
       setTextSize((state) =>
@@ -146,41 +129,89 @@ export const SidepanelApp = () => {
       );
     }
 
-    setSelectedLink(link);
-    if (ContentSlugs.includes(link as StudyToolContentSlugs))
-      setSelectedContent(link as StudyToolContentSlugs);
+    setSelectedReadActions(link);
   };
 
+  const studyActionsClickHandler = (
+    link: ContentStudyActionsIconsSlugsType,
+  ) => {
+    if (link === "content") {
+      setSelectedStudyAction(link);
+    } else if (link === "words") {
+      setSelectedStudyAction(link);
+    } else if (link === "summary") {
+      !taskId?.[link] &&
+        !hasSummary &&
+        setTaskId((state = {}) => ({
+          ...state,
+          summary: summarise(
+            userContentRef.current?.activeTabContent?.textContent,
+          ),
+        }));
+      setSelectedStudyAction(link);
+    } else if (link === "simplify") {
+      !taskId?.[link] && !hasSimplifed;
+      setTaskId((state = {}) => ({
+        ...state,
+        simplify: simplify(
+          userContentRef.current?.activeTabContent?.textContent,
+        ),
+      }));
+      setSelectedStudyAction(link);
+    } else if (link === "flashcards") {
+      setSelectedStudyAction(link);
+    }
+  };
+
+  const [isPinned, setIsPinned] = useState<boolean>(false);
+
+  const scrollContainerRef = useEventListener("scroll", () => {
+    setIsPinned(scrollContainerRef.current?.scrollTop > 200);
+  });
+
   return (
-    <div className={styles.container}>
-      <StudyToolbar
-        selectedLink={selectedLink}
-        disabled={isDisabled}
-        onClick={toolBarClickHandler}
-      />
+    <div ref={scrollContainerRef} className={styles.container}>
+      <section className={styles.studyActionsContainer}>
+        <ContentStudyActionsBar
+          selectedLink={selectedStudyAction}
+          disabled={isDisabled}
+          onClick={studyActionsClickHandler}
+        />
+      </section>
       <main
+        onScroll={(e) => {
+          console.log("scroll", (e.target as HTMLDivElement).scrollTop);
+        }}
         className={classNames(
           styles.content,
           styles[`layoutSize-${layoutSizes[layoutSize]}`],
         )}
       >
-        <h1>
-          {taskStatus === "progress" && <IconFidgetSpinner />}
-          {userContent?.activeTabContent?.title || "No title"}
-        </h1>
+        <section className={classNames(styles.readActionsContainer, isPinned)}>
+          <ContentReadActionsBar
+            className={styles.horizontal}
+            selectedLink={selectedReadActions}
+            disabled={isDisabled}
+            onClick={readActionsClickHandler}
+          />
+        </section>
+
+        <header>
+          <h1>
+            {taskStatus === "progress" && <IconFidgetSpinner />}
+            {userContent?.activeTabContent?.title || "No title"}
+          </h1>
+        </header>
         <div
-          ref={contentRef}
-          className={classNames(
-            styles.contentText,
-            styles[`textSize-${textSizes[textSize]}`],
-          )}
+          className={classNames(styles[`textSize-${textSizes[textSize]}`])}
           dangerouslySetInnerHTML={
-            selectedContent !== "flashcards" && selectedContent !== "words"
+            selectedStudyAction !== "flashcards" &&
+            selectedStudyAction !== "words"
               ? {
                   __html:
-                    selectedContent === "content"
+                    selectedStudyAction === "content"
                       ? userContent?.activeTabContent?.content || ""
-                      : studyState[contentUrl]?.[selectedContent] || "",
+                      : studyState[contentUrl]?.[selectedStudyAction] || "",
                 }
               : { __html: "" }
           }

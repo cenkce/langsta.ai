@@ -4,6 +4,16 @@
   }
 }
 
+.studyActionsContainer {
+  width: max-content;
+  z-index: 1; 
+  min-height: 100%;
+  left: 0; 
+  top: 0; 
+  background: var(--background-color); 
+  position: sticky;
+}
+
 :root, :root[data-theme="light"] {
   --text-font-family: 'Roboto', sans-serif;
   --text-color: #555;
@@ -79,18 +89,50 @@ code {
   color: var(--code-font-color);
 }
 
+.readActionsContainer {
+  height: max-content; 
+  width: max-content; 
+  position: sticky;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--background-color);
+  * {
+    border: none;
+  }
+}
+
 .container {
   margin: 0 auto;
   display: flex;
   flex-direction: row;
   overflow: auto;
-  max-height: 100%;
+  max-height: 100vh;
+  h1:first-child {
+    margin-top: 0;
+  }
+}
+
+.horizontal {
+  flex-direction: row !important;
+  width: 100%;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
 }
 
 .content {
   flex: 1;
   margin: 0 auto;
   padding: 0 16px;
+  height: 100%;
 }
 
 .textSize-xs {
