@@ -32,12 +32,14 @@ export async function GPTTranslateRequest(message: TranslateRequestMessage) {
   const taskAtom = TaskStore.createTaskAtom(
     () =>
       sendGPTRequest({
-        userMessage: messageBody.content.text,
+        userMessage: messageBody?.content?.text || "",
         systemMessage: messageBody.systemMessage,
       }),
     {
       tags: ["translate-service", "background-task"],
-      selection: clone(messageBody.content.selectors),
+      selection: messageBody?.content?.selectors
+        ? clone(messageBody.content.selectors)
+        : "",
     },
     id,
   );
@@ -54,12 +56,15 @@ export async function GPTTranslateRequest(message: TranslateRequestMessage) {
       result &&
         upsertTranslationTask({
           selection: message.content,
-          status: "completed",
           taskId: taskAtom.id,
           result: result,
         });
     },
-    complete() {},
+    complete() {
+      upsertTranslationTask({
+        status: "completed",
+      });
+    },
     error(err) {
       console.error(err);
       upsertTranslationTask({

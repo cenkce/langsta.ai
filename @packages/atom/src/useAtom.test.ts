@@ -25,13 +25,12 @@ test("should set state of Atom", async () => {
 test("should set state of Atom using callback", async () => {
   const MockAtom = Atom.of(
     { key: "mockAtom" },
-    new StoreSubject({ mockAtom: { state: 1 } }),
+    new StoreSubject({ mockAtom: { state: 1 }, mockAtom2: { state2: '1' } }),
   );
-
-  const { result } = renderHook(() => useAtom(MockAtom));
+  const { result } = renderHook(() => useAtom(MockAtom, {subscribeKey: 'state'}));
 
   act(() => {
-    result.current[1]((state: { state: number }) => ({
+    result.current[1]((state) => ({
       state: 2 + state.state,
     }));
   });

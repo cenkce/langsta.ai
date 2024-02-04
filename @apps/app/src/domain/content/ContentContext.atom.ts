@@ -29,24 +29,26 @@ export type StudyContentType = {
   flashcards?: { word: string; translation: string }[];
 };
 
+export type PageContent = {
+  title: string;
+  content: string;
+  textContent: string;
+  length: number;
+  excerpt: string;
+  byline: string;
+  dir: string;
+  siteName: string;
+  lang: string;
+  publishedTime: string;
+};
+
 export type UserContentState = {
   selectedText: {
     text: string;
     selectors?: [anchor: TextSelector, focus: TextSelector];
-    siteName?: string;
+    url?: string;
   } | undefined;
-  activeTabContent: {
-    title: string;
-    content: string;
-    textContent: string;
-    length: number;
-    excerpt: string;
-    byline: string;
-    dir: string;
-    siteName: string;
-    lang: string;
-    publishedTime: string;
-  } | undefined;
+  activeTabContent: {[url: string]: PageContent | undefined} | undefined;
   translation: Record<string, TranslationTextTask> | undefined;
   contentTasks: Record<string, ContentTask> | undefined;
 };
@@ -59,7 +61,7 @@ const contentStore = new StoreSubject<{
 }>({
   contentContextAtom: {
     selectedText: undefined,
-    activeTabContent: undefined,
+    activeTabContent: {},
     translation: undefined,
     contentTasks: undefined,
   },

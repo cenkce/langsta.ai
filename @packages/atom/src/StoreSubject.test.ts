@@ -87,6 +87,7 @@ describe("StoreSubject", () => {
     expect(atom3.getValue()).toEqual(1);
 
     atom2.set$({ value: 1 });
+    atom2.get$().subscribe((value) => { value });
     expect(store.getValue()).toEqual({
       "state-name": 2,
       "state-name2": { value: 1, value2: 0 },

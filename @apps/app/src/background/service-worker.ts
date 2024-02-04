@@ -14,7 +14,7 @@ export const openai = new OpenAI({
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel.setOptions({ path: 'side-panel.html' });
+  chrome.sidePanel.setOptions({ path: "side-panel.html" });
   chrome.contextMenus.create({
     id: "wordsplorer",
     title: "Wordsplorer",
@@ -24,10 +24,9 @@ chrome.runtime.onInstalled.addListener(() => {
     id: "wordsplorer-defineSelection",
     parentId: "wordsplorer",
     title: "Translate selection",
-    contexts: ["selection"]
+    contexts: ["selection"],
   });
 });
-
 
 // chrome.contextMenus.onClicked.addListener((info, tab) => {
 //   if (info.menuItemId === "wordsplorer-defineSelection") {
@@ -40,7 +39,11 @@ chrome.runtime.onInstalled.addListener(() => {
 GPTMessagesEventEmitter.addListener(async (message) => {
   if (message.type === "gpt/translate") {
     GPTTranslateRequest(message);
-  } else if (message.type === "gpt/simplify" || message.type === "gpt/summarise") {
+  } else if (
+    message.type === "gpt/words" ||
+    message.type === "gpt/simplify" ||
+    message.type === "gpt/summary"
+  ) {
     GPTContentRequest(message);
   }
 });
@@ -54,18 +57,17 @@ ContentMessageEventEmitter.addListener(async (message, sender) => {
     }
   } else if (message.type === "open-study-mode-side-panel") {
     try {
-      openSidePanel(sender.tab?.id, 'sidepanel-study-mode.html');
+      openSidePanel(sender.tab?.id, "sidepanel-study-mode.html");
     } catch (error) {
       console.error(error);
     }
-  }
-   else if (message.type === "define-selected-text") {
+  } else if (message.type === "define-selected-text") {
     try {
       openSidePanel(sender.tab?.id);
     } catch (error) {
       console.error(error);
     }
-  } else if(message.type === 'backend/delete-task') {
+  } else if (message.type === "backend/delete-task") {
     // @TODO: Doesn't work yet
     TaskStore.cancelTask(message.payload.task);
   }

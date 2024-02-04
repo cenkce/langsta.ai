@@ -1,5 +1,5 @@
 import { sanitizeUtmUrl } from "@espoojs/utils";
-import { useCurrentTabData } from "../domain/content/currentTabMessageDispatch";
+import { useCurrentTabData } from "../domain/content/activeTabMessageDispatch";
 import { ArtBoard } from "../ui/ArtBoard";
 import { TabContainer } from "../ui/TabContainer";
 import styles from "./SidepanelApp.module.scss";
@@ -58,7 +58,7 @@ const PageTranslations = () => {
   return (
     <Translations
       onFilter={(task) => {
-        return !!tabData.current?.url && !!task.selection.siteName && task.selection.siteName === tabUrl;
+        return !!tabData.current?.url && !!task.selection?.url && task.selection?.url === tabUrl;
       }}
     />
   );
@@ -72,7 +72,7 @@ const DomainTranslations = () => {
       onFilter={(task) => {
         if (tabUrl) {
           const url = new URL(tabUrl || "");
-          return (task.selection.siteName?.indexOf(url.host) || -1) > -1;
+          return (task.selection?.url?.indexOf(url.host) || -1) > -1;
         }
         return false;
       }}

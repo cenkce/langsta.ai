@@ -22,7 +22,8 @@ import { useEventListener } from "@mantine/hooks";
 import {
   ContentStudyActionsBar,
   ContentStudyActionsIconsSlugsType,
-} from "./ContentStudyActionsBar copy";
+} from "./ContentStudyActionsBar";
+import { activeTabMessageDispatch } from "../domain/content/activeTabMessageDispatch";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
@@ -59,6 +60,11 @@ export const SidepanelApp = () => {
   userContentRef.current = userContent;
 
   useEffect(() => {
+    !userContent.activeTabContent?.content &&
+      activeTabMessageDispatch({ type: "get-page-content" });
+  }, []);
+
+  useEffect(() => {
     const currentTaskId = taskId?.[selectedStudyAction];
     if (currentTaskId) {
       const subscription = TaskStore.instance
@@ -73,23 +79,24 @@ export const SidepanelApp = () => {
         )
         .subscribe({
           next: ([result, task]) => {
-            const siteName = userContentRef?.current?.selectedText?.siteName;
-            const resultKey = task?.params?.tags.includes("gpt/simplify")
-              ? "simplify"
-              : "summary";
-            console.log("result", result);
+            const url = userContentRef?.current?.selectedText?.url;
+            const resultKey = task?.params?.tags
+              .find((tag) => tag.includes("gpt/"))
+              ?.replace("gpt/", "");
+            if (resultKey === undefined) return;
+
             result &&
-              siteName &&
+              url &&
               setStudyState((state) => ({
                 ...state,
-                [siteName]: {
-                  ...state[siteName],
+                [url]: {
+                  ...state[url],
                   [resultKey]: result,
                   updatedAt: new Date().toISOString(),
                   createdAt: new Date().toISOString(),
                   level: "",
                   title: "",
-                  url: siteName,
+                  url: url,
                 },
               }));
             task?.status && setTaskStatus(task?.status);
@@ -105,13 +112,12 @@ export const SidepanelApp = () => {
     }
   }, [selectedStudyAction, taskId]);
 
-  const { simplify, summarise } = useTranslateService();
-  // const task = useTaskSubscribeById(taskId?.["Simplify"]);
+  const { simplify, summarise, extractWords } = useTranslateService();
   const isDisabled = taskStatus === "progress";
-  // const contentRef = useRef<HTMLDivElement | null>(null);
-  const contentUrl = userContent?.selectedText?.siteName || "";
+  const contentUrl = userContent?.selectedText?.url || "";
   const contentFromCache = studyState[contentUrl];
   const hasSummary = !!contentFromCache?.summary;
+  // const hasWords = !!contentFromCache?.words;
   const hasSimplifed = !!contentFromCache?.simplify;
 
   const readActionsClickHandler = (link: ContentReadActionsSlugsType) => {
@@ -135,9 +141,18 @@ export const SidepanelApp = () => {
   const studyActionsClickHandler = (
     link: ContentStudyActionsIconsSlugsType,
   ) => {
+    console.log("link", link);
     if (link === "content") {
       setSelectedStudyAction(link);
     } else if (link === "words") {
+      !taskId?.[link] &&
+        // !hasWords &&
+        setTaskId((state = {}) => ({
+          ...state,
+          summary: extractWords(
+            userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
+          ),
+        }));
       setSelectedStudyAction(link);
     } else if (link === "summary") {
       !taskId?.[link] &&
@@ -145,7 +160,7 @@ export const SidepanelApp = () => {
         setTaskId((state = {}) => ({
           ...state,
           summary: summarise(
-            userContentRef.current?.activeTabContent?.textContent,
+            userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
           ),
         }));
       setSelectedStudyAction(link);
@@ -154,7 +169,7 @@ export const SidepanelApp = () => {
       setTaskId((state = {}) => ({
         ...state,
         simplify: simplify(
-          userContentRef.current?.activeTabContent?.textContent,
+          userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
         ),
       }));
       setSelectedStudyAction(link);
@@ -179,9 +194,6 @@ export const SidepanelApp = () => {
         />
       </section>
       <main
-        onScroll={(e) => {
-          console.log("scroll", (e.target as HTMLDivElement).scrollTop);
-        }}
         className={classNames(
           styles.content,
           styles[`layoutSize-${layoutSizes[layoutSize]}`],
@@ -195,11 +207,10 @@ export const SidepanelApp = () => {
             onClick={readActionsClickHandler}
           />
         </section>
-
         <header>
           <h1>
             {taskStatus === "progress" && <IconFidgetSpinner />}
-            {userContent?.activeTabContent?.title || "No title"}
+            {userContent?.activeTabContent?.[contentUrl]?.title || "No title"}
           </h1>
         </header>
         <div

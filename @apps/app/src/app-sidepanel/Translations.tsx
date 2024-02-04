@@ -9,7 +9,7 @@ import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
 import styles from "./SidepanelApp.module.scss";
 import { Button } from "../ui/Button";
-import { currentTabMessageDispatch } from "../domain/content/currentTabMessageDispatch";
+import { activeTabMessageDispatch } from "../domain/content/activeTabMessageDispatch";
 import { useState } from "react";
 import { classNames } from "@espoojs/utils";
 
@@ -33,7 +33,7 @@ export const Translations = (props: {
           }
           onClick={setSelectedTranslation}
           onShowSelection={(task) => {
-            currentTabMessageDispatch({
+            activeTabMessageDispatch({
               type: "select-content",
               task: task,
             });

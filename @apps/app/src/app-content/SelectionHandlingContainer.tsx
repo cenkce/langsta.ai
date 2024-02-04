@@ -11,7 +11,7 @@ import {
   getSelectedText,
   getSelectedTextSelectors,
 } from "../domain/utils/getSelectedText";
-import { TabMessages } from "../domain/content/currentTabMessageDispatch";
+import { TabMessages } from "../domain/content/TabMessages";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 import { createContentSelection } from "../domain/utils/createContentSelection";
@@ -19,7 +19,8 @@ import {
   sanitizeUtmUrl,
   useGlobalMouseEventHandlerService,
 } from "@espoojs/utils";
-import { parseContent } from "../domain/content/parseContent";
+import { parseTabPageContent } from "./parseTabPageContent";
+import { getSanitizedUrl } from "../api/utils/getSanitizedUrl";
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);
@@ -39,7 +40,7 @@ export const ContentCaptureContainer = () => {
           selectedText: {
             text: selectedText,
             selectors: getSelectedTextSelectors(),
-            siteName: sanitizeUtmUrl(window.location.href),
+            url: sanitizeUtmUrl(window.location.href),
           },
         }));
         setMarkers((markers) => [
@@ -78,7 +79,7 @@ export const ContentCaptureContainer = () => {
     };
     const messageHandler = (message: TabMessages) => {
       if (message.type === "select-content") {
-        if (message.task.selection.selectors) {
+        if (message?.task?.selection?.selectors) {
           try {
             const [anchorElement] = createContentSelection(
               message.task.selection.selectors,
@@ -89,7 +90,8 @@ export const ContentCaptureContainer = () => {
               return [
                 {
                   // TODO: Only get taskid from message and find the task in content app and use it instead.
-                  text: message.task.result || message.task.selection.text,
+                  text:
+                    message.task.result || message.task?.selection?.text || "",
                   taskId: message.task.taskId,
                   id: message.task.taskId || Date.now().toString(),
                   left: 0,
@@ -109,7 +111,8 @@ export const ContentCaptureContainer = () => {
               ...markers,
               {
                 // TODO: Only get taskid from message and find the task in content app and use it instead.
-                text: message.task.result || message.task.selection.text,
+                text:
+                  message.task.result || message.task?.selection?.text || "",
                 taskId: message.task.taskId,
                 id: message.task.taskId || Date.now().toString(),
                 left: 0,
@@ -144,11 +147,14 @@ export const ContentCaptureContainer = () => {
                   });
                   return;
                 } else if (action === "study-mode") {
-                  const content = parseContent();
+                  const content = parseTabPageContent();
                   if (!content) return;
                   setUserContent((state) => ({
                     ...state,
-                    activeTabContent: content,
+                    activeTabContent: {
+                      ...state.activeTabContent,
+                      [getSanitizedUrl()]: content,
+                    },
                   }));
                   serviceWorkerContentMessageDispatch({
                     type: "open-study-mode-side-panel",

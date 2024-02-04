@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import { TranslatePropmpts } from "../../prompts/translate";
 import {
+  ExtractWordsRequestMessage,
   SimplyfyRequestMessage,
   SummariseContentRequestMessage,
   TranslateRequestMessage,
@@ -23,7 +24,7 @@ export const useTranslateService = () => {
     return id;
   };
   const summarise = (content?: string) => {
-    if(!content )
+    if(!content)
       return;
     const id = nanoid();
 
@@ -48,7 +49,34 @@ export const useTranslateService = () => {
         createSimplyfyRequestMessage({
           content,
           id,
-          language: settings.nativelanguage,
+          targetLanguage: settings.nativelanguage,
+          level: settings.level,
+        }),
+      );
+
+    return id;
+  };
+  const extractWords = (content?: string) => {
+    if(!content )
+      return;
+    const id = nanoid();
+
+    if(!settings.targetLanguage )
+      throw new Error("Target language is not set");
+    
+    if(!settings.nativelanguage )
+      throw new Error("Native language is not set");
+
+    if(!settings.level )
+      throw new Error("Target language level is not set");
+
+    if (content)
+      sendGPTRequest(
+        createExtractWordsRequestMessage({
+          content,
+          id,
+          nativeLanguage: settings.nativelanguage,
+          targetLanguage: settings.targetLanguage,
           level: settings.level,
         }),
       );
@@ -56,6 +84,7 @@ export const useTranslateService = () => {
     return id;
   };
   return {
+    extractWords,
     translate,
     summarise,
     simplify
@@ -73,14 +102,14 @@ export function createTranslateTextMessage(options: {
     content: options.selection,
     id: options.id || nanoid(),
     systemMessage: TranslatePropmpts({
-      language: options.language,
+      targetLanguage: options.language,
       level: options.level,
     }).translate_text_string,
   } as TranslateRequestMessage;
 }
 
 export function createSimplyfyRequestMessage(options: {
-  language: string;
+  targetLanguage: string;
   level: string;
   content: string;
   id?: string;
@@ -90,10 +119,30 @@ export function createSimplyfyRequestMessage(options: {
     content: options.content,
     id: options.id || nanoid(),
     systemMessage: TranslatePropmpts({
-      language: options.language,
+      targetLanguage: options.targetLanguage,
       level: options.level,
     }).simplfy_text,
   } as SimplyfyRequestMessage;
+}
+
+export function createExtractWordsRequestMessage(options: {
+  nativeLanguage: string;
+  targetLanguage: string;
+  level: string;
+  content: string;
+  id?: string;
+}) {
+  return {
+    type: "gpt/words",
+    content: options.content,
+    id: options.id || nanoid(),
+    stream: false,
+    systemMessage: TranslatePropmpts({
+      nativeLanguage: options.nativeLanguage,
+      targetLanguage: options.targetLanguage,
+      level: options.level,
+    }).extract_words,
+  } as ExtractWordsRequestMessage;
 }
 
 export function createSummariseRequestMessage(options: {
@@ -103,11 +152,11 @@ export function createSummariseRequestMessage(options: {
   id?: string;
 }) {
   return {
-    type: "gpt/summarise",
+    type: "gpt/summary",
     content: options.content,
     id: options.id || nanoid(),
     systemMessage: TranslatePropmpts({
-      language: options.language,
+      targetLanguage: options.language,
       level: options.level,
     }).summarise_text,
   } as SummariseContentRequestMessage;

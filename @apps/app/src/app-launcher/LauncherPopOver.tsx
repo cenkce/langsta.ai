@@ -4,6 +4,8 @@ import { SettingsAtom } from "../domain/user/SettingsModel";
 import { TargetLanguageLevel } from "../domain/student/TargetLanguageLevel";
 import { ApiSettingsForm } from "./ApiSettingsForm";
 import { useAtom } from "@espoojs/atom";
+import { Button } from "@mantine/core";
+import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 
 export const solutions = [
   {
@@ -62,6 +64,22 @@ const LanguageLevelSelect = (props: {
   );
 };
 
+const StudyModeSettings = () => {
+  return (
+    <div className="join">
+      <Button
+        onClick={() => {
+          serviceWorkerContentMessageDispatch({
+            type: "open-study-mode-side-panel",
+          });
+        }}
+      >
+        Open Study Panel
+      </Button>
+    </div>
+  );
+};
+
 export function LauncherPopOver() {
   const [{ level }, setSettings] = useAtom(SettingsAtom);
 
@@ -69,6 +87,13 @@ export function LauncherPopOver() {
     <div className={"min-w-full h-auto"}>
       <TabContainer
         content={[
+          {
+            id: "2",
+            component: StudyModeSettings,
+            button: "Chat GPT",
+            title: "Study Mode Settings",
+            props: {},
+          },
           {
             id: "3",
             component: ApiSettingsForm,
@@ -87,7 +112,7 @@ export function LauncherPopOver() {
                 setSettings((settings) => ({ ...settings, level: value }));
               },
             },
-          }
+          },
         ]}
       />
     </div>

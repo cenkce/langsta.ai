@@ -12,7 +12,7 @@ import { Atom } from "./StoreSubject";
  */
 function useAtom<
   TState extends { [key: string]: any },
-  TName extends string = string,
+  TName extends string,
 >(
   atom: Atom<TState, TName>,
   {
@@ -21,15 +21,16 @@ function useAtom<
     equalityCheck,
     ignoreUpdateKeys
   }: {
-    subscribeKey?: TState[TName] extends { [key: string]: any }
-      ? keyof TState[TName]
-      : undefined;
+    subscribeKey?: TState[TName] extends { [key: string]: unknown }
+    ? keyof TState[TName]
+    : undefined;
+
     /**
      * You should assign an equalityCheck function to ignore some keys.
      */
     ignoreUpdateKeys?: TState[TName] extends { [key: string]: any }
       ? (keyof TState[TName])[]
-      : undefined;
+      : never;
     noStateUpdate?: boolean;
     equalityCheck?: (newState: TState[TName], state: TState[TName]) => boolean;
   } = {},
@@ -43,7 +44,7 @@ function useAtom<
 
   useEffect(() => {
     if (noStateUpdate === false) {
-      const subscription = atom.get$(subscribeKey).subscribe({
+      const subscription = atom.get$(subscribeKey as any).subscribe({
         next(newState) {
           if (typeof newState === "object") {
             const state = {...newState};
@@ -62,7 +63,7 @@ function useAtom<
             });
           }
         },
-        error: console.error,
+        // error: console.error,
       });
       return () => {
         subscription?.unsubscribe();

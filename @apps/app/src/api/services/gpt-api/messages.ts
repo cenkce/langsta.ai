@@ -12,13 +12,23 @@ export type SimplyfyRequestMessage = {
   systemMessage: string,
   id?: string,
   content: string;
+  stream?: boolean;
 };
 
-export type SummariseContentRequestMessage = {
-  type: 'gpt/summarise',
+export type ExtractWordsRequestMessage = {
+  type: 'gpt/words',
   systemMessage: string,
   id?: string,
   content: string;
+  stream?: boolean;
 };
 
-export type GPTApiRequestMessages = TranslateRequestMessage | SimplyfyRequestMessage | SummariseContentRequestMessage;
+export type SummariseContentRequestMessage = {
+  type: 'gpt/summary',
+  systemMessage: string,
+  id?: string,
+  content: string;
+  stream?: boolean;
+};
+
+export type GPTApiRequestMessages = ExtractWordsRequestMessage | TranslateRequestMessage | SimplyfyRequestMessage | SummariseContentRequestMessage;

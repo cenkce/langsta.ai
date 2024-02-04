@@ -1,4 +1,4 @@
-import type { ParsedContentType } from "./parseContent";
+import type { ParsedContentType } from "../../app-content/parseTabPageContent";
 
 export type ExtractTabContentMessage = {
   type: 'extract-tab-content',

@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { TranslationTextTask } from "../../api/task/TranslationTextTask";
+import { TabMessages } from "./TabMessages";
 
-export type TabMessages = {
-  type: 'select-content',
-  task: TranslationTextTask,
-};
 
 export const useCurrentTabData = () => {
   const [tab, setTab] = useState<chrome.tabs.Tab | undefined>();
@@ -19,7 +15,7 @@ export const useCurrentTabData = () => {
   return tabRef;
 }
 
-export const currentTabMessageDispatch = async (message: TabMessages) => {
+export const activeTabMessageDispatch = async (message: TabMessages) => {
   const queryOptions = { active: true, currentWindow: true };
   const tabs = await chrome.tabs.query(queryOptions);
 

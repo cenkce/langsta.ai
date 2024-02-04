@@ -63,7 +63,7 @@ export function useLocalstorageSync<
     );
 
     return () => {
-      unloads.forEach((unload) => unload());
+      unloads.forEach((unload) => unload?.());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
