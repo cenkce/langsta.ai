@@ -41,8 +41,9 @@ export const solutions = [
 ] as const;
 
 const LanguageLevelSelect = (props: {
-  value: string;
-  onChange: (level: TargetLanguageLevel) => void;
+  header?: string;
+  value?: string;
+  onChange?: (level: TargetLanguageLevel) => void;
 }) => {
   return (
     <div className="join">
@@ -53,7 +54,7 @@ const LanguageLevelSelect = (props: {
             className="join-item btn"
             type="radio"
             name="level"
-            onChange={() => props.onChange(level)}
+            onChange={() => props.onChange?.(level)}
             checked={props.value === level}
             aria-label={level}
             value={level}

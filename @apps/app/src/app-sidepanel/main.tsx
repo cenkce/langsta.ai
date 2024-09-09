@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { SidepanelApp } from "./SidepanelApp";
 import "../index.scss";
 import { MantineCommonProvider } from "../app-common";
+
 localStorage.removeItem("theme");
 
 ReactDOM.createRoot(document.getElementById("sidepanel-root")!).render(
@@ -10,5 +11,5 @@ ReactDOM.createRoot(document.getElementById("sidepanel-root")!).render(
     <MantineCommonProvider>
       <SidepanelApp />
     </MantineCommonProvider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

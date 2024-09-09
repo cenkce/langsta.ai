@@ -1,4 +1,6 @@
 import { PropsWithChildren } from "react";
+import styles from "./Arboard.module.scss";
+import { Paper, Title } from "@mantine/core";
 
 export function ArtBoard(
   props: PropsWithChildren<{
@@ -8,23 +10,28 @@ export function ArtBoard(
     className?: string;
   }>,
 ) {
-  const className = props.className;
 
   return (
-    <div
+    <Paper
       data-theme={props.theme}
       data-component="artboard"
-      className={`artboard ${className} min-h-full min-w-full rounded-none flex flex-col overflow-hidden`}
+      className={styles.artboard}
     >
-      <div className="card-body min-h-full card-bordered min-w-full shadow-xl">
-        {props.title && <h2 className="card-title">{props.title}</h2>}
-        {props.subtitle && <h3 className="text-left">{props.subtitle}</h3>}
+      <header>
+      <Title>
+          {props.title && <h2 className="card-title">{props.title}</h2>}
+        </Title>
+        <Title order={4} >
+          {props.subtitle && <h3 className="text-left">{props.subtitle}</h3>}
+        </Title>
+      </header>
+      <main>
         <div className="h-full flex flex-col overflow-hidden">
           <div className="h-full flex flex-col overflow-x-scroll">
             {props.children}
           </div>
         </div>
-      </div>
-    </div>
+      </main>
+    </Paper>
   );
 }
