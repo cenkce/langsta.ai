@@ -8,7 +8,7 @@
   },
   "type": "module",
   "scripts": {
-    "app": "env-cmd pnpm --filter chrome-extension",
+    "app": "env-cmd pnpm --filter chrome-extension run dev",
     "atom": "pnpm --filter @espoojs/atom",
     "task": "pnpm --filter @espoojs/task",
     "packages": "pnpm --filter @espoojs/*",
