@@ -26,7 +26,7 @@ export type AreaName = Parameters<StorageAddListenerCallback>[1];
 //   T extends { length: L } ? T : BuildTuple<L, [...T, any]>;
 // type Tt = Length<BuildTuple<3>>
 
-type Tuples<T extends Record<string, any>> = T extends Record<infer K, infer V>
+type Tuples<T extends Record<string, unknown>> = T extends Record<infer K, infer V>
   ? [K, V]
   : [];
 
@@ -43,7 +43,7 @@ type Tuples<T extends Record<string, any>> = T extends Record<infer K, infer V>
 
 export abstract class Storage<
   StateT extends Record<string, unknown> = Record<string, unknown>,
-  U extends [string, any] = Tuples<StateT>
+  U extends [string, unknown] = Tuples<StateT>
 > {
   private emitter = new StorageEventEmitter();
   private subscribers: WeakMap<

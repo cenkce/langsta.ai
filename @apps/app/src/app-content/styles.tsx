@@ -12,8 +12,8 @@ export const StyleContextAtom = Atom.of(
 
 (async () => {
   if(!__DEV__) {
-    const ContentStyle: any = (await import('./index.scss?inline')).default;
-    const TranslationContentCardStyle: any = (await import('./TranslationContentCard.scss?inline')).default;
+    const ContentStyle = (await import('./index.scss?inline')).default;
+    const TranslationContentCardStyle = (await import('./TranslationContentCard.scss?inline')).default;
 
     StyleContextAtom.set$({ContentStyle, TranslationContentCardStyle});
   }

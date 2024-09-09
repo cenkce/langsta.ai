@@ -60,7 +60,7 @@ export const SidepanelApp = () => {
   userContentRef.current = userContent;
 
   useEffect(() => {
-    !userContent.activeTabContent?.content &&
+    if (!userContent.activeTabContent?.content)
       activeTabMessageDispatch({ type: "get-page-content" });
   }, []);
 
@@ -85,8 +85,7 @@ export const SidepanelApp = () => {
               ?.replace("gpt/", "");
             if (resultKey === undefined) return;
 
-            result &&
-              url &&
+            if (result && url)
               setStudyState((state) => ({
                 ...state,
                 [url]: {
@@ -99,7 +98,7 @@ export const SidepanelApp = () => {
                   url: url,
                 },
               }));
-            task?.status && setTaskStatus(task?.status);
+            if (task?.status) setTaskStatus(task?.status);
             if (task?.status === "completed")
               setTaskId((state) => ({
                 ...state,
@@ -145,8 +144,7 @@ export const SidepanelApp = () => {
     if (link === "content") {
       setSelectedStudyAction(link);
     } else if (link === "words") {
-      !taskId?.[link] &&
-        // !hasWords &&
+      if (!taskId?.[link])
         setTaskId((state = {}) => ({
           ...state,
           summary: extractWords(
@@ -155,8 +153,7 @@ export const SidepanelApp = () => {
         }));
       setSelectedStudyAction(link);
     } else if (link === "summary") {
-      !taskId?.[link] &&
-        !hasSummary &&
+      if (!taskId?.[link] && !hasSummary)
         setTaskId((state = {}) => ({
           ...state,
           summary: summarise(
@@ -165,13 +162,13 @@ export const SidepanelApp = () => {
         }));
       setSelectedStudyAction(link);
     } else if (link === "simplify") {
-      !taskId?.[link] && !hasSimplifed;
-      setTaskId((state = {}) => ({
-        ...state,
-        simplify: simplify(
-          userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
-        ),
-      }));
+      if (!taskId?.[link] && !hasSimplifed)
+        setTaskId((state = {}) => ({
+          ...state,
+          simplify: simplify(
+            userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
+          ),
+        }));
       setSelectedStudyAction(link);
     } else if (link === "flashcards") {
       setSelectedStudyAction(link);

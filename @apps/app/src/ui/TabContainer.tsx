@@ -4,7 +4,7 @@ import { classNames } from "@espoojs/utils";
 
 type TabContent<P extends Record<string, unknown> = Record<string, unknown>> = {
   id: string;
-  component: ComponentType<any>;
+  component: ComponentType<{header: string}>;
   button: string;
   title: string;
   props?: P;

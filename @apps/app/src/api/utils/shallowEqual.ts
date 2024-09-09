@@ -8,7 +8,7 @@ function is(x: unknown, y: unknown) {
   }
 }
 
-export default function shallowEqual(objA: any, objB: any) {
+export default function shallowEqual(objA: unknown, objB: unknown) {
   if (is(objA, objB)) return true;
 
   if (
@@ -27,8 +27,13 @@ export default function shallowEqual(objA: any, objB: any) {
 
   for (let i = 0; i < keysA.length; i++) {
     if (
-      !Object.prototype.hasOwnProperty.call(objB, keysA[i]) ||
-      !is(objA[keysA[i]], objB[keysA[i]])
+      typeof objA === "object" &&
+      typeof objB === "object" &&
+      (!Object.prototype.hasOwnProperty.call(objB, keysA[i]) ||
+        !is(
+          (objA as Record<string, unknown>)[keysA[i] as string],
+          (objB as Record<string, unknown>)[keysA[i]],
+        ))
     ) {
       return false;
     }

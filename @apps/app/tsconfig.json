@@ -28,6 +28,6 @@
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   },
   "exclude": ["dist"],
-  "include": ["src", "../../@packages/utilities/src/react/ShadowRoot.tsx"],
+  "include": ["src", "script", "../../@packages/utilities/src/react/ShadowRoot.tsx"],
   // "references": [{ "path": "./tsconfig.node.json" }]
 }

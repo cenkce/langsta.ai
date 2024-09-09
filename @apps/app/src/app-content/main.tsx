@@ -10,6 +10,7 @@ import { getSanitizedUrl } from "../api/utils/getSanitizedUrl";
 chrome.runtime.onMessage.addListener((message: TabMessages) => {
   if(message.type === "get-page-content") {
     const state = ContentContextAtom.getValue();
+    console.log('get-page-content in content app', state);
     ContentContextAtom.set$({
       activeTabContent: {
         ...state.activeTabContent,
@@ -20,6 +21,7 @@ chrome.runtime.onMessage.addListener((message: TabMessages) => {
 });
 
 export function initializeApplication() {
+  console.log('initializeApplication', getSanitizedUrl())
   const container = document.createDocumentFragment();
 
   ReactDOM.createRoot(container).render(

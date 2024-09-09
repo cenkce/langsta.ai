@@ -51,6 +51,7 @@ export type UserContentState = {
   activeTabContent: {[url: string]: PageContent | undefined} | undefined;
   translation: Record<string, TranslationTextTask> | undefined;
   contentTasks: Record<string, ContentTask> | undefined;
+  activeTabUrl: string | undefined;
 };
 
 const contentStore = new StoreSubject<{
@@ -64,6 +65,7 @@ const contentStore = new StoreSubject<{
     activeTabContent: {},
     translation: undefined,
     contentTasks: undefined,
+    activeTabUrl: undefined
   },
   studyContent: {} as {
     [url: string]: StudyContentType;

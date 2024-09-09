@@ -5,7 +5,7 @@ import shallowEqual from "../utils/shallowEqual";
 
 /**
  * Listen to localstorage changes and syncs with the given atom
- * 
+ *
  * @example
  * ```tsx
  * const storageAtom = Atom.of({ key: "storageAtom" }, { name: "storageAtom" });
@@ -15,9 +15,9 @@ import shallowEqual from "../utils/shallowEqual";
  *   storageAtom: SettingsAtom,
  *   contentStorage: SettingsStorage,
  * });
- * 
+ *
  * ```
- * @param props 
+ * @param props
  */
 export function useLocalstorageSync<
   StorageT extends Record<string, unknown> = Record<string, unknown>,
@@ -38,7 +38,7 @@ export function useLocalstorageSync<
   useEffect(() => {
     const unloads: (() => void)[] = [];
     const subscription = props.storageAtom.get$().subscribe((storageValue) => {
-      initializedRef.current && contentStorage.load(storageValue);
+      if (initializedRef.current) contentStorage.load(storageValue);
     });
 
     unloads.push(() => subscription.unsubscribe());
@@ -47,7 +47,7 @@ export function useLocalstorageSync<
       .getState()
       .then((data) => {
         initializedRef.current = true;
-        data && setStorageData(data);
+        if (data) setStorageData(data);
       })
       .catch(console.error);
 
@@ -59,12 +59,11 @@ export function useLocalstorageSync<
             if (shallowEqual(newValue, oldValue)) setStorageData(newValue);
           });
         }
-      })
+      }),
     );
 
     return () => {
       unloads.forEach((unload) => unload?.());
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 }

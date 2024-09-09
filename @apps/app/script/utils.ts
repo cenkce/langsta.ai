@@ -1,7 +1,8 @@
 function getId(id: string): string {
-  // @ts-expect-error
   return id.split("/").slice(-3).join('__').replaceAll('.', '_');
 }
+
+
 // influenced from https://github.com/farazshuja/chrome-extension-vite-vue-starter-template/blob/master/src/contentScripts/utils.ts
 export function updateStyle(id: string, content: string) {
   const root = document.getElementsByTagName('extension-app-shadow-host')[0];
@@ -45,19 +46,19 @@ export function removeStyle(id: string) {
   if (style) {
     if (window.location.href.includes('chrome-extension://')) {
       if (style instanceof CSSStyleSheet) {
-        (document as any).adoptedStyleSheets = (
-          document as any
-        ).adoptedStyleSheets.filter((s: any) => s !== style);
+        document.adoptedStyleSheets = (
+          document
+        ).adoptedStyleSheets.filter((s: unknown) => s !== style);
       } else {
         document.head.removeChild(style);
       }
     } else {
       const root = document.getElementsByTagName('extension-app-shadow-host')[0];
-      const shadowEl: any = root?.shadowRoot;
+      const shadowEl = root?.shadowRoot;
       if (style instanceof CSSStyleSheet) {
         if (shadowEl) {
           shadowEl.adoptedStyleSheets = shadowEl.adoptedStyleSheets.filter(
-            (s: any) => s !== style,
+            (s) => s !== style,
           );
         }
       } else if (shadowEl) {
