@@ -1,4 +1,11 @@
-.artboard {
+div.artboard {
   min-width: 600px;
   min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 1rem 1rem;
+}
+
+.hero {
 }

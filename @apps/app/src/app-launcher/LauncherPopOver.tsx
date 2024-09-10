@@ -1,44 +1,42 @@
-import { LevelsIcon, IconLevelMid, IconLevelHigh } from "../ui/LevelsIcon";
 import { TabContainer } from "../ui/TabContainer";
 import { SettingsAtom } from "../domain/user/SettingsModel";
 import { TargetLanguageLevel } from "../domain/student/TargetLanguageLevel";
 import { ApiSettingsForm } from "./ApiSettingsForm";
 import { useAtom } from "@espoojs/atom";
-import { Button } from "@mantine/core";
-import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
+import { SegmentedControl, Title } from "@mantine/core";
 
 export const solutions = [
   {
     name: "Elementary",
     description: "Convert selected text to A2 level",
-    level: "A1",
-    icon: LevelsIcon,
+    label: "A1",
+    value: "A1",
   },
   {
     name: "Elementary",
     description: "Convert selected text to A2 level",
-    level: "A2",
-    icon: LevelsIcon,
+    label: "A2",
+    value: "A2",
   },
   {
     name: "Intermediate",
     description: "Convert selected text to B1 level",
-    level: "B1",
-    icon: IconLevelMid,
+    label: "B1",
+    value: "B1",
   },
   {
     name: "Intermediate",
     description: "Convert selected text to B1 level",
-    level: "B2",
-    icon: IconLevelMid,
+    label: "B2",
+    value: "B2",
   },
   {
     name: "Upper Intermediate",
     description: "Convert selected text to B2 level",
-    level: "C1",
-    icon: IconLevelHigh,
+    label: "C1",
+    value: "C1",
   },
-] as const;
+];
 
 const LanguageLevelSelect = (props: {
   header?: string;
@@ -46,38 +44,18 @@ const LanguageLevelSelect = (props: {
   onChange?: (level: TargetLanguageLevel) => void;
 }) => {
   return (
-    <div className="join">
-      {solutions.map(({ level }) => {
-        return (
-          <input
-            key={level}
-            className="join-item btn"
-            type="radio"
-            name="level"
-            onChange={() => props.onChange?.(level)}
-            checked={props.value === level}
-            aria-label={level}
-            value={level}
-          />
-        );
-      })}
-    </div>
-  );
-};
-
-const StudyModeSettings = () => {
-  return (
-    <div className="join">
-      <Button
-        onClick={() => {
-          serviceWorkerContentMessageDispatch({
-            type: "open-study-mode-side-panel",
-          });
-        }}
-      >
-        Open Study Panel
-      </Button>
-    </div>
+    <>
+      <Title order={4} className="text-center">
+        {props.header}
+      </Title>
+      <div className="join">
+        <SegmentedControl
+          value={props.value}
+          data={solutions}
+          onChange={(d) => props.onChange?.(d as TargetLanguageLevel)}
+        />
+      </div>
+    </>
   );
 };
 
@@ -88,13 +66,6 @@ export function LauncherPopOver() {
     <div className={"min-w-full h-auto"}>
       <TabContainer
         content={[
-          {
-            id: "2",
-            component: StudyModeSettings,
-            button: "Chat GPT",
-            title: "Study Mode Settings",
-            props: {},
-          },
           {
             id: "3",
             component: ApiSettingsForm,

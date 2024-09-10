@@ -14,6 +14,7 @@ import { useState } from "react";
 import { classNames } from "@espoojs/utils";
 
 export const Translations = (props: {
+  header?: string;
   onFilter?: (translation: TranslationTextTask) => boolean;
 }) => {
   const userContent = useUserContentState();

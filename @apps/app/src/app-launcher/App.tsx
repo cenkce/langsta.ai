@@ -4,6 +4,8 @@ import { LauncherPopOver } from "./LauncherPopOver";
 import "./App.css";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 import { ContentContextAtom, ContentStorage } from "../domain/content/ContentContext.atom";
+import { Button } from "@mantine/core";
+import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 
 function App() {
   useLocalstorageSync({
@@ -21,12 +23,28 @@ function App() {
     <ArtBoard
       title="Langsta"
       subtitle="Self-taught Language Asistant"
-      theme="cupcake"
       className="min-w-max w-screen artboard-horizontal min-h-max"
+      hero={<StudyModeSettings ></StudyModeSettings>}
     >
       <LauncherPopOver />
     </ArtBoard>
   );
 }
+
+const StudyModeSettings = () => {
+  return (
+    <div className="join">
+      <Button
+        onClick={() => {
+          serviceWorkerContentMessageDispatch({
+            type: "open-study-mode-side-panel",
+          });
+        }}
+      >
+        Open Study Panel
+      </Button>
+    </div>
+  );
+};
 
 export default App;

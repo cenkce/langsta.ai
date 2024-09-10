@@ -21,6 +21,7 @@ import {
 } from "@espoojs/utils";
 import { parseTabPageContent } from "./parseTabPageContent";
 import { getSanitizedUrl } from "../api/utils/getSanitizedUrl";
+
 export const ContentCaptureContainer = () => {
   const setUserContent = useUserContentSetState();
   const [markers, setMarkers] = useState<ContentMarkerBadgeType[]>([]);

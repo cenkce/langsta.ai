@@ -1,5 +1,3 @@
-import { useAtom } from "@espoojs/atom";
-import { StyleContextAtom } from "./styles";
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { ContentContextAtom, ContentStorage, useUserContentState } from "../domain/content/ContentContext.atom";
 import { useEffect } from "react";
@@ -41,8 +39,4 @@ export const ContentApp = () => {
   //   </ShadowDom>
   // );
   return <></>
-};
-
-export const useAddStyleAtom = () => {
-  return useAtom(StyleContextAtom, { noStateUpdate: true });
 };

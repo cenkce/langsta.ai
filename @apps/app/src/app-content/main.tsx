@@ -21,7 +21,6 @@ chrome.runtime.onMessage.addListener((message: TabMessages) => {
 });
 
 export function initializeApplication() {
-  console.log('initializeApplication', getSanitizedUrl())
   const container = document.createDocumentFragment();
 
   ReactDOM.createRoot(container).render(

@@ -1,92 +1,94 @@
 import { useAtom } from "@espoojs/atom";
+import { SettingsAtom } from "../domain/user/SettingsModel";
+import { useEffect, useRef } from "react";
+import { useForm } from "@mantine/form";
+import { NativeSelect, TextInput } from "@mantine/core";
 import shallowEqual from "../api/utils/shallowEqual";
-import { SettingsAtom, SettingsState } from "../domain/user/SettingsModel";
-import { ReactNode, useEffect, useRef, useState } from "react";
 
 export const ApiSettingsForm = () => {
   const [settings, setSettings] = useAtom(SettingsAtom);
-  const [saved, setSaved] = useState<undefined | boolean>();
-  const settingsRef = useRef<SettingsState | null | undefined>(null);
-
+  // const [saved, setSaved] = useState<undefined | boolean>();
+  // const settingsRef = useRef<SettingsState | null | undefined>(null);
+  const form = useForm({
+    mode: "uncontrolled",
+    initialValues: {
+      apiKey: settings.apiKey,
+      nativelanguage: settings.nativelanguage,
+    },
+    validate: {
+      apiKey: (value) => !!value?.trim()?.length,
+    },
+    onValuesChange: (values) => {
+      console.log("values", values);
+      setSettings(values);
+    },
+  });
+  const formRef = useRef(form);
+  formRef.current = form;
   useEffect(() => {
-    if (settingsRef.current === null) {
-      settingsRef.current = settings;
-    } else if (!shallowEqual(settingsRef.current, settings)) {
-      const timeout = setTimeout(() => {
-        setSaved(true);
-        settingsRef.current = settings;
-      }, 500);
-      return () => {
-        clearTimeout(timeout);
-      };
-    }
-  }, [saved]);
+    const subs = SettingsAtom.get$().subscribe((v) => {
+      if (
+        !shallowEqual(
+          { apiKey: v.apiKey, nativelanguage: v.nativelanguage },
+          formRef.current.getValues(),
+        )
+      ) {
+        console.log(v, formRef.current.getValues());
+        form.setValues({
+          apiKey: v.apiKey,
+          nativelanguage: v.nativelanguage,
+        });
+      }
+    });
+    return () => {
+      subs.unsubscribe();
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   if (settingsRef.current === null) {
+  //     settingsRef.current = settings;
+  //   } else if (!shallowEqual(settingsRef.current, settings)) {
+  //     const timeout = setTimeout(() => {
+  //       setSaved(true);
+  //       settingsRef.current = settings;
+  //     }, 500);
+  //     return () => {
+  //       clearTimeout(timeout);
+  //     };
+  //   }
+  // }, [saved]);
 
   return (
-    <div className="form-control">
-      <FormInput
-        onChange={(value) => {
-          setSaved(false);
-          setSettings({ apiKey: value });
-        }}
-        value={settings.apiKey}
-        autoHide={true}
-        topLabel="Enter ChatGPT Api Key"
-        bottomLabel={
-          <span className="label-text label-text-alt">
-            If you haven't had an api-key yet, please subscribe ChatGTP and get
-            an api-key.{" "}
-            <a
-              href="https://chat.openai.com/auth/login"
-              className="link link-hover"
-              target="_blank"
-            >
-              Click to Subcribe
-            </a>
-          </span>
-        }
+    <form>
+      <TextInput
+        withAsterisk={false}
+        label="Enter ChatGPT Api Key"
+        placeholder=""
+        key={form.key("apiKey")}
+        {...form.getInputProps("apiKey")}
       />
-      <FormSelect
-        topLabel="Your Native Language"
-        value={settings.nativelanguage}
-        onChange={(value) => {
-          setSaved(false);
-          setSettings({ nativelanguage: value });
-        }}
-      >
-        <option>Select Language</option>
-        <option value="en">English</option>
-        <option value="fr">French</option>
-        <option value="de">German</option>
-        <option value="es">Spanish</option>
-        <option value="it">Italian</option>
-        <option value="ja">Japanese</option>
-        <option value="pt">Portuguese</option>
-        <option value="ru">Russian</option>
-        <option value="zh">Chinese</option>
-        <option value="ar">Arabic</option>
-        <option value="fa">Persian</option>
-        <option value="tr">Turkish</option>
-      </FormSelect>
-      <FormSelect
-        topLabel="Your Target Language"
-        value={settings.targetLanguage}
-        onChange={(value) => {
-          setSaved(false);
-          setSettings({ targetLanguage: value });
-        }}
-      >
-        <option>Select Language</option>
-        <option value="en">English</option>
-        <option value="fr">French</option>
-        <option value="de">German</option>
-        <option value="es">Spanish</option>
-        <option value="it">Italian</option>
-        <option value="ja">Japanese</option>
-        <option value="pt">Portuguese</option>
-        <option value="tr">Turkish</option>
-      </FormSelect>
-      {saved !== undefined && (
+      <NativeSelect
+        label="Your Native Language"
+        key={form.key("nativelanguage")}
+        data={[
+          { value: "en", label: "English" },
+          { value: "fr", label: "French" },
+          { value: "de", label: "German" },
+          { value: "es", label: "Spanish" },
+          { value: "it", label: "Italian" },
+          { value: "ja", label: "Japanese" },
+          { value: "pt", label: "Portuguese" },
+          { value: "ru", label: "Russian" },
+          { value: "zh", label: "Chinese" },
+          { value: "ar", label: "Arabic" },
+          { value: "fa", label: "Persian" },
+          { value: "tr", label: "Turkish" },
+        ]}
+        {...form.getInputProps("nativelanguage")}
+      />
+
+      {/* {saved !== undefined && (
         <div
           className={`alert ${
             saved ? "alert-success" : "alert-warning"
@@ -107,70 +109,7 @@ export const ApiSettingsForm = () => {
           </svg>
           <span>{saved ? "Saved" : "Saving"}</span>
         </div>
-      )}
-    </div>
-  );
-};
-
-const FormInput = (props: {
-  onChange: (value: string) => void;
-  value?: string;
-  bottomLabel?: string | ReactNode;
-  topLabel?: string | ReactNode;
-  autoHide?: boolean;
-}) => {
-  return (
-    <div>
-      <label className="label">
-        <span className="label-text font-bold">{props.topLabel}</span>
-      </label>
-      <input
-        className="input input-bordered input-sm w-full"
-        placeholder="Api Key"
-        value={props.value}
-        onFocus={(e) => {
-          e.target.type = "text";
-        }}
-        onBlur={(e) => {
-          if (props.autoHide) e.target.type = "password";
-        }}
-        type="password"
-        onChange={(e) => {
-          props.onChange(e.target.value);
-        }}
-      />
-      {props.bottomLabel && (
-        <label className="label">{props.bottomLabel}</label>
-      )}
-    </div>
-  );
-};
-
-const FormSelect = (props: {
-  children:
-    | React.ReactElement<HTMLOptionElement, "option">
-    | React.ReactElement<HTMLOptionElement, "option">[];
-  onChange: (value: string) => void;
-  value?: string;
-  bottomLabel?: string | ReactNode;
-  topLabel?: string | ReactNode;
-  autoHide?: boolean;
-}) => {
-  return (
-    <div>
-      <label className="label">
-        <span className="label-text font-bold">{props.topLabel}</span>
-      </label>
-      <select
-        value={props.value}
-        onChange={(e) => props.onChange(e.target.value)}
-        className="select select-bordered select-sm  w-full"
-      >
-        {props.children}
-      </select>
-      {props.bottomLabel && (
-        <label className="label">{props.bottomLabel}</label>
-      )}
-    </div>
+      )} */}
+    </form>
   );
 };
