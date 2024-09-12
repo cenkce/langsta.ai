@@ -148,7 +148,7 @@ export const ContentCaptureContainer = () => {
                   });
                   return;
                 } else if (action === "study-mode") {
-                  const content = parseTabPageContent();
+                  const content = parseTabPageContent(window.document);
                   if (!content) return;
                   setUserContent((state) => ({
                     ...state,

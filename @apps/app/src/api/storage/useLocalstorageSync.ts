@@ -1,7 +1,6 @@
 import { PropsWithChildren, useEffect, useRef } from "react";
 import { LocalStorage } from "./LocalStorage";
 import { Atom, useAtom } from "@espoojs/atom";
-import shallowEqual from "../utils/shallowEqual";
 
 /**
  * Listen to localstorage changes and syncs with the given atom
@@ -37,8 +36,12 @@ export function useLocalstorageSync<
 
   useEffect(() => {
     const unloads: (() => void)[] = [];
+    props.verbose && console.debug("initialize atom subscription : ", props.debugKey);
     const subscription = props.storageAtom.get$().subscribe((storageValue) => {
-      if (initializedRef.current) contentStorage.load(storageValue);
+      props.verbose && console.debug("atom : ", props.debugKey, storageValue);
+      if (initializedRef.current) {
+        contentStorage.load(storageValue);
+      }
     });
 
     unloads.push(() => subscription.unsubscribe());
@@ -46,23 +49,27 @@ export function useLocalstorageSync<
     contentStorage
       .getState()
       .then((data) => {
-        initializedRef.current = true;
         if (data) setStorageData(data);
+        initializedRef.current = true;
       })
       .catch(console.error);
 
     // subscribes storage changes and updates its local state with
     unloads.push(
       contentStorage.subscribe((changes) => {
+        props.verbose && console.debug("changes : ", props.debugKey, changes);
+
         if (props.contentStorage.name in changes) {
-          Object.entries(changes).forEach(([, { newValue, oldValue }]) => {
-            if (shallowEqual(newValue, oldValue)) setStorageData(newValue);
+          Object.entries(changes).forEach(([, { newValue }]) => {
+            props.verbose && console.debug("new update : ", newValue);
+            setStorageData(newValue);
           });
         }
       }),
     );
 
     return () => {
+      props.verbose && console.debug("unmounted : ", props.debugKey);
       unloads.forEach((unload) => unload?.());
     };
   }, []);

@@ -5,17 +5,18 @@ import ReactDOM from "react-dom/client";
 import { ContentApp } from "./ContentApp";
 import { MantineCommonProvider } from "../app-common";
 import { ContentContextAtom } from "../domain/content/ContentContext.atom";
-import { getSanitizedUrl } from "../api/utils/getSanitizedUrl";
+import { sanitizeUtmUrl } from "@espoojs/utils";
 
 chrome.runtime.onMessage.addListener((message: TabMessages) => {
   if(message.type === "get-page-content") {
     const state = ContentContextAtom.getValue();
-    console.log('get-page-content in content app', state);
+    const url = sanitizeUtmUrl(window.location.href);
     ContentContextAtom.set$({
       activeTabContent: {
         ...state.activeTabContent,
-        [getSanitizedUrl()]: parseTabPageContent() || undefined,
-      }
+        [url]: parseTabPageContent(window.document) || undefined,
+      },
+      activeTabUrl: sanitizeUtmUrl(window.location.href),
     })
   }
 });

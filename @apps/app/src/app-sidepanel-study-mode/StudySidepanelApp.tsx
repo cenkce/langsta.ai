@@ -40,6 +40,7 @@ export const SidepanelApp = () => {
     debugKey: "content-sidepanel-study-mode",
     storageAtom: ContentContextAtom,
     contentStorage: ContentStorage,
+    verbose: true,
   });
 
   useLocalstorageSync({
@@ -140,7 +141,6 @@ export const SidepanelApp = () => {
   const studyActionsClickHandler = (
     link: ContentStudyActionsIconsSlugsType,
   ) => {
-    console.log("link", link);
     if (link === "content") {
       setSelectedStudyAction(link);
     } else if (link === "words") {
@@ -181,6 +181,15 @@ export const SidepanelApp = () => {
     setIsPinned(scrollContainerRef.current?.scrollTop > 200);
   });
 
+  const currentTabContent = userContent?.activeTabUrl
+    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.content ||
+      ""
+    : "";
+  const currentTabTitle = userContent?.activeTabUrl
+    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.title ||
+      ""
+    : "";
+
   return (
     <div ref={scrollContainerRef} className={styles.container}>
       <section className={styles.studyActionsContainer}>
@@ -204,10 +213,14 @@ export const SidepanelApp = () => {
             onClick={readActionsClickHandler}
           />
         </section>
-        <header>
+        <header
+          onClick={() => {
+            activeTabMessageDispatch({ type: "get-page-content" });
+          }}
+        >
           <h1>
             {taskStatus === "progress" && <IconFidgetSpinner />}
-            {userContent?.activeTabContent?.[contentUrl]?.title || "No title"}
+            {currentTabTitle || "No title"}
           </h1>
         </header>
         <div
@@ -218,7 +231,7 @@ export const SidepanelApp = () => {
               ? {
                   __html:
                     selectedStudyAction === "content"
-                      ? userContent?.activeTabContent?.content || ""
+                      ? currentTabContent
                       : studyState[contentUrl]?.[selectedStudyAction] || "",
                 }
               : { __html: "" }

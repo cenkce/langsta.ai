@@ -1,42 +1,34 @@
+import { ShadowDom } from "@espoojs/utils";
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
-import { ContentContextAtom, ContentStorage, useUserContentState } from "../domain/content/ContentContext.atom";
-import { useEffect } from "react";
-import { getSanitizedUrl } from "../api/utils/getSanitizedUrl";
+import { ContentContextAtom, ContentStorage } from "../domain/content/ContentContext.atom";
+import { useMemo } from "react";
 
 export const ContentApp = () => {
   // const [styles] = useAtom(StyleContextAtom);
-  const url = getSanitizedUrl();
   useLocalstorageSync({
     debugKey: "content",
+    verbose: true,
     storageAtom: ContentContextAtom,
     contentStorage: ContentStorage,
   });
-  const {activeTabUrl} = useUserContentState();
-  console.log('getSanitizedUrl : ', activeTabUrl, getSanitizedUrl())
+  // const url = getSanitizedUrl();
 
-  useEffect(() => {
-    if(activeTabUrl !== url) {
-      ContentContextAtom.set$({activeTabUrl: url});
-    }
-  }, [activeTabUrl, url]);
+  const parentElement = useMemo(
+    () => document.querySelector("#__contentAppllicationRoot__"),
+    [],
+  );
 
-  // const parentElement = useMemo(
-  //   () => document.querySelector("#__contentAppllicationRoot__"),
-  //   [],
-  // );
-
-  // return (
-  //   <ShadowDom parentElement={parentElement} mode={__DEV__ ? "open" : "closed"}>
-  //     <style>
-  //       {`
-  //     :host {
-  //       font-size: 20px !important;
-  //     }
-  //     `}
-  //       {Object.values(styles).join("\r\n")}
-  //     </style>
-  //     <ContentCaptureContainer />
-  //   </ShadowDom>
-  // );
-  return <></>
+  return (
+    <ShadowDom parentElement={parentElement} mode={__DEV__ ? "open" : "closed"}>
+      <style>
+        {`
+      :host {
+        font-size: 20px !important;
+      }
+      `}
+        {/* {Object.values(styles).join("\r\n")} */}
+      </style>
+      {/* <ContentCaptureContainer /> */}
+    </ShadowDom>
+  );
 };

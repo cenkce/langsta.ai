@@ -28,6 +28,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+
 // chrome.contextMenus.onClicked.addListener((info, tab) => {
 //   if (info.menuItemId === "wordsplorer-defineSelection") {
 //     info.selectionText && translateHander(createTranslateTextMessage(info.selectionText));

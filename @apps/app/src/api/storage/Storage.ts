@@ -65,6 +65,7 @@ export abstract class Storage<
   };
 
   load = async (params: StateT): Promise<void> => {
+    console.log('load : ', this.getStorageName(), params);
     if(!(this.getStorageName() in params))
       return this.getStorageInstance().set({[this.getStorageName()]: params});
   };

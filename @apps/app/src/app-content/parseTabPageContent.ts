@@ -2,7 +2,7 @@ import { Readability } from "@mozilla/readability";
 
 export type ParsedContentType = ReturnType<typeof parseTabPageContent>;
 
-export function parseTabPageContent() {
+export function parseTabPageContent(document: Document) {
   const doc = document.implementation.createHTMLDocument();
   const newNode = doc.importNode(document.documentElement, true);
   doc.replaceChild(newNode, doc.documentElement);

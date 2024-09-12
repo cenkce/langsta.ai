@@ -18,7 +18,6 @@ export const SidepanelApp = () => {
     <ArtBoard
       title="Translations"
       subtitle="Displaying translations all or by domain, or page url"
-      theme="cupcake"
     >
       <div className={styles.container}>
         <TabContainer
