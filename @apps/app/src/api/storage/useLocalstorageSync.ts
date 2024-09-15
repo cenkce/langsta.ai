@@ -1,7 +1,7 @@
-import { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useMemo, useRef } from "react";
 import { LocalStorage } from "./LocalStorage";
 import { Atom, useAtom } from "@espoojs/atom";
-
+import { verbose } from "../utils/verbose";
 /**
  * Listen to localstorage changes and syncs with the given atom
  *
@@ -28,6 +28,8 @@ export function useLocalstorageSync<
     verbose?: boolean;
   }>,
 ) {
+const log = useMemo(() => verbose(`useLocalstorageSync of ${props.debugKey}`), [props.debugKey]);
+
   const initializedRef = useRef(false);
   const [, setStorageData] = useAtom(props.storageAtom, {
     noStateUpdate: true,
@@ -36,9 +38,9 @@ export function useLocalstorageSync<
 
   useEffect(() => {
     const unloads: (() => void)[] = [];
-    props.verbose && console.debug("initialize atom subscription : ", props.debugKey);
+    log(props.verbose, "initialized atom subscription ")
     const subscription = props.storageAtom.get$().subscribe((storageValue) => {
-      props.verbose && console.debug("atom : ", props.debugKey, storageValue);
+      log(props.verbose, "atom : ", storageValue)
       if (initializedRef.current) {
         contentStorage.load(storageValue);
       }
@@ -57,11 +59,11 @@ export function useLocalstorageSync<
     // subscribes storage changes and updates its local state with
     unloads.push(
       contentStorage.subscribe((changes) => {
-        props.verbose && console.debug("changes : ", props.debugKey, changes);
+        log(props.verbose, "new changes passed : ", changes)
 
         if (props.contentStorage.name in changes) {
           Object.entries(changes).forEach(([, { newValue }]) => {
-            props.verbose && console.debug("new update : ", newValue);
+            log(props.verbose, "new update : ", newValue)
             setStorageData(newValue);
           });
         }
@@ -69,7 +71,7 @@ export function useLocalstorageSync<
     );
 
     return () => {
-      props.verbose && console.debug("unmounted : ", props.debugKey);
+      log(props.verbose, "unmounted ");
       unloads.forEach((unload) => unload?.());
     };
   }, []);
