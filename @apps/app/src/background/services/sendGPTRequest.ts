@@ -1,16 +1,17 @@
-import { openai } from "../service-worker";
+import { ApiConnect } from "../service-worker";
 import { Observable } from "rxjs";
 import { ChatCompletionChunk } from "openai/resources/index.mjs";
 import { Stream } from "openai/streaming.mjs";
 import OpenAI from "openai";
+import { SettingsStorage } from "../../domain/user/SettingsModel";
 
-export function sendGPTRequest(message: {
+export async function sendGPTRequest(message: {
   userMessage: string;
   systemMessage: string;
   stream?: boolean;
 }) {
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
-messages: [
+    messages: [
       { role: "system", content: message.systemMessage },
       { role: "user", content: message.userMessage },
     ],
@@ -19,21 +20,27 @@ messages: [
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
-    stream: message.stream !== undefined ? message.stream : true
+    stream: message.stream !== undefined ? message.stream : true,
   };
-  const completion = openai.chat.completions.create(params);
+
+  const apiKey = await SettingsStorage.read("apiKey");
 
   return new Observable<string>((subscriber) => {
+    const completion = ApiConnect.connect({ apiKey }).chat.completions.create(
+      params,
+    );
+
     completion
       .then(async (stream) => {
-        if(message.stream !== false)
+        if (message.stream !== false)
           for await (const part of stream as unknown as Stream<ChatCompletionChunk>) {
             if (part.choices[0].delta?.content) {
               subscriber.next(part.choices[0].delta.content);
             }
           }
         else
-          return (stream as OpenAI.Chat.Completions.ChatCompletion).choices[0].message.content;
+          return (stream as OpenAI.Chat.Completions.ChatCompletion).choices[0]
+            .message.content;
       })
       .catch((error) => {
         subscriber.error(error);

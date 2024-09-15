@@ -9,7 +9,7 @@ export const SettingsAtom = Atom.of(
   }>({ settings: {} })
 );
 
-export const SettingsStorage = LocalStorage.of('settings');
+export const SettingsStorage = LocalStorage.of<SettingsState>('settings');
 
 export type SettingsState = {
   apiKey?: string;

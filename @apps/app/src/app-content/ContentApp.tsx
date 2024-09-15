@@ -1,17 +1,22 @@
 import { ShadowDom } from "@espoojs/utils";
 import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
-import { ContentContextAtom, ContentStorage } from "../domain/content/ContentContext.atom";
+import {
+  ContentContextAtom,
+  ContentStorage,
+} from "../domain/content/ContentContext.atom";
 import { useMemo } from "react";
+import "./styles.tsx";
+import { useAtom } from "@espoojs/atom";
+import { StyleContextAtom } from "./styles";
+import MantainStyle from '@mantine/core/styles.css?inline';
 
 export const ContentApp = () => {
-  // const [styles] = useAtom(StyleContextAtom);
+  const [styles] = useAtom(StyleContextAtom);
   useLocalstorageSync({
     debugKey: "content",
-    verbose: true,
     storageAtom: ContentContextAtom,
     contentStorage: ContentStorage,
   });
-  // const url = getSanitizedUrl();
 
   const parentElement = useMemo(
     () => document.querySelector("#__contentAppllicationRoot__"),
@@ -26,9 +31,9 @@ export const ContentApp = () => {
         font-size: 20px !important;
       }
       `}
-        {/* {Object.values(styles).join("\r\n")} */}
+        {MantainStyle}
+        {Object.values(styles).join("\r\n")}
       </style>
-      {/* <ContentCaptureContainer /> */}
     </ShadowDom>
   );
 };

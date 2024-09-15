@@ -87,11 +87,11 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       openai:
-        specifier: ^4.55.6
-        version: 4.58.2
+        specifier: ^4.61.0
+        version: 4.61.0
       ramda:
-        specifier: ^0.29.1
-        version: 0.29.1
+        specifier: ^0.30.1
+        version: 0.30.1
       react:
         specifier: 18.3.1
         version: 18.3.1
@@ -2231,8 +2231,8 @@ packages:
     resolution: {integrity: sha512-1FlR+gjXK7X+AsAHso35MnyN5KqGwJRi/31ft6x0M194ht7S+rWAvd7PHss9xSKMzE0asv1pyIHaJYq+BbacAQ==}
     engines: {node: '>=12'}
 
-  openai@4.58.2:
-    resolution: {integrity: sha512-hIalypYELt7/PcryFpz4Gi1z/8ZDzukWyOhr+jKM6L/GVE+t4NseaENXKt+OxnkkIm/1R2EkdGxgnHrZ0kB5bQ==}
+  openai@4.61.0:
+    resolution: {integrity: sha512-xkygRBRLIUumxzKGb1ug05pWmJROQsHkGuj/N6Jiw2dj0dI19JvbFpErSZKmJ/DA+0IvpcugZqCAyk8iLpyM6Q==}
     hasBin: true
     peerDependencies:
       zod: ^3.23.8
@@ -2434,8 +2434,8 @@ packages:
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
 
-  ramda@0.29.1:
-    resolution: {integrity: sha512-OfxIeWzd4xdUNxlWhgFazxsA/nl3mS4/jGZI5n00uWOoSSFRhC1b6gl6xvmzUamgmqELraWp0J/qqVlXYPDPyA==}
+  ramda@0.30.1:
+    resolution: {integrity: sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw==}
 
   react-dom@18.3.1:
     resolution: {integrity: sha512-5m4nQKp+rZRb09LNH59GM4BxTh9251/ylbKIbpe7TpGxfJ+9kv6BLkLBXIjjspbgbnIBNqlI23tRnTWT0snUIw==}
@@ -4297,7 +4297,7 @@ snapshots:
 
   define-data-property@1.1.1:
     dependencies:
-      get-intrinsic: 1.2.2
+      get-intrinsic: 1.2.4
       gopd: 1.0.1
       has-property-descriptors: 1.0.1
 
@@ -4690,7 +4690,7 @@ snapshots:
 
   gopd@1.0.1:
     dependencies:
-      get-intrinsic: 1.2.2
+      get-intrinsic: 1.2.4
 
   graceful-fs@4.2.11: {}
 
@@ -4704,7 +4704,7 @@ snapshots:
 
   has-property-descriptors@1.0.1:
     dependencies:
-      get-intrinsic: 1.2.2
+      get-intrinsic: 1.2.4
 
   has-property-descriptors@1.0.2:
     dependencies:
@@ -4789,9 +4789,9 @@ snapshots:
 
   internal-slot@1.0.6:
     dependencies:
-      get-intrinsic: 1.2.2
+      get-intrinsic: 1.2.4
       hasown: 2.0.0
-      side-channel: 1.0.4
+      side-channel: 1.0.6
 
   invariant@2.2.4:
     dependencies:
@@ -4818,7 +4818,7 @@ snapshots:
 
   is-boolean-object@1.1.2:
     dependencies:
-      call-bind: 1.0.5
+      call-bind: 1.0.7
       has-tostringtag: 1.0.0
 
   is-callable@1.2.7: {}
@@ -4882,8 +4882,8 @@ snapshots:
 
   is-weakset@2.0.2:
     dependencies:
-      call-bind: 1.0.5
-      get-intrinsic: 1.2.2
+      call-bind: 1.0.7
+      get-intrinsic: 1.2.4
 
   is-what@3.14.1: {}
 
@@ -5207,7 +5207,7 @@ snapshots:
     dependencies:
       mimic-fn: 4.0.0
 
-  openai@4.58.2:
+  openai@4.61.0:
     dependencies:
       '@types/node': 18.19.3
       '@types/node-fetch': 2.6.9
@@ -5388,7 +5388,7 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
-  ramda@0.29.1: {}
+  ramda@0.30.1: {}
 
   react-dom@18.3.1(react@18.3.1):
     dependencies:

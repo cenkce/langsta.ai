@@ -7,11 +7,25 @@ import { openSidePanel } from "../api/helper/openSidePanel";
 import { TaskStore } from "@espoojs/task";
 import { GPTContentRequest } from "./services/content";
 import "./services/backgroundTaskMessagesBroadcaster";
+import { SettingsStorage } from "../domain/user/SettingsModel";
 
-export const openai = new OpenAI({
-  apiKey: import.meta.env.VITE_API_KEY || "", // defaults to process.env["OPENAI_API_KEY"]
-  dangerouslyAllowBrowser: true,
-});
+export class ApiConnect {
+  private static apiKey?: string = '';
+  private static sdk: OpenAI = new OpenAI({ apiKey: ApiConnect.apiKey });
+  static connect({baseUrl, apiKey}: {baseUrl?: string, apiKey?: string }) {
+    if (baseUrl) this.sdk.baseURL = baseUrl;
+    if (apiKey) this.sdk.apiKey = apiKey;
+    return this.sdk;
+  }
+
+  static {
+    SettingsStorage.subscribe((settings) => {
+      if (settings.apiKey) this.apiKey = settings.apiKey.newValue;
+    });
+  }
+
+  protected constructor() {}
+}
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setOptions({ path: "side-panel.html" });
@@ -27,7 +41,6 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ["selection"],
   });
 });
-
 
 // chrome.contextMenus.onClicked.addListener((info, tab) => {
 //   if (info.menuItemId === "wordsplorer-defineSelection") {

@@ -65,15 +65,14 @@ export abstract class Storage<
   };
 
   load = async (params: StateT): Promise<void> => {
-    console.log('load : ', this.getStorageName(), params);
     if(!(this.getStorageName() in params))
       return this.getStorageInstance().set({[this.getStorageName()]: params});
   };
 
-  read = <M extends U[0]>(key: M): Promise<StateT[M]> => {
-    return this.getStorageInstance()
-      .get(this.getStorageName())
-      .then((data) => data[this.getStorageName()][key]);
+  read = async <M extends Tuples<Required<StateT>>[0]>(key: M) => {
+    const data = await this.getStorageInstance()
+      .get(this.getStorageName());
+    return data[this.getStorageName()][key];
   };
 
   getState(): Promise<StateT>  {

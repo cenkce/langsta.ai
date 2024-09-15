@@ -29,12 +29,12 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
 
 export async function GPTTranslateRequest(message: TranslateRequestMessage) {
   const { id, ...messageBody } = message;
+  const task = await sendGPTRequest({
+    userMessage: messageBody?.content?.text || "",
+    systemMessage: messageBody.systemMessage,
+  });
   const taskAtom = TaskStore.createTaskAtom(
-    () =>
-      sendGPTRequest({
-        userMessage: messageBody?.content?.text || "",
-        systemMessage: messageBody.systemMessage,
-      }),
+    () => task,
     {
       tags: ["translate-service", "background-task"],
       selection: messageBody?.content?.selectors
@@ -53,7 +53,7 @@ export async function GPTTranslateRequest(message: TranslateRequestMessage) {
 
   taskAtom.plugAtom$(taskAtom.chargeAtom$()).subscribe({
     next(result) {
-      result &&
+      if (result)
         upsertTranslationTask({
           selection: message.content,
           taskId: taskAtom.id,
