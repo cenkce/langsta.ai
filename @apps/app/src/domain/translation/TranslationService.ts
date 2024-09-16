@@ -24,8 +24,7 @@ export const useTranslateService = () => {
     return id;
   };
   const summarise = (content?: string) => {
-    if(!content)
-      return;
+    if (!content) return;
     const id = nanoid();
 
     if (content && settings.nativelanguage && settings.level)
@@ -41,8 +40,7 @@ export const useTranslateService = () => {
     return id;
   };
   const simplify = (content?: string) => {
-    if(!content )
-      return;
+    if (!content) return;
     const id = nanoid();
     if (content && settings.nativelanguage && settings.level)
       sendGPTRequest(
@@ -57,18 +55,14 @@ export const useTranslateService = () => {
     return id;
   };
   const extractWords = (content?: string) => {
-    if(!content )
-      return;
+    if (!content) return;
     const id = nanoid();
 
-    if(!settings.targetLanguage )
-      throw new Error("Target language is not set");
-    
-    if(!settings.nativelanguage )
-      throw new Error("Native language is not set");
+    if (!settings.targetLanguage) throw new Error("Target language is not set");
 
-    if(!settings.level )
-      throw new Error("Target language level is not set");
+    if (!settings.nativelanguage) throw new Error("Native language is not set");
+
+    if (!settings.level) throw new Error("Target language level is not set");
 
     if (content)
       sendGPTRequest(
@@ -87,7 +81,7 @@ export const useTranslateService = () => {
     extractWords,
     translate,
     summarise,
-    simplify
+    simplify,
   };
 };
 
@@ -96,16 +90,18 @@ export function createTranslateTextMessage(options: {
   level?: string;
   selection: UserContentState["selectedText"];
   id?: string;
-}) {
+}): TranslateRequestMessage {
+  const propmpts = TranslatePropmpts({
+    targetLanguage: options.language,
+    level: options.level,
+  });
   return {
     type: "gpt/translate",
     content: options.selection,
     id: options.id || nanoid(),
-    systemMessage: TranslatePropmpts({
-      targetLanguage: options.language,
-      level: options.level,
-    }).translate_text_string,
-  } as TranslateRequestMessage;
+    userMessage: propmpts.translate_text_string,
+    systemMessage: propmpts.systemTeacherMessage,
+  };
 }
 
 export function createSimplyfyRequestMessage(options: {
@@ -113,16 +109,18 @@ export function createSimplyfyRequestMessage(options: {
   level: string;
   content: string;
   id?: string;
-}) {
+}): SimplyfyRequestMessage {
+  const propmpts = TranslatePropmpts({
+    targetLanguage: options.targetLanguage,
+    level: options.level,
+  });
   return {
     type: "gpt/simplify",
     content: options.content,
+    userMessage: propmpts.simplfy_text,
     id: options.id || nanoid(),
-    systemMessage: TranslatePropmpts({
-      targetLanguage: options.targetLanguage,
-      level: options.level,
-    }).simplfy_text,
-  } as SimplyfyRequestMessage;
+    systemMessage: propmpts.systemTeacherMessage,
+  };
 }
 
 export function createExtractWordsRequestMessage(options: {
@@ -132,16 +130,18 @@ export function createExtractWordsRequestMessage(options: {
   content: string;
   id?: string;
 }) {
+  const propmpts = TranslatePropmpts({
+    nativeLanguage: options.nativeLanguage,
+    targetLanguage: options.targetLanguage,
+    level: options.level,
+  });
   return {
     type: "gpt/words",
     content: options.content,
     id: options.id || nanoid(),
-    stream: false,
-    systemMessage: TranslatePropmpts({
-      nativeLanguage: options.nativeLanguage,
-      targetLanguage: options.targetLanguage,
-      level: options.level,
-    }).extract_words,
+    stream: true,
+    userMessage: propmpts.extract_words,
+    systemMessage: propmpts.systemTeacherMessage,
   } as ExtractWordsRequestMessage;
 }
 
@@ -150,14 +150,16 @@ export function createSummariseRequestMessage(options: {
   level: string;
   content: string;
   id?: string;
-}) {
+}): SummariseContentRequestMessage {
+  const propmpts = TranslatePropmpts({
+    targetLanguage: options.language,
+    level: options.level,
+  });
   return {
     type: "gpt/summary",
     content: options.content,
     id: options.id || nanoid(),
-    systemMessage: TranslatePropmpts({
-      targetLanguage: options.language,
-      level: options.level,
-    }).summarise_text,
-  } as SummariseContentRequestMessage;
+    userMessage: propmpts.summarise_text,
+    systemMessage: propmpts.systemTeacherMessage,
+  };
 }

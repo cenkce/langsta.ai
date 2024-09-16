@@ -8,15 +8,23 @@ import { SettingsStorage } from "../../domain/user/SettingsModel";
 export async function sendGPTRequest(message: {
   userMessage: string;
   systemMessage: string;
+  content?: string;
   stream?: boolean;
 }) {
   const params: OpenAI.Chat.ChatCompletionCreateParams = {
     messages: [
       { role: "system", content: message.systemMessage },
-      { role: "user", content: message.userMessage },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: message.userMessage },
+          { type: "text", text: message.content || '' },
+        ],
+      },
+      // { role: "user", content:  },
     ],
-    model: "gpt-3.5-turbo-16k",
-    temperature: 1,
+    model: "gpt-4-turbo",
+    temperature: 0.6,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,

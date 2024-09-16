@@ -16,7 +16,7 @@ import {
   useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
-import { OperatorFunction, filter, scan } from "rxjs";
+import { OperatorFunction, bufferTime, filter, scan } from "rxjs";
 import { classNames } from "@espoojs/utils";
 import { useEventListener } from "@mantine/hooks";
 import {
@@ -61,8 +61,8 @@ export const SidepanelApp = () => {
   userContentRef.current = userContent;
 
   useEffect(() => {
-    if (!userContent.activeTabContent?.content)
-      activeTabMessageDispatch({ type: "get-page-content" });
+    // if (!userContent.activeTabContent?.content)
+    activeTabMessageDispatch({ type: "get-page-content" });
   }, []);
 
   useEffect(() => {
@@ -74,37 +74,53 @@ export const SidepanelApp = () => {
           filter((task) => {
             return task !== undefined;
           }) as OperatorFunction<TaskNode | undefined, TaskNode>,
-          scan<TaskNode, [string, TaskNode] | []>((acc, task) => {
-            return [(acc[0] || "") + (task.result || ""), task];
-          }, []),
+          bufferTime(500),
+          scan<TaskNode[], [string, TaskNode | undefined] | []>(
+            (acc, nodes) => {
+              let result = "";
+              let task: TaskNode | undefined;
+              nodes?.forEach((tsk) => {
+                result += tsk.result || "";
+                task = tsk;
+              });
+
+              return [(acc[0] || "") + (result || ""), task];
+            },
+            [],
+          ),
         )
         .subscribe({
-          next: ([result, task]) => {
-            const url = userContentRef?.current?.selectedText?.url;
+          next: ([result = "", task]) => {
+            const url = contentUrl;
+
             const resultKey = task?.params?.tags
               .find((tag) => tag.includes("gpt/"))
               ?.replace("gpt/", "");
             if (resultKey === undefined) return;
 
-            if (result && url)
+            if (result && url) {
+              const newState = {
+                [resultKey]: result,
+                updatedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                level: "",
+                title: "",
+                url: url,
+              };
+
               setStudyState((state) => ({
                 ...state,
-                [url]: {
-                  ...state[url],
-                  [resultKey]: result,
-                  updatedAt: new Date().toISOString(),
-                  createdAt: new Date().toISOString(),
-                  level: "",
-                  title: "",
-                  url: url,
-                },
+                [url]: newState,
               }));
+            }
             if (task?.status) setTaskStatus(task?.status);
-            if (task?.status === "completed")
+            if (task?.status === "completed") {
               setTaskId((state) => ({
                 ...state,
                 [selectedStudyAction]: undefined,
               }));
+              subscription.unsubscribe();
+            }
           },
         });
 
@@ -114,7 +130,7 @@ export const SidepanelApp = () => {
 
   const { simplify, summarise, extractWords } = useTranslateService();
   const isDisabled = taskStatus === "progress";
-  const contentUrl = userContent?.selectedText?.url || "";
+  const contentUrl = userContent?.activeTabUrl || "";
   const contentFromCache = studyState[contentUrl];
   const hasSummary = !!contentFromCache?.summary;
   // const hasWords = !!contentFromCache?.words;
@@ -147,7 +163,7 @@ export const SidepanelApp = () => {
       if (!taskId?.[link])
         setTaskId((state = {}) => ({
           ...state,
-          summary: extractWords(
+          words: extractWords(
             userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
           ),
         }));
@@ -182,13 +198,17 @@ export const SidepanelApp = () => {
   });
 
   const currentTabContent = userContent?.activeTabUrl
-    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.content ||
-      ""
+    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.content || ""
     : "";
   const currentTabTitle = userContent?.activeTabUrl
-    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.title ||
-      ""
+    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.title || ""
     : "";
+
+  // console.log(
+  //   "currentTabContent",
+  //   selectedStudyAction === "words" &&
+  //     studyState[contentUrl]?.[selectedStudyAction],
+  // );
 
   return (
     <div ref={scrollContainerRef} className={styles.container}>
@@ -237,7 +257,49 @@ export const SidepanelApp = () => {
               : { __html: "" }
           }
         />
+        {selectedStudyAction === "words" ? (
+          <ExtractedWordsView
+            words={studyState[contentUrl]?.[selectedStudyAction] as any}
+          />
+        ) : null}
       </main>
     </div>
   );
 };
+
+const ExtractedWordsView = ({ words }: { words?: string }) => {
+  let jsonResult: WordCollection[] | undefined;
+  try {
+    jsonResult = JSON.parse(
+      words?.substring(0, words?.lastIndexOf("},") + 1) + "]",
+    );
+  } catch {
+    console.error("Failed to parse words", words?.substring(0, words?.lastIndexOf("}")) + "]");
+    jsonResult = [];
+  }
+  return (
+    jsonResult?.map((item, i) => {
+      return (
+        <div key={i}>
+          {Object.keys(item)?.map((key) => {
+            return (
+              <div key={key}>
+                <h3>{key}</h3>
+                <h4>{item[key].translation}</h4>
+                <p>{item[key].kind}</p>
+                <ul>
+                  {item[key]?.examples?.map((example, i) => (
+                    <li key={i}>{example}</li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }) || []
+  );
+};
+
+type WordDescriptor = { translation: string; kind: string; examples: string[] };
+type WordCollection = { [key: string]: WordDescriptor };

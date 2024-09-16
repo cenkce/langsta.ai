@@ -14,13 +14,14 @@ export const ApiSettingsForm = () => {
     initialValues: {
       apiKey: settings.apiKey,
       nativelanguage: settings.nativelanguage,
-      targetLanguage: settings.targetLanguage,
+      targetLanguage: settings.targetLanguage || "en",
       level: settings.level
     },
     validate: {
       apiKey: (value) => !!value?.trim()?.length,
     },
     onValuesChange: (values) => {
+      console.log("values", values);
       setSettings(values);
     },
   });
@@ -85,6 +86,7 @@ export const ApiSettingsForm = () => {
         label="Your Target Language"
         key={form.key("targetLanguage")}
         data={[
+          { value: "", label: "Select" },
           { value: "en", label: "English" },
         ]}
         {...form.getInputProps("targetLanguage")}

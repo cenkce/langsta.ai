@@ -8,16 +8,20 @@ import {
 import { TaskStore } from "@espoojs/task";
 
 export const GPTContentRequest = async (
-  message: SummariseContentRequestMessage | SimplyfyRequestMessage | ExtractWordsRequestMessage,
+  message:
+    | SummariseContentRequestMessage
+    | SimplyfyRequestMessage
+    | ExtractWordsRequestMessage,
 ) => {
   const messageBody = omit(["id"], message);
+  const task = await sendGPTRequest({
+    userMessage: messageBody.userMessage,
+    systemMessage: messageBody.systemMessage,
+    stream: messageBody.stream,
+    content: messageBody.content,
+  });
   const taskAtom = TaskStore.createTaskAtom(
-    () =>
-      sendGPTRequest({
-        userMessage: messageBody.content,
-        systemMessage: messageBody.systemMessage,
-        stream: messageBody.stream,
-      }),
+    () => task,
     {
       tags: ["content-service", "background-task", message.type],
       type: message.type,

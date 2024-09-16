@@ -1,34 +1,18 @@
 import { UserContentState } from "../../../domain/content/ContentContext.atom";
 
-export type TranslateRequestMessage = {
-  type: 'gpt/translate',
+export type ChatRequestMessage<T extends string, C = string> = {
+  type: `gpt/${T}`,
   systemMessage: string,
+  userMessage: string,
   id?: string,
-  content: UserContentState['selectedText'];
-};
-
-export type SimplyfyRequestMessage = {
-  type: 'gpt/simplify',
-  systemMessage: string,
-  id?: string,
-  content: string;
+  content: C;
   stream?: boolean;
 };
 
-export type ExtractWordsRequestMessage = {
-  type: 'gpt/words',
-  systemMessage: string,
-  id?: string,
-  content: string;
-  stream?: boolean;
-};
+export type TranslateRequestMessage = ChatRequestMessage<'translate', UserContentState['selectedText']> 
 
-export type SummariseContentRequestMessage = {
-  type: 'gpt/summary',
-  systemMessage: string,
-  id?: string,
-  content: string;
-  stream?: boolean;
-};
 
+export type SimplyfyRequestMessage = ChatRequestMessage<'simplify'>;
+export type ExtractWordsRequestMessage = ChatRequestMessage<'words'>;
+export type SummariseContentRequestMessage = ChatRequestMessage<'summary'>;
 export type GPTApiRequestMessages = ExtractWordsRequestMessage | TranslateRequestMessage | SimplyfyRequestMessage | SummariseContentRequestMessage;
