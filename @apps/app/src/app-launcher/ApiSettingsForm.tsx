@@ -2,7 +2,7 @@ import { useAtom } from "@espoojs/atom";
 import { SettingsAtom } from "../domain/user/SettingsModel";
 import { useEffect, useRef } from "react";
 import { useForm } from "@mantine/form";
-import { NativeSelect, TextInput } from "@mantine/core";
+import { NativeSelect, PasswordInput } from "@mantine/core";
 import shallowEqual from "../api/utils/shallowEqual";
 import { LanguageLevelSelect } from "./LanguageLevelSelect";
 import styles from "./ApiSettingsForm.module.scss";
@@ -56,7 +56,7 @@ export const ApiSettingsForm = () => {
 
   return (
     <form className={styles.root}>
-      <TextInput
+      <PasswordInput
         withAsterisk={false}
         label="Enter ChatGPT Api Key"
         placeholder=""

@@ -6,10 +6,9 @@ export const TranslatePropmpts = ({nativeLanguage, targetLanguage, level}:{nativ
   - Your answer must consist of only a single Json and please don't add explanations or summaries.`,
   extract_words: `Your task is to find and extract Study Words by language's level ${level} or higher in the content and translate them to ${nativeLanguage?.toUpperCase()}. I use Study Words for unique unfamiliar, important or unknown words on the content. 
   Follow the rules below to pinpoint words:
-  - Extract amount of words as much as possible.
-  - Least count of words must be %15 of words in the content.
+  - Extract amount of words as much as you can.
   - Extract words with their translations as json format.
-  - Extracted words is an array of json format : '{original word: {translation: its translation, kind: kind of word like verb, adjective etc.}}'.
+  - Extracted words should be an array of json format : '{original word: {translation: its translation, kind: kind of word like verb, adjective etc.}}'.
   - Every word must be unique and not repeated.
   - Output must contain only json text. Don't add \`\`\` or \`\`\`json.
   - Translated the words should be detailed and clear.
@@ -19,7 +18,7 @@ export const TranslatePropmpts = ({nativeLanguage, targetLanguage, level}:{nativ
   summarise_text_native: `Summarise specified text by translating ${nativeLanguage} for ${level} second language learners by using at least 50% of the text. Your answer must include only the summarised text.`,
   simplfy_text: `Simplify grammar of the text in the same language for ${level} second language learners by following the rules:
   - Don't shorten the text.
-  - Adds paragraphs with proper HTML tags.
+  - Add HTML tags for paragraphs and headers.
   - Clear links and useless html tags.
   - Clear unrelated and unnecessary content.
   - Don't use html and body tags.

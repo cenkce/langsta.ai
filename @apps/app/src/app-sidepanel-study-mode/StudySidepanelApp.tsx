@@ -7,7 +7,6 @@ import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 import { useEffect, useRef, useState } from "react";
-import { IconFidgetSpinner } from "@tabler/icons-react";
 import { TaskNode, TaskStatus, TaskStore } from "@espoojs/task";
 import {
   ContentContextAtom,
@@ -18,12 +17,25 @@ import {
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
 import { OperatorFunction, bufferTime, filter, scan } from "rxjs";
 import { classNames } from "@espoojs/utils";
-import { useEventListener } from "@mantine/hooks";
+import { upperFirst, useEventListener } from "@mantine/hooks";
 import {
   ContentStudyActionsBar,
   ContentStudyActionsIconsSlugsType,
 } from "./ContentStudyActionsBar";
 import { activeTabMessageDispatch } from "../domain/content/activeTabMessageDispatch";
+import {
+  ActionIcon,
+  Card,
+  Divider,
+  Flex,
+  Group,
+  Loader,
+  Menu,
+  rem,
+  Text,
+  Title,
+} from "@mantine/core";
+import { IconDots, IconFileZip, IconEye, IconTrash } from "@tabler/icons-react";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
@@ -68,6 +80,7 @@ export const SidepanelApp = () => {
   useEffect(() => {
     const currentTaskId = taskId?.[selectedStudyAction];
     if (currentTaskId) {
+      // stream task result
       const subscription = TaskStore.instance
         .subscribeTaskById(currentTaskId)
         .pipe(
@@ -75,6 +88,7 @@ export const SidepanelApp = () => {
             return task !== undefined;
           }) as OperatorFunction<TaskNode | undefined, TaskNode>,
           bufferTime(500),
+          // merges buffered chunks and accumulates stream
           scan<TaskNode[], [string, TaskNode | undefined] | []>(
             (acc, nodes) => {
               let result = "";
@@ -203,13 +217,7 @@ export const SidepanelApp = () => {
   const currentTabTitle = userContent?.activeTabUrl
     ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.title || ""
     : "";
-
-  // console.log(
-  //   "currentTabContent",
-  //   selectedStudyAction === "words" &&
-  //     studyState[contentUrl]?.[selectedStudyAction],
-  // );
-
+  // taskStatus === "progress"
   return (
     <div ref={scrollContainerRef} className={styles.container}>
       <section className={styles.studyActionsContainer}>
@@ -233,16 +241,14 @@ export const SidepanelApp = () => {
             onClick={readActionsClickHandler}
           />
         </section>
-        <header
+        {/* <header
           onClick={() => {
             activeTabMessageDispatch({ type: "get-page-content" });
           }}
-        >
-          <h1>
-            {taskStatus === "progress" && <IconFidgetSpinner />}
-            {currentTabTitle || "No title"}
-          </h1>
-        </header>
+        > */}
+        <Title my={'1rem'}>{currentTabTitle || "No title"}</Title>
+        {/* </header> */}
+        <Divider my={'1rem 1rem'}></Divider>
         <div
           className={classNames(styles[`textSize-${textSizes[textSize]}`])}
           dangerouslySetInnerHTML={
@@ -259,6 +265,7 @@ export const SidepanelApp = () => {
         />
         {selectedStudyAction === "words" ? (
           <ExtractedWordsView
+            loading={taskStatus === "progress"}
             words={studyState[contentUrl]?.[selectedStudyAction] as any}
           />
         ) : null}
@@ -267,39 +274,112 @@ export const SidepanelApp = () => {
   );
 };
 
-const ExtractedWordsView = ({ words }: { words?: string }) => {
+const ExtractedWordsView = ({ words, loading }: { words?: string; loading?: boolean }) => {
   let jsonResult: WordCollection[] | undefined;
   try {
     jsonResult = JSON.parse(
       words?.substring(0, words?.lastIndexOf("},") + 1) + "]",
     );
   } catch {
-    console.error("Failed to parse words", words?.substring(0, words?.lastIndexOf("}")) + "]");
+    console.error(
+      "Failed to parse words",
+      words?.substring(0, words?.lastIndexOf("}")) + "]",
+    );
     jsonResult = [];
   }
+
   return (
-    jsonResult?.map((item, i) => {
-      return (
-        <div key={i}>
-          {Object.keys(item)?.map((key) => {
-            return (
-              <div key={key}>
-                <h3>{key}</h3>
-                <h4>{item[key].translation}</h4>
-                <p>{item[key].kind}</p>
-                <ul>
-                  {item[key]?.examples?.map((example, i) => (
-                    <li key={i}>{example}</li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-      );
-    }) || []
+    <>
+      <Group>
+        {loading ? <Loader type="dots"></Loader> : null}{" "}
+        <Text size="sm">{jsonResult?.length} Words</Text>
+      </Group>
+      <Flex direction={"row"} wrap={"wrap"}>
+        {jsonResult?.map((item) => {
+          const word = Object.keys(item)[0];
+          return <WordCard descriptor={item[word]} word={word}></WordCard>;
+        }) || []}
+      </Flex>
+    </>
   );
 };
 
 type WordDescriptor = { translation: string; kind: string; examples: string[] };
 type WordCollection = { [key: string]: WordDescriptor };
+
+function WordCard({
+  word,
+  descriptor,
+}: {
+  word: string;
+  descriptor: WordDescriptor;
+}) {
+  return (
+    <Card
+      style={{ gap: "1rem" }}
+      w={rem(280)}
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+    >
+      <Card.Section withBorder inheritPadding py="xs">
+        <Group justify="space-between">
+          <Flex direction="column">
+            <Title size={"h6"}>
+              {upperFirst(word)} ({descriptor.kind}){" "}
+            </Title>
+            <Text size="xs">{upperFirst(descriptor.translation)}</Text>
+          </Flex>
+          <Menu withinPortal position="bottom-end" shadow="sm">
+            <Menu.Target>
+              <ActionIcon variant="subtle" color="gray">
+                <IconDots style={{ width: rem(16), height: rem(16) }} />
+              </ActionIcon>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={
+                  <IconFileZip style={{ width: rem(14), height: rem(14) }} />
+                }
+              >
+                Download zip
+              </Menu.Item>
+              <Menu.Item
+                leftSection={
+                  <IconEye style={{ width: rem(14), height: rem(14) }} />
+                }
+              >
+                Preview all
+              </Menu.Item>
+              <Menu.Item
+                leftSection={
+                  <IconTrash style={{ width: rem(14), height: rem(14) }} />
+                }
+                color="red"
+              >
+                Delete all
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Group>
+      </Card.Section>
+      <Flex
+        direction={"column"}
+        justify="flex-start"
+        align="flex-start"
+        gap={rem(5)}
+      >
+        <Text fz={"sm"} fw={"bold"} c="dimmed">
+          Examples
+        </Text>
+        {descriptor?.examples?.map((example, i) => (
+          <Text fz={"sm"} key={i}>
+            {i % 2 === 1 ? <i>{example}</i> : example}
+          </Text>
+        ))}
+      </Flex>
+    </Card>
+  );
+}

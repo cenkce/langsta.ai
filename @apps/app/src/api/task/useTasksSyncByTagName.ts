@@ -5,19 +5,23 @@ import { of } from "rxjs";
 
 export const useTasksSyncByTagName = (tag: string) => {
   useEffect(() => {
-    return TaskEventEmitter.addListener((message) => {
+    return TaskEventEmitter.addListener((messages) => {
       if (
-        message.type === "task/update" &&
-        message.payload.params?.tags?.includes(tag)
+        messages.type === "task/update" &&
+        messages.payload.filter(
+          (message) => message.params?.tags?.includes(tag),
+        )
       ) {
-        if(!TaskStore.instance.hasNode(message.payload.id)) {
-          TaskStore.instance.createNode({
-            ...message.payload,
-            task: () => of()
-          });
-        } else {
-          TaskStore.instance.updateNode(message.payload.id, message.payload);
-        }
+        messages.payload.map((task) => {
+          if (!TaskStore.instance.hasNode(task.id)) {
+            TaskStore.instance.createNode({
+              ...task,
+              task: () => of(),
+            });
+          } else {
+            TaskStore.instance.updateNode(task.id, task);
+          }
+        });
       }
     });
   }, [tag]);

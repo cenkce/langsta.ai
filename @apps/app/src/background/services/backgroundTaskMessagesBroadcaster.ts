@@ -1,6 +1,7 @@
 import { TaskStore } from "@espoojs/task";
 import { TaskMessage } from "../../api/task/TaskMessage";
 import { omit } from "ramda";
+import { bufferTime } from "rxjs";
 
 /**
  * Subscribes to task updates by tag name and emits task update messages to be subscribed from any environments.
@@ -13,16 +14,17 @@ TaskStore.instance
     "progress",
     "completed",
   ])
+  .pipe(
+    bufferTime(200),
+  )
   .subscribe({
-    next(task) {
-      if (task) {
-        const taskBody = omit(['task'], task);
+    next(tasks) {
+      if (tasks && tasks?.length) {
+        const taskBody = tasks.filter(task => task !== null).map((task) => omit(['task'], task));
 
         TaskMessage({
           type: "task/update",
-          payload: {
-            ...taskBody,
-          },
+          payload: taskBody
         });
       }
     },

@@ -4,12 +4,12 @@ import { TaskNode } from "@espoojs/task";
 export type TaskUpdate = Omit<TaskNode, 'task'>;
 export type TaskUpdateMessage = {
   type: "task/update";
-  payload: TaskUpdate;
+  payload: TaskUpdate[];
 };
 /**
- * Emits task update messages to the background, sidebars, frontend and content environments.
- * Tasks can be created in any environment, but other environtments can't get the task informations directly from the task store,
- * because every environtment has own context and the taskstore instance. This is why we need to emit task updates to every environtment.
+ * Emits task update messages to the background, sidebars, frontend and content applications.
+ * Tasks can be created in any application, but other applications can't get the task informations directly from the task store,
+ * because every application has own context and the taskstore instance. This is why we need to emit task updates to every application.
  *
  * @param task
  */
