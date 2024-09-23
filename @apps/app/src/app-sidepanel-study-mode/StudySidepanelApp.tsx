@@ -17,36 +17,44 @@ import {
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
 import { OperatorFunction, bufferTime, filter, scan } from "rxjs";
 import { classNames } from "@espoojs/utils";
-import { upperFirst, useEventListener } from "@mantine/hooks";
+import { useEventListener } from "@mantine/hooks";
 import {
   ContentStudyActionsBar,
   ContentStudyActionsIconsSlugsType,
 } from "./ContentStudyActionsBar";
 import { activeTabMessageDispatch } from "../domain/content/activeTabMessageDispatch";
-import {
-  ActionIcon,
-  Card,
-  Divider,
-  Flex,
-  Group,
-  Loader,
-  Menu,
-  rem,
-  Text,
-  Title,
-} from "@mantine/core";
-import { IconDots, IconFileZip, IconEye, IconTrash } from "@tabler/icons-react";
+import { Divider, Title } from "@mantine/core";
+import { ExtractedWordsView } from "./extract-words/ExtractedWordsView";
+import { useAtom } from "@espoojs/atom";
+import { studyContentTasksAtom } from "./StudyContentTasksAtom";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
 
+// const useStudyContentTask = (taskId: string) => {
+//   const [studyTasks, setStudyTasks] = useAtom(StudyContentTasksAtom);
+//   // const [taskId, setTaskId] = useState<
+//   //   { [key in ContentStudyActionsIconsSlugsType]?: string } | undefined
+//   // >();
+//   useEffect(() => {
+//     if (taskId) {
+//       const subscription = TaskStore.instance
+//         .subscribeTaskById(taskId)
+//         .subscribe((task) => {
+//           setTask(task);
+//         });
+
+//       return () => subscription.unsubscribe();
+//     }
+//   }, [taskId]);
+//   return task;
+// };
+
 export const SidepanelApp = () => {
-  const [taskId, setTaskId] = useState<
-    { [key in ContentStudyActionsIconsSlugsType]?: string } | undefined
-  >();
   const [taskStatus, setTaskStatus] = useState<TaskStatus>();
   const [textSize, setTextSize] = useState<number>(2);
   const [layoutSize, setLayoutSize] = useState<number>(2);
+  const [studyTasks, setStudyTasks] = useAtom(studyContentTasksAtom);
 
   useLocalstorageSync({
     debugKey: "content-sidepanel-study-mode",
@@ -78,7 +86,7 @@ export const SidepanelApp = () => {
   }, []);
 
   useEffect(() => {
-    const currentTaskId = taskId?.[selectedStudyAction];
+    const currentTaskId = studyTasks?.[selectedStudyAction];
     if (currentTaskId) {
       // stream task result
       const subscription = TaskStore.instance
@@ -129,7 +137,7 @@ export const SidepanelApp = () => {
             }
             if (task?.status) setTaskStatus(task?.status);
             if (task?.status === "completed") {
-              setTaskId((state) => ({
+              setStudyTasks((state) => ({
                 ...state,
                 [selectedStudyAction]: undefined,
               }));
@@ -140,7 +148,7 @@ export const SidepanelApp = () => {
 
       return () => subscription.unsubscribe();
     }
-  }, [selectedStudyAction, taskId]);
+  }, [selectedStudyAction, studyTasks]);
 
   const { simplify, summarise, extractWords } = useTranslateService();
   const isDisabled = taskStatus === "progress";
@@ -174,8 +182,8 @@ export const SidepanelApp = () => {
     if (link === "content") {
       setSelectedStudyAction(link);
     } else if (link === "words") {
-      if (!taskId?.[link])
-        setTaskId((state = {}) => ({
+      if (!studyTasks?.[link])
+        setStudyTasks((state = {}) => ({
           ...state,
           words: extractWords(
             userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
@@ -183,8 +191,8 @@ export const SidepanelApp = () => {
         }));
       setSelectedStudyAction(link);
     } else if (link === "summary") {
-      if (!taskId?.[link] && !hasSummary)
-        setTaskId((state = {}) => ({
+      if (!studyTasks?.[link] && !hasSummary)
+        setStudyTasks((state = {}) => ({
           ...state,
           summary: summarise(
             userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
@@ -192,8 +200,8 @@ export const SidepanelApp = () => {
         }));
       setSelectedStudyAction(link);
     } else if (link === "simplify") {
-      if (!taskId?.[link] && !hasSimplifed)
-        setTaskId((state = {}) => ({
+      if (!studyTasks?.[link] && !hasSimplifed)
+        setStudyTasks((state = {}) => ({
           ...state,
           simplify: simplify(
             userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
@@ -241,14 +249,10 @@ export const SidepanelApp = () => {
             onClick={readActionsClickHandler}
           />
         </section>
-        {/* <header
-          onClick={() => {
-            activeTabMessageDispatch({ type: "get-page-content" });
-          }}
-        > */}
-        <Title my={'1rem'}>{currentTabTitle || "No title"}</Title>
-        {/* </header> */}
-        <Divider my={'1rem 1rem'}></Divider>
+        <Title my={"1rem"} size={"h3"}>
+          {currentTabTitle || "No title"}
+        </Title>
+        <Divider my={"1rem 1rem"}></Divider>
         <div
           className={classNames(styles[`textSize-${textSizes[textSize]}`])}
           dangerouslySetInnerHTML={
@@ -273,113 +277,3 @@ export const SidepanelApp = () => {
     </div>
   );
 };
-
-const ExtractedWordsView = ({ words, loading }: { words?: string; loading?: boolean }) => {
-  let jsonResult: WordCollection[] | undefined;
-  try {
-    jsonResult = JSON.parse(
-      words?.substring(0, words?.lastIndexOf("},") + 1) + "]",
-    );
-  } catch {
-    console.error(
-      "Failed to parse words",
-      words?.substring(0, words?.lastIndexOf("}")) + "]",
-    );
-    jsonResult = [];
-  }
-
-  return (
-    <>
-      <Group>
-        {loading ? <Loader type="dots"></Loader> : null}{" "}
-        <Text size="sm">{jsonResult?.length} Words</Text>
-      </Group>
-      <Flex direction={"row"} wrap={"wrap"}>
-        {jsonResult?.map((item) => {
-          const word = Object.keys(item)[0];
-          return <WordCard descriptor={item[word]} word={word}></WordCard>;
-        }) || []}
-      </Flex>
-    </>
-  );
-};
-
-type WordDescriptor = { translation: string; kind: string; examples: string[] };
-type WordCollection = { [key: string]: WordDescriptor };
-
-function WordCard({
-  word,
-  descriptor,
-}: {
-  word: string;
-  descriptor: WordDescriptor;
-}) {
-  return (
-    <Card
-      style={{ gap: "1rem" }}
-      w={rem(280)}
-      shadow="sm"
-      padding="lg"
-      radius="md"
-      withBorder
-    >
-      <Card.Section withBorder inheritPadding py="xs">
-        <Group justify="space-between">
-          <Flex direction="column">
-            <Title size={"h6"}>
-              {upperFirst(word)} ({descriptor.kind}){" "}
-            </Title>
-            <Text size="xs">{upperFirst(descriptor.translation)}</Text>
-          </Flex>
-          <Menu withinPortal position="bottom-end" shadow="sm">
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray">
-                <IconDots style={{ width: rem(16), height: rem(16) }} />
-              </ActionIcon>
-            </Menu.Target>
-
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={
-                  <IconFileZip style={{ width: rem(14), height: rem(14) }} />
-                }
-              >
-                Download zip
-              </Menu.Item>
-              <Menu.Item
-                leftSection={
-                  <IconEye style={{ width: rem(14), height: rem(14) }} />
-                }
-              >
-                Preview all
-              </Menu.Item>
-              <Menu.Item
-                leftSection={
-                  <IconTrash style={{ width: rem(14), height: rem(14) }} />
-                }
-                color="red"
-              >
-                Delete all
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Group>
-      </Card.Section>
-      <Flex
-        direction={"column"}
-        justify="flex-start"
-        align="flex-start"
-        gap={rem(5)}
-      >
-        <Text fz={"sm"} fw={"bold"} c="dimmed">
-          Examples
-        </Text>
-        {descriptor?.examples?.map((example, i) => (
-          <Text fz={"sm"} key={i}>
-            {i % 2 === 1 ? <i>{example}</i> : example}
-          </Text>
-        ))}
-      </Flex>
-    </Card>
-  );
-}

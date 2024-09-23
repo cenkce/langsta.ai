@@ -9,10 +9,10 @@
   "type": "module",
   "scripts": {
     "app": "env-cmd pnpm --filter chrome-extension run dev",
-    "atom": "pnpm --filter @espoojs/atom",
-    "task": "pnpm --filter @espoojs/task",
-    "packages": "pnpm --filter @espoojs/*",
-    "utilities": "pnpm --filter @espoojs/utils",
+    "atom": "pnpm --filter @espoojs/atom run dev",
+    "task": "pnpm --filter @espoojs/task run dev",
+    "packages": "pnpm --filter @espoojs/* run dev",
+    "utilities": "pnpm --filter @espoojs/utils run dev",
     "test": "vitest"
   },
   "devDependencies": {

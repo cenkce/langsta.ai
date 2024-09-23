@@ -4,9 +4,7 @@ import { StoreSubject, Atom} from "@espoojs/atom";
 
 export const SettingsAtom = Atom.of(
   { key: "settings" },
-  new StoreSubject<{
-    settings: SettingsState;
-  }>({ settings: {} })
+  new StoreSubject({ settings: {} as SettingsState })
 );
 
 export const SettingsStorage = LocalStorage.of<SettingsState>('settings');

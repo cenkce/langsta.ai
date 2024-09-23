@@ -2,55 +2,71 @@ import { BehaviorSubject, Observable, distinctUntilChanged, map } from "rxjs";
 
 export class Atom<
   TStoreState extends { [key: string]: any } = any,
-  TName extends string = any,
+  TName extends string | undefined = any,
+  State extends TName extends string ? TStoreState[TName] : TStoreState = TName extends string ? TStoreState[TName] : TStoreState,
 > {
-  static of<T extends { [key: string]: any }, N extends string>(
-    params: { key: N },
+  static of<T extends { [key: string]: any } = any>(
     store: StoreSubject<T>,
+  ): Atom<T, undefined>;
+  static of<T extends { [key: string]: any } = any, N extends string = string>(
+    params: { key?: N },
+    store: StoreSubject<T>,
+  ): Atom<T, N>;
+  static of<T extends { [key: string]: any }, N extends string = string>(
+    params: any,
+    store?: StoreSubject<T>,
   ) {
-    return new Atom<T, N>(params, store);
+    return params instanceof StoreSubject
+      ? new Atom<T, N>({}, params)
+      : new Atom<T, undefined>(params, store as StoreSubject<T>);
   }
   /**
    * Use Atom.of() instead
    */
   protected constructor(
     private params: {
-      key: TName;
+      key?: TName | undefined;
     },
     private store: StoreSubject<TStoreState>,
   ) {}
 
-  private _getValue<Y extends keyof TStoreState[TName]>(
-    state: TStoreState,
-    key?: Y,
-  ) {
+  private _getValue<
+    Y extends TName extends string
+      ? keyof TStoreState[TName]
+      : keyof TStoreState,
+  >(state: TStoreState, key?: Y) {
     if (key) {
-      return state[this.params.key][key];
-    } else return state[this.params.key] as TStoreState[TName];
+      return this.params.key
+        ? state[this.params.key][key]
+        : state[key as string];
+    } else
+      return this.params.key
+        ? (state[this.params.key] as TName extends string
+            ? TStoreState[TName]
+            : never)
+        : state;
   }
 
   getValue<
-    Y extends TStoreState[TName] extends { [key: string]: any }
-      ? keyof TStoreState[TName]
-      : undefined,
+    Y extends keyof State,
   >(
     key: Y,
-  ): Y extends keyof TStoreState[TName] ? TStoreState[TName][Y] : never;
-  getValue(key?: undefined): TStoreState[TName];
-  getValue(key?: TStoreState[TName]) {
+  ): State[Y];
+  getValue(
+    key?: undefined,
+  ): State;
+  getValue(key?: any) {
     return this._getValue(this.store.getValue(), key);
   }
 
   get$<
-    Y extends TStoreState[TName] extends { [key: string]: unknown }
-      ? keyof TStoreState[TName]
-      : undefined,
+    Y extends keyof State
   >(
     key: Y,
-  ): Y extends keyof TStoreState[TName]
-    ? Observable<TStoreState[TName][Y]>
-    : never;
-  get$(key?: undefined): Observable<TStoreState[TName]>;
+  ): Observable<State[Y]>
+  get$(
+    key?: undefined,
+  ): Observable<TName extends string ? TStoreState[TName] : TStoreState>;
   get$(key?: any) {
     return this.store.pipe(
       map((state) => this._getValue(state, key)),
@@ -58,9 +74,11 @@ export class Atom<
     );
   }
 
-  set$(value: Partial<TStoreState[TName]>) {
+  set$(
+    value: Partial<TName extends string ? TStoreState[TName] : TStoreState>,
+  ) {
     const state = this.store.getValue();
-    const prevValue = state[this.params.key];
+    const prevValue = this._getValue(state);
     const update = (
       typeof value === "object" && value !== null
         ? Array.isArray(value)
@@ -69,10 +87,14 @@ export class Atom<
         : value
     ) as TStoreState;
 
-    this.store.next({
-      ...state,
-      [this.params.key]: update,
-    } as TStoreState);
+    this.store.next(
+      this.params.key
+        ? {
+            ...state,
+            [this.params.key as string]: update,
+          }
+        : { ...state, ...update },
+    );
 
     return this.store.asObservable();
   }

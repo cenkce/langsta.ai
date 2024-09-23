@@ -12,50 +12,48 @@ import { Atom } from "./StoreSubject";
  */
 function useAtom<
   TState extends { [key: string]: any },
-  TName extends string,
+  TName extends string | undefined,
+  State extends TName extends string ? TState[TName] : TState,
+  Names extends keyof State,
 >(
   atom: Atom<TState, TName>,
   {
     subscribeKey,
     noStateUpdate = false,
     equalityCheck,
-    ignoreUpdateKeys
+    ignoreUpdateKeys,
   }: {
-    subscribeKey?: TState[TName] extends { [key: string]: unknown }
-    ? keyof TState[TName]
-    : undefined;
+    subscribeKey?: Names;
 
     /**
      * You should assign an equalityCheck function to ignore some keys.
      */
-    ignoreUpdateKeys?: TState[TName] extends { [key: string]: any }
-      ? (keyof TState[TName])[]
-      : never;
+    ignoreUpdateKeys?: Names[];
     noStateUpdate?: boolean;
-    equalityCheck?: (newState: TState[TName], state: TState[TName]) => boolean;
+    equalityCheck?: (newState: State, state: State) => boolean;
   } = {},
 ) {
-  const value = atom.getValue() as TState[TName];
-  const [state, setState] = useState<TState[TName]>(value);
-  const stateRef = useRef<TState[TName]>(state);
+  const value = atom.getValue();
+  const [state, setState] = useState(value);
+  const stateRef = useRef(state);
   const equityCHeckRef = useRef(equalityCheck);
   equityCHeckRef.current = equalityCheck;
   stateRef.current = state;
 
   useEffect(() => {
     if (noStateUpdate === false) {
-      const subscription = atom.get$(subscribeKey as any).subscribe({
+      const subscription = atom.get$(subscribeKey as string)?.subscribe({
         next(newState) {
-          if (typeof newState === "object") {
-            const state = {...newState};
-            if(ignoreUpdateKeys?.length && equityCHeckRef.current) {
-              ignoreUpdateKeys.forEach(key => {
+          if (newState) {
+            const state = { ...newState };
+            if (ignoreUpdateKeys?.length && equityCHeckRef.current) {
+              ignoreUpdateKeys.forEach((key) => {
                 delete state[key];
               });
             }
-            setState((curr) => {
+            setState((curr: any) => {
               const update = equityCHeckRef.current
-                ? equityCHeckRef.current?.(state, curr)
+                ? equityCHeckRef.current?.(state as State, curr)
                   ? curr
                   : newState
                 : newState;
@@ -72,11 +70,15 @@ function useAtom<
   }, [atom, noStateUpdate]);
 
   const setNewState = useCallback(
-    (newState: ((state: TState[TName]) => TState[TName]) | TState[TName]) => {
+    (
+      newState:
+        | ((
+            state: TName extends string ? TState[TName] : TState,
+          ) => TName extends string ? TState[TName] : TState)
+        | (TName extends string ? TState[TName] : TState),
+    ) => {
       const update =
-        newState instanceof Function
-          ? newState(atom.getValue() as TState[TName])
-          : newState;
+        newState instanceof Function ? newState(atom.getValue()) : newState;
       atom.set$(update);
     },
     [atom],
