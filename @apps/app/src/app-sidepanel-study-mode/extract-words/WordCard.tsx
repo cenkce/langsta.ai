@@ -41,6 +41,12 @@ export function WordCard({
                 Save
               </Menu.Item>
               <Menu.Item
+                disabled
+                leftSection={<IconPlus style={{ width: rem(14), height: rem(14) }} />}
+              >
+                More
+              </Menu.Item>
+              <Menu.Item
                 leftSection={<IconTrash style={{ width: rem(14), height: rem(14) }} />}
                 color="red"
               >

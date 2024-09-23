@@ -66,7 +66,7 @@ export class Atom<
   ): Observable<State[Y]>
   get$(
     key?: undefined,
-  ): Observable<TName extends string ? TStoreState[TName] : TStoreState>;
+  ): Observable<State>;
   get$(key?: any) {
     return this.store.pipe(
       map((state) => this._getValue(state, key)),

@@ -31,25 +31,6 @@ import { studyContentTasksAtom } from "./StudyContentTasksAtom";
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
 
-// const useStudyContentTask = (taskId: string) => {
-//   const [studyTasks, setStudyTasks] = useAtom(StudyContentTasksAtom);
-//   // const [taskId, setTaskId] = useState<
-//   //   { [key in ContentStudyActionsIconsSlugsType]?: string } | undefined
-//   // >();
-//   useEffect(() => {
-//     if (taskId) {
-//       const subscription = TaskStore.instance
-//         .subscribeTaskById(taskId)
-//         .subscribe((task) => {
-//           setTask(task);
-//         });
-
-//       return () => subscription.unsubscribe();
-//     }
-//   }, [taskId]);
-//   return task;
-// };
-
 export const SidepanelApp = () => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>();
   const [textSize, setTextSize] = useState<number>(2);
