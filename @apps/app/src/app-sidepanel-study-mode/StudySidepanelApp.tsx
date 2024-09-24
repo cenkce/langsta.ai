@@ -27,6 +27,7 @@ import { Divider, Title } from "@mantine/core";
 import { ExtractedWordsView } from "./extract-words/ExtractedWordsView";
 import { useAtom } from "@espoojs/atom";
 import { studyContentTasksAtom } from "./StudyContentTasksAtom";
+import { notifications } from "@mantine/notifications";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
@@ -94,6 +95,16 @@ export const SidepanelApp = () => {
         )
         .subscribe({
           next: ([result = "", task]) => {
+            if (task?.error) {
+              notifications.show({
+                color: 'red',
+                title: `Task Error: ${task.error.type.toUpperCase()}`,
+                message: task.error.error.message,
+                autoClose: 5000
+              });
+              setTaskStatus(task?.status);
+              return;
+            }
             const url = contentUrl;
 
             const resultKey = task?.params?.tags

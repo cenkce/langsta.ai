@@ -251,7 +251,10 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
             return response;
           }),
           catchError((err) => {
-            this._instance.updateNode(atom.getId(), { error: err });
+            this._instance.updateNode(atom.getId(), {
+              status: "error",
+              error: err,
+            });
             throw err;
           }),
           share(),
