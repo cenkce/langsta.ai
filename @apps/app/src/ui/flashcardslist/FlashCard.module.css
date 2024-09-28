@@ -1,0 +1,10 @@
+/* FlashCard.module.css */
+.flashcard {
+  position: absolute;
+  width: 300px;
+  transition: opacity 0.4s ease-out;
+}
+
+.fadeOut {
+  opacity: 0;
+}

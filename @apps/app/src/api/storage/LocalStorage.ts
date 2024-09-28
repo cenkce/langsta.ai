@@ -1,14 +1,14 @@
+import { Collection } from "./Collection";
 import { Storage } from "./Storage";
 
-
-export class LocalStorage<T extends Record<string, unknown> = Record<string, unknown>, NameT extends string = string> extends Storage<T> {
-  private static storages: Map<string, LocalStorage<Record<string, unknown>>>;
+export class LocalStorage<T extends Collection = Collection, NameT extends string = string> extends Storage<T> {
+  private static storages: Map<string, LocalStorage<Collection>>;
   
   static {
     this.storages = new Map();
   }
 
-  static of<TState extends Record<string, unknown> = Record<string, unknown>, NameST extends string = string>(key: NameST) {
+  static of<TState extends Collection = Collection, NameST extends string = string>(key: NameST) {
     const storage = this.getStorage(key) || new LocalStorage(key);
     if(!LocalStorage.storages.has(key))
       LocalStorage.storages.set(key, storage);

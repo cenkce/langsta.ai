@@ -1,3 +1,4 @@
+import { Collection } from "./Collection";
 import { StorageEventEmitter } from "./StorageEventEmitter";
 
 export interface IStorage {
@@ -26,7 +27,7 @@ export type AreaName = Parameters<StorageAddListenerCallback>[1];
 //   T extends { length: L } ? T : BuildTuple<L, [...T, any]>;
 // type Tt = Length<BuildTuple<3>>
 
-type Tuples<T extends Record<string, unknown>> = T extends Record<infer K, infer V>
+type Tuples<T extends Collection> = T extends Collection<infer K, infer V>
   ? [K, V]
   : [];
 
@@ -42,7 +43,7 @@ type Tuples<T extends Record<string, unknown>> = T extends Record<infer K, infer
 //   : Readonly<Result>;
 
 export abstract class Storage<
-  StateT extends Record<string, unknown> = Record<string, unknown>,
+  StateT extends Collection = Collection,
   U extends [string, unknown] = Tuples<StateT>
 > {
   private emitter = new StorageEventEmitter();

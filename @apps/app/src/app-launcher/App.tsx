@@ -2,21 +2,22 @@ import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { ArtBoard } from "../ui/ArtBoard";
 import { LauncherPopOver } from "./LauncherPopOver";
 import "./App.css";
-import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
-import { ContentContextAtom, ContentStorage } from "../domain/content/ContentContext.atom";
+import { SettingsAtom, SettingsStorage, UsersAtom, UserStorage } from "../domain/user/SettingsModel";
 import { Button } from "@mantine/core";
 import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 
 function App() {
-  useLocalstorageSync({
-    debugKey: "content-sidepanel",
-    storageAtom: ContentContextAtom,
-    contentStorage: ContentStorage,
-  });
+
   useLocalstorageSync({
     debugKey: "settings-sidepanel",
     storageAtom: SettingsAtom,
     contentStorage: SettingsStorage,
+  });
+
+  useLocalstorageSync({
+    debugKey: "settings-sidepanel",
+    storageAtom: UsersAtom,
+    contentStorage: UserStorage,
   });
 
   return (

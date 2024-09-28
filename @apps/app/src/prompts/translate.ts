@@ -7,13 +7,22 @@ export const TranslatePropmpts = ({nativeLanguage, targetLanguage, level}:{nativ
   extract_words: `Your task is to find and extract Study Words by language's level ${level} or higher in the content and translate them to ${nativeLanguage?.toUpperCase()}. I use Study Words for unique unfamiliar, important or unknown words on the content. 
   Follow the rules below to pinpoint words:
   - Extract amount of words as much as you can.
-  - Extract words with their translations as json format.
-  - Extracted words should be an array of json format : '{original word: {translation: its translation, kind: kind of word like verb, adjective etc.}}'.
+  - Extract words with their translations as the string format of rules below:
+    - Extracted words should be this string : word|translation|kind|examples
+      - word: original word
+      - translation: translation of the word
+      - kind: kind of word like verb, adjective etc.
+      - examples: example sentences of the word in format of |target language#example sentence in target language|native language#example sentence in translated language|
+        - Target and native language like en, tr, de etc.
+        - # is a separator between target language and translated language. 
+      - Every word must be in the new line.
+    - If no word is extracted, leave the line empty.
+  - Paginate extracted words. Each page might contain 15 words the most. If user message is more words and there are still more pages, use next page words. Otherwise reply empty.
   - Every word must be unique and not repeated.
-  - Output must contain only json text. Don't add \`\`\` or \`\`\`json.
   - Translated the words should be detailed and clear.
   - Add at least 2 examples for each words with translations by language lavel ${level} and json attirbute name must be examples.
-  - Don't extract special words and numbers like years, programming language names, brands etc.`,
+  - Don't extract special words and numbers like years, programming language names, brands etc.
+  - Don't add anything the response except extracted words.`,
   summarise_text: `Summarise specified text in the same language for ${level} second language learners by using at least 50% of the text. Your answer must include only the summarised text.`,
   summarise_text_native: `Summarise specified text by translating ${nativeLanguage} for ${level} second language learners by using at least 50% of the text. Your answer must include only the summarised text.`,
   simplfy_text: `Simplify grammar of the text in the same language for ${level} second language learners by following the rules:

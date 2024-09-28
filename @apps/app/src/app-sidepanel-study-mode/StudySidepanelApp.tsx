@@ -5,7 +5,12 @@ import {
 } from "./ContentReadActionsBar";
 import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
-import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
+import {
+  SettingsAtom,
+  SettingsStorage,
+  UsersAtom,
+  UserStorage,
+} from "../domain/user/SettingsModel";
 import { useEffect, useRef, useState } from "react";
 import { TaskNode, TaskStatus, TaskStore } from "@espoojs/task";
 import {
@@ -28,6 +33,7 @@ import { ExtractedWordsView } from "./extract-words/ExtractedWordsView";
 import { useAtom } from "@espoojs/atom";
 import { studyContentTasksAtom } from "./StudyContentTasksAtom";
 import { notifications } from "@mantine/notifications";
+import { FlashCardsView } from "./flash-cards/FlashCardsView";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
@@ -49,6 +55,12 @@ export const SidepanelApp = () => {
     debugKey: "settings-sidepanel",
     storageAtom: SettingsAtom,
     contentStorage: SettingsStorage,
+  });
+
+  useLocalstorageSync({
+    debugKey: "user-sidepanel",
+    storageAtom: UsersAtom,
+    contentStorage: UserStorage,
   });
 
   useTasksSyncByTagName("background-task");
@@ -97,10 +109,10 @@ export const SidepanelApp = () => {
           next: ([result = "", task]) => {
             if (task?.error) {
               notifications.show({
-                color: 'red',
+                color: "red",
                 title: `Task Error: ${task.error.type.toUpperCase()}`,
                 message: task.error.error.message,
-                autoClose: 5000
+                autoClose: 5000,
               });
               setTaskStatus(task?.status);
               return;
@@ -265,6 +277,7 @@ export const SidepanelApp = () => {
             words={studyState[contentUrl]?.[selectedStudyAction] as any}
           />
         ) : null}
+        {selectedStudyAction === "flashcards" ? <FlashCardsView /> : null}
       </main>
     </div>
   );

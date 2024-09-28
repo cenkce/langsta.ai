@@ -2,6 +2,7 @@ import { PropsWithChildren, useEffect, useMemo, useRef } from "react";
 import { LocalStorage } from "./LocalStorage";
 import { Atom, useAtom } from "@espoojs/atom";
 import { verbose } from "../utils/verbose";
+import { Collection } from "./Collection";
 /**
  * Listen to localstorage changes and syncs with the given atom
  *
@@ -19,7 +20,7 @@ import { verbose } from "../utils/verbose";
  * @param props
  */
 export function useLocalstorageSync<
-  StorageT extends Record<string, unknown> = Record<string, unknown>,
+  StorageT extends Collection = Collection,
 >(
   props: PropsWithChildren<{
     debugKey?: string;
