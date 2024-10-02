@@ -12,6 +12,7 @@ export const useTasksSyncByTagName = (tag: string) => {
           (message) => message.params?.tags?.includes(tag),
         )
       ) {
+
         messages.payload.map((task) => {
           if (!TaskStore.instance.hasNode(task.id)) {
             TaskStore.instance.createNode({

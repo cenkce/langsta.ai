@@ -13,7 +13,7 @@ export function getDomPath(el: Node) {
     let sibIndex = 1;
     if (!currentNode) break;
     for (let i = 0; i < currentNode.parentNode.childNodes.length; i++) {
-      const sib = currentNode.parentNode.childNodes.item(i);
+      const sib: ChildNode = currentNode.parentNode.childNodes.item(i);
       if (sib === currentNode) {
         sibIndex = sibCount;
         break;

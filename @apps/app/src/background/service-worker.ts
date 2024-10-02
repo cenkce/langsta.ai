@@ -11,7 +11,7 @@ import { SettingsStorage } from "../domain/user/SettingsModel";
 
 export class ApiConnect {
   private static apiKey?: string = '';
-  private static sdk: OpenAI = new OpenAI({ apiKey: ApiConnect.apiKey });
+  private static sdk = new OpenAI({ apiKey: ApiConnect.apiKey });
   static connect({baseUrl, apiKey}: {baseUrl?: string, apiKey?: string }) {
     if (baseUrl) this.sdk.baseURL = baseUrl;
     if (apiKey) this.sdk.apiKey = apiKey;

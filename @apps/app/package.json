@@ -33,14 +33,16 @@
     "@popperjs/core": "^2.11.8",
     "@tabler/icons-react": "^2.46.0",
     "nanoid": "^5.0.4",
-    "openai": "^4.61.0",
+    "openai": "^4.67.1",
     "ramda": "^0.30.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-feather": "^2.0.10",
+    "groq-sdk": "^0.7.0",
     "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "terser": "^5.34.1",
     "@crxjs/vite-plugin": "2.0.0-beta.25",
     "@espoojs/atom": "workspace:*",
     "@espoojs/task": "workspace:*",

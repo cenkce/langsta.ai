@@ -8,6 +8,7 @@ import {
   map,
   share,
   takeUntil,
+  takeWhile,
 } from "rxjs";
 import { nanoid } from "nanoid";
 import { StoreSubject } from "@espoojs/atom";
@@ -34,6 +35,8 @@ export type TaskNode<
   result?: any;
   id: string;
   createdAt: number;
+  updatedAt?: number;
+  stream?: boolean;
 };
 
 export type TaskStatus = "completed" | "idle" | "progress" | "error";
@@ -103,6 +106,7 @@ export class TaskAtom<
 export class TaskStore extends StoreSubject<TaskStoreState> {
   private static _instance: TaskStore;
   private static forceCancelSubject = new Subject<string>();
+  public name?: string;
 
   static {
     this._instance = new TaskStore();
@@ -131,8 +135,13 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     update: Partial<TaskNode<unknown, any>>,
     force = false,
   ) {
+    
     const tasks = new Map(this.value.tasks);
     const currentNode = tasks.get(id);
+
+    // // @ts-ignore
+    // console.log('updateNode ', update, currentNode, this.name);
+    
 
     // shallow check
     if (
@@ -160,7 +169,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
       tagMap.add(`${updateNode.status}_${id}`);
       nodesByTag.set(tag, tagMap);
     });
-
+    
     this.next({ tasks, nodesByTag, recentTaskId: id });
   }
 
@@ -172,6 +181,7 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     return this.pipe(
       map(({ tasks }) => tasks.get(id)),
       distinctUntilChanged(),
+      takeWhile(task => task?.status !== "completed"),
       share(),
     );
   }

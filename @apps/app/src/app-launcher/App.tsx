@@ -2,7 +2,8 @@ import { useLocalstorageSync } from "../api/storage/useLocalstorageSync";
 import { ArtBoard } from "../ui/ArtBoard";
 import { LauncherPopOver } from "./LauncherPopOver";
 import "./App.css";
-import { SettingsAtom, SettingsStorage, UsersAtom, UserStorage } from "../domain/user/SettingsModel";
+import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
+import { UsersAtom, UserStorage } from "../domain/user/UserModel";
 import { Button } from "@mantine/core";
 import { serviceWorkerContentMessageDispatch } from "../domain/content/messages";
 
@@ -44,8 +45,17 @@ const StudyModeSettings = () => {
       >
         Open Study Panel
       </Button>
+      <Button
+        onClick={() => {
+          chrome.tabs.create({ url: chrome.runtime.getURL("sidepanel-study-mode.html") });
+        }}
+      >
+        Open Standalone
+      </Button>
     </div>
   );
 };
+
+
 
 export default App;

@@ -5,12 +5,8 @@ import {
 } from "./ContentReadActionsBar";
 import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
-import {
-  SettingsAtom,
-  SettingsStorage,
-  UsersAtom,
-  UserStorage,
-} from "../domain/user/SettingsModel";
+import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
+import { UsersAtom, UserStorage } from "../domain/user/UserModel";
 import { useEffect, useRef, useState } from "react";
 import { TaskNode, TaskStatus, TaskStore } from "@espoojs/task";
 import {
@@ -20,7 +16,7 @@ import {
   useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
-import { OperatorFunction, bufferTime, filter, scan } from "rxjs";
+import { OperatorFunction, bufferTime, filter, map, scan } from "rxjs";
 import { classNames } from "@espoojs/utils";
 import { useEventListener } from "@mantine/hooks";
 import {
@@ -37,6 +33,7 @@ import { FlashCardsView } from "./flash-cards/FlashCardsView";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
+let ID = 0;
 
 export const SidepanelApp = () => {
   const [taskStatus, setTaskStatus] = useState<TaskStatus>();
@@ -73,6 +70,7 @@ export const SidepanelApp = () => {
   const userContent = useUserContentState();
   const userContentRef = useRef(userContent);
   userContentRef.current = userContent;
+  const [CompID] = useState(() => ++ID);
 
   useEffect(() => {
     // if (!userContent.activeTabContent?.content)
@@ -82,31 +80,38 @@ export const SidepanelApp = () => {
   useEffect(() => {
     const currentTaskId = studyTasks?.[selectedStudyAction];
     if (currentTaskId) {
+      TaskStore.instance.name = "SidepanelApp";
       // stream task result
       const subscription = TaskStore.instance
         .subscribeTaskById(currentTaskId)
         .pipe(
           filter((task) => {
-            return task !== undefined;
+            return task !== undefined && task?.status !== "completed";
           }) as OperatorFunction<TaskNode | undefined, TaskNode>,
           bufferTime(500),
+          filter((nodes) => {
+            return nodes.length > 0;
+          }),
+          map((nodes) => {
+            const task = nodes[nodes.length - 1];
+            return {
+              ...task,
+              result: nodes.map((tsk) => tsk.result || "").join("").replace('\n\n', "\n"),
+            };
+          }),
           // merges buffered chunks and accumulates stream
-          scan<TaskNode[], [string, TaskNode | undefined] | []>(
-            (acc, nodes) => {
-              let result = "";
-              let task: TaskNode | undefined;
-              nodes?.forEach((tsk) => {
-                result += tsk.result || "";
-                task = tsk;
-              });
-
-              return [(acc[0] || "") + (result || ""), task];
+          scan<TaskNode, TaskNode>(
+            (acc, task) => {
+              return task.result ? {
+                ...task,
+                result: acc.result + task.result,
+              } : acc;
             },
-            [],
+            { result: "" } as TaskNode,
           ),
         )
         .subscribe({
-          next: ([result = "", task]) => {
+          next: (task) => {
             if (task?.error) {
               notifications.show({
                 color: "red",
@@ -124,9 +129,9 @@ export const SidepanelApp = () => {
               ?.replace("gpt/", "");
             if (resultKey === undefined) return;
 
-            if (result && url) {
+            if (task.result && url) {
               const newState = {
-                [resultKey]: result,
+                [resultKey]: task.result,
                 updatedAt: new Date().toISOString(),
                 createdAt: new Date().toISOString(),
                 level: "",
@@ -140,17 +145,20 @@ export const SidepanelApp = () => {
               }));
             }
             if (task?.status) setTaskStatus(task?.status);
-            if (task?.status === "completed") {
-              setStudyTasks((state) => ({
-                ...state,
-                [selectedStudyAction]: undefined,
-              }));
-              subscription.unsubscribe();
-            }
+          },
+          complete() {
+            setStudyTasks((state) => ({
+              ...state,
+              [selectedStudyAction]: undefined,
+            }));
+            setTaskStatus('completed');
           },
         });
 
-      return () => subscription.unsubscribe();
+      return () => {
+        console.log("unsubscribeTaskById", CompID);
+        subscription.unsubscribe();
+      }
     }
   }, [selectedStudyAction, studyTasks]);
 

@@ -1,4 +1,4 @@
-import { sendGPTRequest } from "./sendGPTRequest";
+import { sendOpenAIGPTRequest } from "./sendGPTRequest";
 import { omit } from "ramda";
 import {
   ExtractWordsRequestMessage,
@@ -14,7 +14,7 @@ export const GPTContentRequest = async (
     | ExtractWordsRequestMessage,
 ) => {
   const messageBody = omit(["id"], message);
-  const task = await sendGPTRequest({
+  const task = await sendOpenAIGPTRequest({
     userMessage: messageBody.userMessage,
     systemMessage: messageBody.systemMessage,
     stream: messageBody.stream,

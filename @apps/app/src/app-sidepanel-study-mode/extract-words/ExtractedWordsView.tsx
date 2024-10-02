@@ -1,7 +1,7 @@
 import { WordCard } from "./WordCard";
 import { WordsDict } from "../../domain/user/WordDescriptor";
 import { Group, Flex, Loader, Text } from "@mantine/core";
-import { UsersAtom } from "../../domain/user/SettingsModel";
+import { UsersAtom } from "../../domain/user/UserModel";
 import { useAtom } from "@espoojs/atom";
 
 export const ExtractedWordsView = ({

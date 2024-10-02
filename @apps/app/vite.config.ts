@@ -41,6 +41,7 @@ export default defineConfig({
         "sidepanel-study-mode.html": resolve(__dirname, "sidepanel-study-mode.html")
       },
     },
+    minify: "terser",
   },
   css: {
     modules: {
