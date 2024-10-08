@@ -1,0 +1,78 @@
+/* App.css */
+
+.app {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.word-input {
+  margin-bottom: 20px;
+}
+
+.word-input input {
+  margin-right: 10px;
+  padding: 5px;
+}
+
+.word-input button {
+  padding: 5px 10px;
+}
+
+.crossword-container {
+  display: flex;
+}
+
+.crossword-grid {
+  display: inline-block;
+  margin-right: 20px;
+}
+
+.crossword-row {
+  display: flex;
+}
+
+.crossword-cell {
+  position: relative;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #000;
+  box-sizing: border-box;
+}
+
+.crossword-cell input {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-size: 1em;
+  border: none;
+  outline: none;
+}
+
+.crossword-cell.block {
+  background-color: #000;
+}
+
+.cell-number {
+  position: absolute;
+  top: 0;
+  left: 2px;
+  font-size: 0.6em;
+  font-weight: bold;
+}
+
+.clues-list {
+  max-width: 200px;
+}
+
+.clues-list h3 {
+  margin-top: 0;
+}
+
+.clues-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.clues-list li {
+  margin-bottom: 5px;
+}

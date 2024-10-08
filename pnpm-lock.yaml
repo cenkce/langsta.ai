@@ -83,6 +83,9 @@ importers:
       '@tabler/icons-react':
         specifier: ^2.46.0
         version: 2.46.0(react@18.3.1)
+      crossword-layout-generator:
+        specifier: ^0.1.1
+        version: 0.1.1
       groq-sdk:
         specifier: ^0.7.0
         version: 0.7.0
@@ -1330,6 +1333,9 @@ packages:
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
     engines: {node: '>= 8'}
+
+  crossword-layout-generator@0.1.1:
+    resolution: {integrity: sha512-wunaTcpzDc1UL7iC77ckh4mMEjFuBDMYIKhJn3yq6b7jvHu5zcxe17cGh4Pv1VbLu1BfC6kgDV0IowfqDUm2sg==}
 
   css-select@5.1.0:
     resolution: {integrity: sha512-nwoRF1rvRRnnCqqY7updORDsuqKzqYJ28+oSMaJMMgOauh3fvwHqMS7EZpIPqK8GL+g9mKxF1vP/ZjSeNjEVHg==}
@@ -4275,6 +4281,8 @@ snapshots:
       path-key: 3.1.1
       shebang-command: 2.0.0
       which: 2.0.2
+
+  crossword-layout-generator@0.1.1: {}
 
   css-select@5.1.0:
     dependencies:
