@@ -14,11 +14,13 @@ import { classNames } from "@espoojs/utils";
 import { FlashCardData } from "./FlashCardData";
 import styles from "./FlashCard.module.css";
 
+export type FlashCardAction = "learned" | "learn-later";
+
 type FlashCardProps = {
   word: string;
   translation: string;
   index: number;
-  onRemove: () => void;
+  onAction?: (action: FlashCardAction) => void;
   isFadingOut: boolean;
 } & FlashCardData;
 
@@ -29,7 +31,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
   image,
   examples,
   index,
-  onRemove,
+  onAction,
   isFadingOut,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -91,10 +93,10 @@ const FlashCard: React.FC<FlashCardProps> = ({
               ))}
             </List>
             <Stack style={{flexDirection: 'row'}}>
-              <Button mt="md" onClick={onRemove}>
+              <Button mt="md" onClick={() => onAction?.( 'learned' )}>
                 Learned
               </Button>
-              <Button mt="md" onClick={onRemove}>
+              <Button mt="md" onClick={() => onAction?.('learn-later')}>
                 Learn Later
               </Button>
             </Stack>

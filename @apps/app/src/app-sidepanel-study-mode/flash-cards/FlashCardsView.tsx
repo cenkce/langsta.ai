@@ -1,21 +1,41 @@
 import { useAtom } from "@espoojs/atom";
+import FlashCardQueue from "./FlashCardQueue";
 import { UsersAtom } from "../../domain/user/UserModel";
-// import FlashCardQueue from "../../ui/flashcardslist/FlashCardQueue";
-import Crosswords, { WordEntry } from "../../ui/crosswords/Crosswords";
+import { FlashCardData } from "./FlashCardData";
+import { useUserContentState } from "../../domain/content/ContentContext.atom";
 import { useMemo } from "react";
 
 export const FlashCardsView = () => {
   const [state] = useAtom(UsersAtom);
-  const data = useMemo<WordEntry[]>(() => {
-    return Object.entries(state.myWords).map(([word, item]) => {
-      return {
-        answer: word,
-        clue: item.translation,
-      }
-    })
-  }, [])
-  return (
-    <Crosswords words={data} />
+  const { activeTabUrl } = useUserContentState();
+  const learnedWords = state?.learnedWords[activeTabUrl || ""];
+    
+  const cards = useMemo(
+    () =>
+      Object.entries(state.myWords).filter(([word]) => !learnedWords.some(l => l === word)).map(([word, item]) => {
+        return {
+          description: "",
+          image: "",
+          word: word,
+          examples: [],
+          translation: item.translation,
+        } as FlashCardData;
+      }),
+    [],
   );
-}
 
+  return (
+    <FlashCardQueue
+      data={cards}
+      onAction={(action, index) => {
+        if (activeTabUrl && action === "learned")
+          UsersAtom.set$({
+            learnedWords: {
+              [activeTabUrl]: [...learnedWords, cards[index].word],
+            },
+          });
+      }}
+      learnedWords={learnedWords}
+    />
+  );
+};

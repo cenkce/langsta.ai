@@ -3,7 +3,9 @@ import { BehaviorSubject, Observable, distinctUntilChanged, map } from "rxjs";
 export class Atom<
   TStoreState extends { [key: string]: any } = any,
   TName extends string | undefined = any,
-  State extends TName extends string ? TStoreState[TName] : TStoreState = TName extends string ? TStoreState[TName] : TStoreState,
+  State extends TName extends string
+    ? TStoreState[TName]
+    : TStoreState = TName extends string ? TStoreState[TName] : TStoreState,
 > {
   static of<T extends { [key: string]: any } = any>(
     store: StoreSubject<T>,
@@ -47,26 +49,14 @@ export class Atom<
         : state;
   }
 
-  getValue<
-    Y extends keyof State,
-  >(
-    key: Y,
-  ): State[Y];
-  getValue(
-    key?: undefined,
-  ): State;
+  getValue<Y extends keyof State>(key: Y): State[Y];
+  getValue(key?: undefined): State;
   getValue(key?: any) {
     return this._getValue(this.store.getValue(), key);
   }
 
-  get$<
-    Y extends keyof State
-  >(
-    key: Y,
-  ): Observable<State[Y]>
-  get$(
-    key?: undefined,
-  ): Observable<State>;
+  get$<Y extends keyof State>(key: Y): Observable<State[Y]>;
+  get$(key?: undefined): Observable<State>;
   get$(key?: any) {
     return this.store.pipe(
       map((state) => this._getValue(state, key)),
@@ -83,7 +73,11 @@ export class Atom<
       typeof value === "object" && value !== null
         ? Array.isArray(value)
           ? [...value]
-          : { ...prevValue, ...value }
+          : prevValue instanceof Map
+            ? value instanceof Map
+              ? new Map([...prevValue.entries(), ...value.entries()])
+              : new Map([...prevValue.entries(), ...Object.entries(value)])
+            : { ...prevValue, ...value }
         : value
     ) as TStoreState;
 
@@ -93,7 +87,7 @@ export class Atom<
             ...state,
             [this.params.key as string]: update,
           }
-        : { ...state, ...update },
+        : update,
     );
 
     return this.store.asObservable();

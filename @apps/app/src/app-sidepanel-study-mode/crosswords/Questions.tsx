@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlashCardData } from '../flashcardslist/FlashCardData';
+import { FlashCardData } from '../flash-cards/FlashCardData';
 
 type QuestionsProps = {
   flashCardData: FlashCardData[];
