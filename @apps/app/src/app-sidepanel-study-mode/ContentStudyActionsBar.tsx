@@ -6,6 +6,7 @@ import {
   IconPageBreak,
   IconTransferOut,
   IconHome2,
+  IconPuzzle
 } from "@tabler/icons-react";
 import { FC } from "react";
 import { classNames } from "@espoojs/utils";
@@ -25,6 +26,7 @@ const Icons = [
   { icon: IconPageBreak, label: "Summarise", slug: "summary" },
   { icon: IconPageBreak, label: "Simplify", slug: "simplify" },
   { icon: IconCards, label: "Flashcards", slug: "flashcards" },
+  { icon: IconPuzzle, label: "Crosswords", slug: "corsswords" },
 ] as const;
 
 export type ContentStudyActionsIconsSlugsType = (typeof Icons)[number]["slug"];

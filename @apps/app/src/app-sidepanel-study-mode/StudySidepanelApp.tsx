@@ -30,6 +30,7 @@ import { useAtom } from "@espoojs/atom";
 import { studyContentTasksAtom } from "./StudyContentTasksAtom";
 import { notifications } from "@mantine/notifications";
 import { FlashCardsView } from "./flash-cards/FlashCardsView";
+import { CrosswordsView } from "./crosswords/CrosswordsView";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
@@ -96,16 +97,21 @@ export const SidepanelApp = () => {
             const task = nodes[nodes.length - 1];
             return {
               ...task,
-              result: nodes.map((tsk) => tsk.result || "").join("").replace('\n\n', "\n"),
+              result: nodes
+                .map((tsk) => tsk.result || "")
+                .join("")
+                .replace("\n\n", "\n"),
             };
           }),
           // merges buffered chunks and accumulates stream
           scan<TaskNode, TaskNode>(
             (acc, task) => {
-              return task.result ? {
-                ...task,
-                result: acc.result + task.result,
-              } : acc;
+              return task.result
+                ? {
+                    ...task,
+                    result: acc.result + task.result,
+                  }
+                : acc;
             },
             { result: "" } as TaskNode,
           ),
@@ -151,14 +157,14 @@ export const SidepanelApp = () => {
               ...state,
               [selectedStudyAction]: undefined,
             }));
-            setTaskStatus('completed');
+            setTaskStatus("completed");
           },
         });
 
       return () => {
         console.log("unsubscribeTaskById", CompID);
         subscription.unsubscribe();
-      }
+      };
     }
   }, [selectedStudyAction, studyTasks]);
 
@@ -220,7 +226,7 @@ export const SidepanelApp = () => {
           ),
         }));
       setSelectedStudyAction(link);
-    } else if (link === "flashcards") {
+    } else {
       setSelectedStudyAction(link);
     }
   };
@@ -265,26 +271,25 @@ export const SidepanelApp = () => {
           {currentTabTitle || "No title"}
         </Title>
         <Divider my={"1rem 1rem"}></Divider>
-        <div
-          className={classNames(styles[`textSize-${textSizes[textSize]}`])}
-          dangerouslySetInnerHTML={
-            selectedStudyAction !== "flashcards" &&
-            selectedStudyAction !== "words"
-              ? {
-                  __html:
-                    selectedStudyAction === "content"
-                      ? currentTabContent
-                      : studyState[contentUrl]?.[selectedStudyAction] || "",
-                }
-              : { __html: "" }
-          }
-        />
+        {selectedStudyAction !== "words" &&
+        selectedStudyAction !== "corsswords" ? (
+          <div
+            className={classNames(styles[`textSize-${textSizes[textSize]}`])}
+            dangerouslySetInnerHTML={{
+              __html:
+                selectedStudyAction === "content"
+                  ? currentTabContent
+                  : studyState[contentUrl]?.[selectedStudyAction] || "",
+            }}
+          />
+        ) : null}
         {selectedStudyAction === "words" ? (
           <ExtractedWordsView
             loading={taskStatus === "progress"}
             words={studyState[contentUrl]?.[selectedStudyAction] as any}
           />
         ) : null}
+        {selectedStudyAction === "corsswords" ? <CrosswordsView /> : null}
         {selectedStudyAction === "flashcards" ? <FlashCardsView /> : null}
       </main>
     </div>

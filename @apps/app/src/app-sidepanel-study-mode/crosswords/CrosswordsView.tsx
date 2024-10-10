@@ -20,6 +20,8 @@ export const CrosswordsView = () => {
       }
     })
   }, [])
+
+  console.log(data);
   return (
     <Crosswords words={data} />
   );
