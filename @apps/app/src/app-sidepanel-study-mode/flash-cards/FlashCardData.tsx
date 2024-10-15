@@ -1,3 +1,4 @@
+import { WordDescriptor } from "../../domain/user/WordDescriptor";
 
 export type Example = {
   example: string;
@@ -6,8 +7,8 @@ export type Example = {
 
 export type FlashCardData = {
   word: string;
-  translation: string;
-  description?: string;
+  descriptor?: WordDescriptor;
   image?: string;
   examples: Example[];
+  isLearned?: boolean;
 };

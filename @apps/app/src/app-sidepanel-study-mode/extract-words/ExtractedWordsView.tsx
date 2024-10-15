@@ -1,65 +1,53 @@
 import { WordCard } from "./WordCard";
-import { WordsDict } from "../../domain/user/WordDescriptor";
+import { WordsCollection } from "../../domain/user/WordDescriptor";
 import { Group, Flex, Loader, Text } from "@mantine/core";
 import { UsersAtom } from "../../domain/user/UserModel";
 import { useAtom } from "@espoojs/atom";
+import { useUserContentState } from "../../domain/content/ContentContext.atom";
+import { useCurrentMywords } from "../../domain/user/useCurrentMywords";
 
 export const ExtractedWordsView = ({
-  words,
+  words = {},
   loading,
 }: {
-  words?: string;
+  words?: WordsCollection;
   loading?: boolean;
 }) => {
-  const jsonResult: WordsDict[] | undefined = words
-    ?.split("\n")
-    .map((line) => {
-      // |word|translation|kind|examples|
-      const [word, translation, kind, ...examples] = line.trim().split("|");
-      const getExamples = (example: string) => {
-        const [lang, translation] = example.split("#");
-        return { [lang]: translation };
-      };
-
-      const examplesCollection = examples.map(getExamples);
-      return {
-        [word]: { translation, kind, examples: examplesCollection },
-      } as WordsDict;
-    })
-    .filter(Boolean);
-
-  const [, setUserState] = useAtom(UsersAtom, {noStateUpdate: true});
+  const [, setUserContent] = useAtom(UsersAtom, { noStateUpdate: true });
+  const { activeTabUrl = "" } = useUserContentState();
+  const { mywords } = useCurrentMywords();
 
   return (
     <>
       <Group justify="space-between" mb={"sm"}>
         {loading ? <Loader type="dots"></Loader> : <div />}{" "}
-        <Text size="sm">{jsonResult?.length} Words</Text>
+        <Text size="sm">{Object.keys(words)?.length} Words</Text>
       </Group>
       <Flex direction={"row"} wrap={"wrap"}>
-        {jsonResult?.map((item) => {
-          const word = Object.keys(item)[0];
+        {Object.entries(words)?.map(([word, descriptor]) => {
           return (
             <WordCard
               key={word}
+              isSaved={mywords[word] !== undefined}
               onMenuClick={(action) => {
                 if (action === "save") {
-                  console.log("save", item[word]);
-                  setUserState((state) => {
+                  setUserContent((state) => {
                     // const myWords = new Map(state.myWords);
                     // myWords.set(word, item[word]);
                     return {
                       myWords: {
-                        ...state.myWords,
-                        [word]: item[word],
+                        [activeTabUrl]: {
+                          ...(state.myWords?.[activeTabUrl] || {}),
+                          [word]: descriptor,
+                        },
                       },
                     };
                   });
                 }
               }}
-              descriptor={item[word]}
+              descriptor={descriptor}
               word={word}
-            ></WordCard>
+            />
           );
         }) || []}
       </Flex>

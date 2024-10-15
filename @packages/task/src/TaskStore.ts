@@ -139,9 +139,6 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     const tasks = new Map(this.value.tasks);
     const currentNode = tasks.get(id);
 
-    // // @ts-ignore
-    // console.log('updateNode ', update, currentNode, this.name);
-    
 
     // shallow check
     if (

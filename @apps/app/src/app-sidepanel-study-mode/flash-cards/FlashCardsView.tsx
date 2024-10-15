@@ -4,23 +4,26 @@ import { UsersAtom } from "../../domain/user/UserModel";
 import { FlashCardData } from "./FlashCardData";
 import { useUserContentState } from "../../domain/content/ContentContext.atom";
 import { useMemo } from "react";
+import { useCurrentMywords } from "../../domain/user/useCurrentMywords";
 
 export const FlashCardsView = () => {
-  const [state] = useAtom(UsersAtom);
-  const { activeTabUrl } = useUserContentState();
-  const learnedWords = state?.learnedWords[activeTabUrl || ""];
-    
+  const [, setUserContent] = useAtom(UsersAtom);
+  const { activeTabUrl = "" } = useUserContentState();
+  console.log("activeTabUrl", activeTabUrl);
+  const { mywords, learnedWords } = useCurrentMywords();
+
   const cards = useMemo(
     () =>
-      Object.entries(state.myWords).filter(([word]) => !learnedWords.some(l => l === word)).map(([word, item]) => {
-        return {
-          description: "",
-          image: "",
-          word: word,
-          examples: [],
-          translation: item.translation,
-        } as FlashCardData;
-      }),
+      Object.entries(mywords)
+        .filter(([word]) => !learnedWords?.some((l) => l === word))
+        .map(([word, descriptor]) => {
+          return {
+            descriptor,
+            image: "",
+            word: word || '',
+            isLearned: learnedWords?.some((l) => l === word),
+          } as FlashCardData;
+        }),
     [],
   );
 
@@ -29,7 +32,7 @@ export const FlashCardsView = () => {
       data={cards}
       onAction={(action, index) => {
         if (activeTabUrl && action === "learned")
-          UsersAtom.set$({
+          setUserContent({
             learnedWords: {
               [activeTabUrl]: [...learnedWords, cards[index].word],
             },

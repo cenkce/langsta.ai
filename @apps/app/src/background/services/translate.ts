@@ -6,7 +6,7 @@ import {
 import { TranslationTextTask } from "../../api/task/TranslationTextTask";
 import { TaskStore } from "@espoojs/task";
 import { clone } from "ramda";
-import { sendLlamaRequest } from "./sendGPTRequest";
+import { sendOpenAIGPTRequest } from "./sendGPTRequest";
 
 async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
   if (!update.taskId) return;
@@ -29,7 +29,7 @@ async function upsertTranslationTask(update: Partial<TranslationTextTask>) {
 
 export async function GPTTranslateRequest(message: TranslateRequestMessage) {
   const { id, ...messageBody } = message;
-  const task = await sendLlamaRequest({
+  const task = await sendOpenAIGPTRequest({
     userMessage: messageBody?.content?.text || "",
     systemMessage: messageBody.systemMessage,
   });

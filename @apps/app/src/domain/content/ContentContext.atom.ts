@@ -24,7 +24,7 @@ export type StudyContentType = {
   tags?: string[];
   createdAt: string;
   updatedAt: string;
-  words?: string[];
+  words?: string;
   level: string;
   flashcards?: { word: string; translation: string }[];
 };

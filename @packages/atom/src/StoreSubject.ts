@@ -65,7 +65,7 @@ export class Atom<
   }
 
   set$(
-    value: Partial<TName extends string ? TStoreState[TName] : TStoreState>,
+    value: TName extends string ? TStoreState[TName] : Partial<TStoreState>,
   ) {
     const state = this.store.getValue();
     const prevValue = this._getValue(state);

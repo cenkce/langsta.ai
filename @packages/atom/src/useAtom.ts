@@ -73,9 +73,9 @@ function useAtom<
     (
       newState:
         | ((
-            state: TName extends string ? TState[TName] : TState,
-          ) => TName extends string ? TState[TName] : TState)
-        | (TName extends string ? TState[TName] : TState),
+            state: TName extends string ? TState[TName] : Partial<TState>,
+          ) => TName extends string ? TState[TName] : Partial<TState>)
+        | (TName extends string ? TState[TName] : Partial<TState>),
     ) => {
       const update =
         newState instanceof Function ? newState(atom.getValue()) : newState;

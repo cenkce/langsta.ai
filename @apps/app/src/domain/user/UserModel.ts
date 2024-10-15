@@ -8,7 +8,10 @@ import { WordsCollection } from "./WordDescriptor";
  * @var myWords holds the user's words by url.
  * @var learnedWords holds the user's learned words by url.
  */
-export type UserStore = { myWords: WordsCollection; learnedWords: Record<string, string[]>; };
+export type UserStore = {
+  myWords?: Record<string, WordsCollection>;
+  learnedWords?: Record<string, string[]>;
+};
 export const UserStore = new StoreSubject({
   settings: {} as SettingsState,
   user: { myWords: {}, learnedWords: {} } as UserStore,

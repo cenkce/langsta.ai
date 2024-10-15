@@ -16,9 +16,11 @@ export function WordCard({
   word,
   descriptor,
   onMenuClick,
+  isSaved
 }: {
   word: string;
   descriptor: WordDescriptor;
+  isSaved?: boolean;
   onMenuClick?: (
     param: "save" | "more" | "remove",
     descriptor: WordDescriptor,
@@ -53,6 +55,7 @@ export function WordCard({
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item
+                disabled={isSaved}
                 leftSection={
                   <IconPlus style={{ width: rem(14), height: rem(14) }} />
                 }

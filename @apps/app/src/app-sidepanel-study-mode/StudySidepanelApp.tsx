@@ -7,7 +7,7 @@ import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 import { UsersAtom, UserStorage } from "../domain/user/UserModel";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { TaskNode, TaskStatus, TaskStore } from "@espoojs/task";
 import {
   ContentContextAtom,
@@ -31,6 +31,10 @@ import { studyContentTasksAtom } from "./StudyContentTasksAtom";
 import { notifications } from "@mantine/notifications";
 import { FlashCardsView } from "./flash-cards/FlashCardsView";
 import { CrosswordsView } from "./crosswords/CrosswordsView";
+import {
+  WordsCollection,
+} from "../domain/user/WordDescriptor";
+import { useCurrentMywords } from "../domain/user/useCurrentMywords";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
@@ -72,6 +76,7 @@ export const SidepanelApp = () => {
   const userContentRef = useRef(userContent);
   userContentRef.current = userContent;
   const [CompID] = useState(() => ++ID);
+  useEffect(() => {}, []);
 
   useEffect(() => {
     // if (!userContent.activeTabContent?.content)
@@ -244,6 +249,8 @@ export const SidepanelApp = () => {
     ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.title || ""
     : "";
   // taskStatus === "progress"
+
+  const getWords = useWordsStream();
   return (
     <div ref={scrollContainerRef} className={styles.container}>
       <section className={styles.studyActionsContainer}>
@@ -284,14 +291,40 @@ export const SidepanelApp = () => {
           />
         ) : null}
         {selectedStudyAction === "words" ? (
-          <ExtractedWordsView
-            loading={taskStatus === "progress"}
-            words={studyState[contentUrl]?.[selectedStudyAction] as any}
-          />
+          <ExtractedWordsView words={getWords(studyState[contentUrl]?.[selectedStudyAction] || "")} loading={taskStatus === "progress"} />
         ) : null}
         {selectedStudyAction === "corsswords" ? <CrosswordsView /> : null}
         {selectedStudyAction === "flashcards" ? <FlashCardsView /> : null}
       </main>
     </div>
   );
+};
+
+const useWordsStream = () => {
+  const {mywords} = useCurrentMywords();
+  const parse = (content: string) => {
+    const result: WordsCollection | undefined = content
+      ?.split("\n")
+      .reduce<WordsCollection>((acc, line) => {
+        // |word|translation|kind|examples|
+        const [word, translation, kind, ...examples] = line.trim().split("|");
+        const getExamples = (example: string) => {
+          const [lang, translation] = example.split("#");
+          return { [lang]: translation };
+        };
+
+        const examplesCollection = examples.map(getExamples);
+        acc = {
+          ...acc,
+          [word]: { translation, kind, examples: examplesCollection },
+        };
+
+        return acc;
+      }, {});
+    return result;
+  };
+
+  return useCallback((content: string) => {
+    return content ? parse(content) : mywords;
+  }, []);
 };

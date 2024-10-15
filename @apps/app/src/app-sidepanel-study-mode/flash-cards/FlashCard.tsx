@@ -27,7 +27,6 @@ type FlashCardProps = {
 const FlashCard: React.FC<FlashCardProps> = ({
   word,
   translation,
-  description,
   image,
   examples,
   index,
@@ -64,7 +63,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
             <Text c="dimmed" size="sm">
               {translation}
             </Text>
-            <Text mt="md">{description}</Text>
+            {/* <Text mt="md">{description}</Text> */}
           </Card>
         </div>
         <div className={styles.back}>
@@ -83,11 +82,11 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 </ThemeIcon>
               }
             >
-              {examples.map((example, index) => (
+              {examples?.map((example, index) => (
                 <List.Item key={index}>
                   <Text>{example.example}</Text>
                   <Text color="dimmed" size="xs">
-                    {example.translation}
+                    {example?.translation}
                   </Text>
                 </List.Item>
               ))}
