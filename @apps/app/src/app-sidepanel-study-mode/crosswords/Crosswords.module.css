@@ -3,6 +3,7 @@
 .app {
   font-family: Arial, sans-serif;
   padding: 20px;
+  height: 100%;
 }
 
 .word-input {
@@ -25,6 +26,7 @@
 .crossword-grid {
   display: inline-block;
   margin-right: 20px;
+  width: 100%;
 }
 
 .crossword-row {
@@ -75,4 +77,10 @@
 
 .clues-list li {
   margin-bottom: 5px;
+}
+
+.highlighted {
+  background-color: --mn;
+  background-color: var(--mantine-primary-color-light-hover);
+
 }

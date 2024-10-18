@@ -32,7 +32,7 @@ declare module 'crossword-layout-generator' {
     cols: number;
     rows: number;
     table: string[][];
-    result: Word[];
+    result: Result[];
   }
 
   export function generateLayout(

@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { generateLayout } from 'crossword-layout-generator';
-import './Crosswords.css';
+import React, { useState, useMemo } from "react";
+import { CrosswordLayout, generateLayout } from "crossword-layout-generator";
+import styles from "./Crosswords.module.css";
+import { Center, Flex, List, Title } from "@mantine/core";
+import { classNames } from "@espoojs/utils";
+import { upperFirst } from "@mantine/hooks";
 
 export interface WordEntry {
   id?: number;
@@ -8,111 +11,175 @@ export interface WordEntry {
   clue: string;
 }
 
-const App: React.FC<{words: WordEntry[]}> = ({words}) => {
-  const [grid, setGrid] = useState<string[][]>([]);
-
-  useEffect(() => {
-    if (words.length > 0) {
-      const layout = generateLayout(words, { width: 15, height: 15 });
-      console.log('layout', layout);
-      setGrid(layout.table);
-    }
-  }, [words]);
-
-
-  // const handleCellChange = (row: number, col: number, value: string) => {
-  //   const updatedGrid = grid.map((gridRow) =>
-  //     gridRow.map((cell) => {
-  //       if (cell.row === row && cell.col === col) {
-  //         return { ...cell, char: value.toUpperCase() };
-  //       }
-  //       return cell;
-  //     })
-  //   );
-  //   setGrid(updatedGrid);
-  // };
-
+const App: React.FC<{ words: WordEntry[] }> = ({ words }) => {
+  const layout = useMemo(
+    () =>
+      words.length > 0
+        ? generateLayout(words)
+        : ({
+            table: [],
+            cols: 0,
+            rows: 0,
+            result: [],
+          } as ReturnType<typeof generateLayout>),
+    [words],
+  );
 
   return (
     <div className="app">
-      <h1>Dynamic Crossword Puzzle</h1>
-      {grid.length > 0 && (
-        <div className="crossword-container">
-          <CrosswordGrid grid={grid} />
-        </div>
-      )}
+      <Title>Crossword Puzzle</Title>
+      <div className="crossword-container">
+        <CrosswordGrid layout={layout} />
+      </div>
     </div>
   );
 };
 
-// WordInput Component
-// const WordInput: React.FC<{ addWord: (wordEntry: WordEntry) => void }> = ({
-//   addWord,
-// }) => {
-//   const [word, setWord] = useState('');
-//   const [clue, setClue] = useState('');
-
-//   const handleAddWord = () => {
-//     if (word.trim() && clue.trim()) {
-//       const newWordEntry: WordEntry = {
-//         id: Date.now(),
-//         answer: word.trim().toUpperCase(),
-//         clue: clue.trim(),
-//       };
-//       addWord(newWordEntry);
-//       setWord('');
-//       setClue('');
-//     }
-//   };
-
-//   return (
-//     <div className="word-input">
-//       <input
-//         type="text"
-//         value={word}
-//         onChange={(e) => setWord(e.target.value)}
-//         placeholder="Enter word"
-//       />
-//       <input
-//         type="text"
-//         value={clue}
-//         onChange={(e) => setClue(e.target.value)}
-//         placeholder="Enter clue"
-//       />
-//       <button onClick={handleAddWord}>Add Word</button>
-//     </div>
-//   );
-// };
-
 // CrosswordGrid Component
 const CrosswordGrid: React.FC<{
-  grid: string[][];
-  // onCellChange: (row: number, col: number, value: string) => void;
-}> = ({ grid }) => {
+  layout: CrosswordLayout;
+  onCellChange?: (row: number, col: number, value: string) => void;
+}> = ({ layout }) => {
+  const [userInputs, setUserInputs] = useState<Map<string, string>>(new Map());
+  const [highlightedClue, setHighlightedClue] = useState<string[] | undefined>(
+    [],
+  );
+
+  const getClueByPosition = (x: number, y: number) => {
+    return layout.result
+      .filter((res) => {
+        if (res.orientation === "across") {
+          console.log(res.starty, y);
+          return (
+            res.startx <= x &&
+            res.starty === y &&
+            res.startx + res.answer.length > x
+          );
+        } else {
+          return (
+            res.startx === x &&
+            res.starty <= y &&
+            res.starty + res.answer.length > y
+          );
+        }
+      })
+      .map(({ clue }) => clue);
+  };
+
+  const matchUserInputsWithAnswerByPosition = () => {
+    const matchedAnswers = new Map<string, boolean>();
+    layout.result.forEach(({ startx, starty, answer, orientation }) => {
+      let isFullyMatched = true;
+      for (let i = 0; i < answer.length; i++) {
+        const key =
+          orientation === "across"
+            ? `${starty - 1}-${startx - 1 + i}`
+            : `${starty - 1 + i}-${startx - 1}`;
+        const userInput = userInputs.get(key)?.toUpperCase() || "";
+        if (userInput !== answer[i].toUpperCase()) {
+          isFullyMatched = false;
+          break;
+        }
+      }
+      if (isFullyMatched) {
+        for (let i = 0; i < answer.length; i++) {
+          const key =
+            orientation === "across"
+              ? `${starty - 1}-${startx - 1 + i}`
+              : `${starty - 1 + i}-${startx - 1}`;
+          matchedAnswers.set(key, true);
+        }
+      }
+    });
+    return matchedAnswers;
+  };
+
   return (
-    <div className="crossword-grid">
-      {grid.map((row, rowIndex) => (
-        <div className="crossword-row" key={rowIndex}>
-          {row.map((cell, colIndex) => (
-            <div
-              className={`crossword-cell ${cell === '-' ? 'block' : 'white'}`}
-              key={colIndex}
-            >
-              {cell !== '-' && (
-                <input
-                  type="text"
-                  maxLength={1}
-                  value={''}
-                  onChange={() => {  }
-                    // onCellChange(cell, cell.col, e.target.value)
-                  }
-                />
+    <Flex
+      className={styles["crossword-grid"]}
+      direction={"row"}
+      columnGap={"md"}
+    >
+      <div>
+        {layout.table.map((row, rowIndex) => (
+          <div className={styles["crossword-row"]} key={rowIndex}>
+            {row.map((cell, colIndex) => (
+              <div
+                className={classNames(
+                  styles["crossword-cell"],
+                  cell === "-",
+                  styles.block,
+                )}
+                key={colIndex}
+              >
+                {cell !== "-" &&
+                  (matchUserInputsWithAnswerByPosition().get(
+                    `${rowIndex}-${colIndex}`,
+                  ) ? (
+                    <Center
+                      onMouseOver={() =>
+                        setHighlightedClue(
+                          getClueByPosition(colIndex + 1, rowIndex + 1),
+                        )
+                      }
+                      onMouseOut={() => setHighlightedClue([])}
+                    >
+                      {userInputs
+                        .get(`${rowIndex}-${colIndex}`)
+                        ?.toUpperCase() || ""}
+                    </Center>
+                  ) : (
+                    <input
+                      type="text"
+                      maxLength={1}
+                      value={
+                        userInputs
+                          .get(`${rowIndex}-${colIndex}`)
+                          ?.toUpperCase() || ""
+                      }
+                      onMouseOver={() =>
+                        setHighlightedClue(
+                          getClueByPosition(colIndex + 1, rowIndex + 1),
+                        )
+                      }
+                      onMouseOut={() => setHighlightedClue([])}
+                      onChange={(e) => {
+                        setUserInputs((ansers) => {
+                          const newAnswers = new Map(ansers);
+                          newAnswers.set(
+                            `${rowIndex}-${colIndex}`,
+                            e.target.value,
+                          );
+                          return newAnswers;
+                        });
+                      }}
+                    />
+                  ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      <Flex direction={"column"}>
+        <List type="ordered">
+          {layout.result.map(({ clue }) => (
+            <List.Item
+              onMouseOver={() => setHighlightedClue([clue])}
+              onMouseOut={() => setHighlightedClue([])}
+              style={{ cursor: "pointer" }}
+              key={clue}
+              data-clue={clue}
+              className={classNames(
+                highlightedClue?.includes(clue),
+                styles.highlighted,
               )}
-            </div>
+            >
+              {upperFirst(clue)}
+            </List.Item>
           ))}
-        </div>
-      ))}
-    </div>
+        </List>
+      </Flex>
+    </Flex>
   );
 };
 
