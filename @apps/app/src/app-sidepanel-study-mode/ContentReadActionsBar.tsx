@@ -6,6 +6,7 @@ import {
   IconColumns2,
   TablerIconsProps,
   IconStar,
+  IconReload,
 } from "@tabler/icons-react";
 import { IconColumns3 } from "@tabler/icons-react";
 import { FC } from "react";
@@ -27,6 +28,7 @@ const StudyToolIcons = [
   { icon: IconColumns2, label: "Narrower Layout", slug: "layout-decrease" },
   { icon: IconColumns3, label: "Wider Layout", slug: "layout-increase" },
   { icon: IconStar, label: "Favorite", slug: "favorite" },
+  { icon: IconReload, label: "Reload Content", slug: "reset" },
 ] as const;
 
 export type ContentReadActionsSlugsType = (typeof StudyToolIcons)[number]["slug"];
@@ -38,13 +40,14 @@ export function ContentReadActionsBar(props: {
   onClick: (link: ContentReadActionsSlugsType) => void;
   className?: string;
   size?: number;
+  loading?: boolean;
 }) {
   const links = StudyToolIcons.map((link) => (
     <ContentActionButton
       {...link}
-      active={link.slug === props.selectedLink}
+      // active={link.slug === props.selectedLink}
       key={link.label}
-      disabled={props.disabled}
+      disabled={props.disabled || (link.slug === 'reset' && props.loading)}
       size={props.size}
       tooltipPosition="bottom"
       onClick={() => {

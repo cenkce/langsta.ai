@@ -7,178 +7,276 @@ import styles from "./SidepanelApp.module.scss";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 import { UsersAtom, UserStorage } from "../domain/user/UserModel";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { TaskNode, TaskStatus, TaskStore } from "@espoojs/task";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ContentContextAtom,
   ContentStorage,
-  useStudyContentState,
+  PageContent,
+  StudyContentAtom,
+  StudyContentStorage,
+  useUserContentSetState,
   useUserContentState,
 } from "../domain/content/ContentContext.atom";
 import { useTasksSyncByTagName } from "../api/task/useTasksSyncByTagName";
-import { OperatorFunction, bufferTime, filter, map, scan } from "rxjs";
 import { classNames } from "@espoojs/utils";
 import { useEventListener } from "@mantine/hooks";
 import {
-  ContentStudyActionsBar,
+  ContentStudyActionsMenu,
   ContentStudyActionsIconsSlugsType,
-} from "./ContentStudyActionsBar";
+  StudyActions,
+} from "./ContentStudyActionsMenu";
 import { activeTabMessageDispatch } from "../domain/content/activeTabMessageDispatch";
-import { Divider, Title } from "@mantine/core";
+import {
+  ActionIcon,
+  Card,
+  Divider,
+  Flex,
+  Menu,
+  rem,
+  Text,
+  Title,
+} from "@mantine/core";
 import { ExtractedWordsView } from "./extract-words/ExtractedWordsView";
 import { useAtom } from "@espoojs/atom";
 import { studyContentTasksAtom } from "./StudyContentTasksAtom";
-import { notifications } from "@mantine/notifications";
 import { FlashCardsView } from "./flash-cards/FlashCardsView";
 import { CrosswordsView } from "./crosswords/CrosswordsView";
-import {
-  WordsCollection,
-} from "../domain/user/WordDescriptor";
+import { WordsCollection } from "../domain/user/WordDescriptor";
 import { useCurrentMywords } from "../domain/user/useCurrentMywords";
+import { useStudyTaskHandler } from "./useStudyTaskHandler";
+import {
+  IconDots,
+  IconPlus,
+  IconDeviceFloppy,
+  IconTrash,
+} from "@tabler/icons-react";
 
 const textSizes = ["xs", "sm", "md", "lg", "xl", "xxl"] as const;
 const layoutSizes = ["xs", "sm", "md", "lg", "xlg", "xxlg"] as const;
-let ID = 0;
 
 export const SidepanelApp = () => {
-  const [taskStatus, setTaskStatus] = useState<TaskStatus>();
-  const [textSize, setTextSize] = useState<number>(2);
-  const [layoutSize, setLayoutSize] = useState<number>(2);
-  const [studyTasks, setStudyTasks] = useAtom(studyContentTasksAtom);
-
   useLocalstorageSync({
     debugKey: "content-sidepanel-study-mode",
     storageAtom: ContentContextAtom,
     contentStorage: ContentStorage,
-    verbose: true,
   });
 
   useLocalstorageSync({
-    debugKey: "settings-sidepanel",
+    debugKey: "content-sidepanel-study-mode",
     storageAtom: SettingsAtom,
     contentStorage: SettingsStorage,
   });
+  useLocalstorageSync({
+    debugKey: "content-sidepanel-study-mode",
+    storageAtom: StudyContentAtom,
+    contentStorage: StudyContentStorage,
+  });
 
   useLocalstorageSync({
-    debugKey: "user-sidepanel",
+    debugKey: "content-sidepanel-study-mode",
     storageAtom: UsersAtom,
     contentStorage: UserStorage,
   });
 
   useTasksSyncByTagName("background-task");
+
+  const userContent = useUserContentState();
+  const setUserContents = useUserContentSetState();
+  const [selectedNote, setSelectedNote] = useState<string | undefined>();
+  const [activeTabContent, setActiveTabContent] = useState<
+    PageContent | undefined
+  >();
+
+
+  useEffect(() => {
+    // if (userContent.activeTabUrl && !userContent.activeTabContent?.[userContent.activeTabUrl])
+      activeTabMessageDispatch({ type: "get-page-content" }).then(({ content}) => {
+        // if(userContent.activeTabContent?.[url]) return;
+        setActiveTabContent(content as PageContent);
+      });
+  }, []);
+
+  const notes = useMemo(() => {
+    const userContents = {...userContent?.activeTabContent};
+    if (activeTabContent && userContent.activeTabUrl)
+      userContents[userContent.activeTabUrl] = activeTabContent;
+
+    return userContents;
+  }, [
+    userContent.activeTabContent,
+    userContent.activeTabUrl,
+    activeTabContent,
+  ]);
+
+  return (
+    <Flex gap={"md"} p={"md"} wrap={"wrap"}>
+      {!selectedNote ? (
+        Object.entries(notes).map(([url, content]) => {
+          return (
+            <NoteCard
+              key={url}
+              title={content?.title}
+              content={content}
+              url={url}
+              active={url === userContent.activeTabUrl}
+              isSaved={!!userContent.activeTabContent?.[url]}
+              onMenuClick={(action, url) => {
+                if (action === "open") setSelectedNote(url);
+                if (action === "save" && url) {
+                  setUserContents((state) => {
+                    const activeTabContent = state.activeTabContent || {};
+                    return {
+                      ...state,
+                      activeTabContent: {
+                        ...activeTabContent,
+                        [url]: content,
+                      },
+                    };
+                  });
+                } else if (action === "remove" && url) {
+                  setUserContents((state) => {
+                    const activeTabContent = {...state.activeTabContent};
+                    delete activeTabContent[url];
+                    return {
+                      ...state,
+                      activeTabContent
+                    };
+                  });
+                }
+              }}
+            />
+          );
+        })
+      ) : (
+        <NotebookReader url={selectedNote} notes={notes} />
+      )}
+    </Flex>
+  );
+};
+
+export const NoteCard = (props: {
+  active?: boolean;
+  title?: string;
+  url?: string;
+  isSaved?: boolean;
+  content?: PageContent;
+  onMenuClick: (action: "save" | "open" | "remove", url?: string) => void;
+}) => {
+  return (
+    <Card
+      style={{
+        gap: "1rem",
+        flexGrow: 1,
+        flexBasis: rem(250),
+        borderColor: props.active ? "var(--mantine-color-red-6)" : "default",
+      }}
+      maw={rem(380)}
+      shadow="sm"
+      padding="lg"
+      radius="md"
+      withBorder
+    >
+      <Card.Section withBorder inheritPadding py="xs">
+        <Flex justify="space-between" direction={"row"}>
+          <Title
+            size={"12px"}
+            style={{
+              textOverflow: "ellipsis",
+              overflow: "hidden",
+              height: "2rem",
+            }}
+          >
+            {props.title}
+          </Title>
+          {/* <Text size="xs">{upperFirst(descriptor.translation)}</Text> */}
+
+          <Menu
+            withinPortal
+            position="bottom-end"
+            portalProps={{ style: { position: "absolute" } }}
+            shadow="sm"
+          >
+            <Menu.Target>
+              <ActionIcon variant="subtle" color="gray">
+                <IconDots style={{ width: rem(16), height: rem(16) }} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                onClick={() => props.onMenuClick?.("open", props.url)}
+                leftSection={
+                  <IconPlus style={{ width: rem(14), height: rem(14) }} />
+                }
+              >
+                Open
+              </Menu.Item>
+              <Menu.Item
+                disabled={props.isSaved}
+                leftSection={
+                  <IconDeviceFloppy
+                    style={{ width: rem(14), height: rem(14) }}
+                  />
+                }
+                onClick={() => props.onMenuClick?.("save", props.url)}
+              >
+                Save
+              </Menu.Item>
+              <Menu.Item
+                // onClick={() => onMenuClick?.("remove", descriptor)}
+                leftSection={
+                  <IconTrash style={{ width: rem(14), height: rem(14) }} />
+                }
+                color="red"
+                onClick={() => props.onMenuClick?.("remove", props.url)}
+              >
+                Remove
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Flex>
+      </Card.Section>
+      <Flex bottom={0} pos={"sticky"} gap={"md"} justify={"space-between"}>
+        <Text size="xs">
+          Published Date:{" "}
+          {new Date(props.content?.publishedTime || "").toLocaleDateString()}
+        </Text>
+        <Text size="xs">
+          Saved Date:{" "}
+          {new Date(props.content?.publishedTime || "").toLocaleDateString()}
+        </Text>
+      </Flex>
+    </Card>
+  );
+};
+
+const NotebookReader = (props: { url: string, notes: Record<string, PageContent | undefined> }) => {
+  const [textSize, setTextSize] = useState<number>(2);
+  const [layoutSize, setLayoutSize] = useState<number>(2);
+  const [studyTasks, setStudyTasks] = useAtom(studyContentTasksAtom);
+
   const [selectedReadActions, setSelectedReadActions] = useState<
     ContentReadActionsSlugsType | undefined
   >();
   const [selectedStudyAction, setSelectedStudyAction] =
-    useState<ContentStudyActionsIconsSlugsType>("content");
-  const [studyState, setStudyState] = useStudyContentState();
-  const userContent = useUserContentState();
-  const userContentRef = useRef(userContent);
-  userContentRef.current = userContent;
-  const [CompID] = useState(() => ++ID);
-  useEffect(() => {}, []);
+    useState<StudyActions>("content");
+  // const userContent = useUserContentState();
+  const userContentRef = useRef(props.notes);
+  userContentRef.current = props.notes;
+  const contentUrl = props.url;
+  const { taskStatus, studyState, setStudyState } = useStudyTaskHandler(
+    studyTasks,
+    selectedStudyAction,
+    contentUrl,
+  );
 
-  useEffect(() => {
-    // if (!userContent.activeTabContent?.content)
-    activeTabMessageDispatch({ type: "get-page-content" });
-  }, []);
-
-  useEffect(() => {
-    const currentTaskId = studyTasks?.[selectedStudyAction];
-    if (currentTaskId) {
-      TaskStore.instance.name = "SidepanelApp";
-      // stream task result
-      const subscription = TaskStore.instance
-        .subscribeTaskById(currentTaskId)
-        .pipe(
-          filter((task) => {
-            return task !== undefined && task?.status !== "completed";
-          }) as OperatorFunction<TaskNode | undefined, TaskNode>,
-          bufferTime(500),
-          filter((nodes) => {
-            return nodes.length > 0;
-          }),
-          map((nodes) => {
-            const task = nodes[nodes.length - 1];
-            return {
-              ...task,
-              result: nodes
-                .map((tsk) => tsk.result || "")
-                .join("")
-                .replace("\n\n", "\n"),
-            };
-          }),
-          // merges buffered chunks and accumulates stream
-          scan<TaskNode, TaskNode>(
-            (acc, task) => {
-              return task.result
-                ? {
-                    ...task,
-                    result: acc.result + task.result,
-                  }
-                : acc;
-            },
-            { result: "" } as TaskNode,
-          ),
-        )
-        .subscribe({
-          next: (task) => {
-            if (task?.error) {
-              notifications.show({
-                color: "red",
-                title: `Task Error: ${task.error.type.toUpperCase()}`,
-                message: task.error.error.message,
-                autoClose: 5000,
-              });
-              setTaskStatus(task?.status);
-              return;
-            }
-            const url = contentUrl;
-
-            const resultKey = task?.params?.tags
-              .find((tag) => tag.includes("gpt/"))
-              ?.replace("gpt/", "");
-            if (resultKey === undefined) return;
-
-            if (task.result && url) {
-              const newState = {
-                [resultKey]: task.result,
-                updatedAt: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                level: "",
-                title: "",
-                url: url,
-              };
-
-              setStudyState((state) => ({
-                ...state,
-                [url]: newState,
-              }));
-            }
-            if (task?.status) setTaskStatus(task?.status);
-          },
-          complete() {
-            setStudyTasks((state) => ({
-              ...state,
-              [selectedStudyAction]: undefined,
-            }));
-            setTaskStatus("completed");
-          },
-        });
-
-      return () => {
-        console.log("unsubscribeTaskById", CompID);
-        subscription.unsubscribe();
-      };
-    }
-  }, [selectedStudyAction, studyTasks]);
+  const isDisabled = taskStatus === "progress";
+  // const [CompID] = useState(() => ++ID);
 
   const { simplify, summarise, extractWords } = useTranslateService();
-  const isDisabled = taskStatus === "progress";
-  const contentUrl = userContent?.activeTabUrl || "";
+
   const contentFromCache = studyState[contentUrl];
   const hasSummary = !!contentFromCache?.summary;
-  // const hasWords = !!contentFromCache?.words;
+  const hasWords = !!contentFromCache?.words;
   const hasSimplifed = !!contentFromCache?.simplify;
 
   const readActionsClickHandler = (link: ContentReadActionsSlugsType) => {
@@ -194,45 +292,69 @@ export const SidepanelApp = () => {
       setLayoutSize((state) =>
         state < layoutSizes.length - 1 ? state + 1 : state,
       );
+    } else if (link === "reset") {
+      const task = studyTaskFactory(selectedStudyAction);
+      if (task) {
+        resetContentHandler(selectedStudyAction);
+        setStudyTasks((state = {}) => ({
+          ...state,
+          [selectedStudyAction]: task,
+        }));
+      }
     }
 
     setSelectedReadActions(link);
   };
 
+  const studyTaskFactory = (link: ContentStudyActionsIconsSlugsType) => {
+    const textContent = props.notes?.[contentUrl]?.textContent;
+    if (!textContent) return null;
+
+    switch (link) {
+      case "words":
+        return extractWords(textContent);
+      case "summary":
+        return summarise(textContent);
+      case "simplify":
+        return simplify(textContent);
+      default:
+        return null;
+    }
+  };
+
   const studyActionsClickHandler = (
     link: ContentStudyActionsIconsSlugsType,
   ) => {
-    if (link === "content") {
-      setSelectedStudyAction(link);
-    } else if (link === "words") {
-      if (!studyTasks?.[link])
-        setStudyTasks((state = {}) => ({
-          ...state,
-          words: extractWords(
-            userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
-          ),
-        }));
-      setSelectedStudyAction(link);
-    } else if (link === "summary") {
-      if (!studyTasks?.[link] && !hasSummary)
-        setStudyTasks((state = {}) => ({
-          ...state,
-          summary: summarise(
-            userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
-          ),
-        }));
-      setSelectedStudyAction(link);
-    } else if (link === "simplify") {
-      if (!studyTasks?.[link] && !hasSimplifed)
-        setStudyTasks((state = {}) => ({
-          ...state,
-          simplify: simplify(
-            userContentRef.current?.activeTabContent?.[contentUrl]?.textContent,
-          ),
-        }));
-      setSelectedStudyAction(link);
-    } else {
-      setSelectedStudyAction(link);
+    const task = studyTaskFactory(link);
+    switch (link) {
+      case "words":
+        if (!studyTasks?.[link] && !hasWords && task)
+          setStudyTasks((state = {}) => ({
+            ...state,
+            words: task,
+          }));
+        setSelectedStudyAction(link);
+        break;
+      case "summary":
+        if (!studyTasks?.[link] && !hasSummary && task)
+          setStudyTasks((state = {}) => ({
+            ...state,
+            summary: task,
+          }));
+        setSelectedStudyAction(link);
+        break;
+      case "simplify":
+        if (!studyTasks?.[link] && !hasSimplifed && task)
+          setStudyTasks((state = {}) => ({
+            ...state,
+            simplify: task,
+          }));
+        setSelectedStudyAction(link);
+        break;
+
+      default:
+        setSelectedStudyAction(link);
+        break;
     }
   };
 
@@ -242,19 +364,35 @@ export const SidepanelApp = () => {
     setIsPinned(scrollContainerRef.current?.scrollTop > 200);
   });
 
-  const currentTabContent = userContent?.activeTabUrl
-    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.content || ""
-    : "";
-  const currentTabTitle = userContent?.activeTabUrl
-    ? userContent?.activeTabContent?.[userContent?.activeTabUrl]?.title || ""
-    : "";
-  // taskStatus === "progress"
+  const currentTabContent = props.notes?.[contentUrl]?.content || "";
+  const currentTabTitle = props.notes?.[contentUrl]?.title || "";
+
+  const resetContentHandler = (section: ContentStudyActionsIconsSlugsType) => {
+    setStudyState((state) => {
+      if (!state?.[contentUrl]) return state;
+      const newState = { ...state[contentUrl] };
+      switch (section) {
+        case "crosswords":
+        case "words":
+          newState.words = undefined;
+          break;
+        case "summary":
+          newState.summary = undefined;
+          break;
+        case "simplify":
+          newState.simplify = undefined;
+          break;
+      }
+
+      return { ...state, [contentUrl]: newState };
+    });
+  };
 
   const getWords = useWordsStream();
   return (
     <div ref={scrollContainerRef} className={styles.container}>
       <section className={styles.studyActionsContainer}>
-        <ContentStudyActionsBar
+        <ContentStudyActionsMenu
           selectedLink={selectedStudyAction}
           disabled={isDisabled}
           onClick={studyActionsClickHandler}
@@ -279,7 +417,7 @@ export const SidepanelApp = () => {
         </Title>
         <Divider my={"1rem 1rem"}></Divider>
         {selectedStudyAction !== "words" &&
-        selectedStudyAction !== "corsswords" ? (
+        selectedStudyAction !== "crosswords" ? (
           <div
             className={classNames(styles[`textSize-${textSizes[textSize]}`])}
             dangerouslySetInnerHTML={{
@@ -291,9 +429,14 @@ export const SidepanelApp = () => {
           />
         ) : null}
         {selectedStudyAction === "words" ? (
-          <ExtractedWordsView words={getWords(studyState[contentUrl]?.[selectedStudyAction] || "")} loading={taskStatus === "progress"} />
+          <ExtractedWordsView
+            words={getWords(
+              studyState[contentUrl]?.[selectedStudyAction] || "",
+            )}
+            loading={taskStatus === "progress"}
+          />
         ) : null}
-        {selectedStudyAction === "corsswords" ? <CrosswordsView /> : null}
+        {selectedStudyAction === "crosswords" ? <CrosswordsView /> : null}
         {selectedStudyAction === "flashcards" ? <FlashCardsView /> : null}
       </main>
     </div>
@@ -301,7 +444,7 @@ export const SidepanelApp = () => {
 };
 
 const useWordsStream = () => {
-  const {mywords} = useCurrentMywords();
+  const { mywords } = useCurrentMywords();
   const parse = (content: string) => {
     const result: WordsCollection | undefined = content
       ?.split("\n")

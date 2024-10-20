@@ -31,9 +31,11 @@
 
 .crossword-row {
   display: flex;
+  gap: 1px;
 }
 
 .crossword-cell {
+  gap: 1px;
   position: relative;
   width: 30px;
   height: 30px;

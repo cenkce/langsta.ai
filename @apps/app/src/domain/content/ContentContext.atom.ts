@@ -49,6 +49,9 @@ export type UserContentState = {
     url?: string;
   } | undefined;
   activeTabContent: {[url: string]: PageContent | undefined} | undefined;
+  /**
+   * @TODO this should be under a url
+   */
   translation: Record<string, TranslationTextTask> | undefined;
   contentTasks: Record<string, ContentTask> | undefined;
   activeTabUrl: string | undefined;
@@ -78,6 +81,7 @@ export const ContentContextAtom = Atom.of(
 );
 
 export const StudyContentAtom = Atom.of({ key: "studyContent" }, contentStore);
+export const StudyContentStorage = LocalStorage.of<StudyContentType>("studyContent");
 
 export const useUserContentState = () => {
   return useAtom(ContentContextAtom, {

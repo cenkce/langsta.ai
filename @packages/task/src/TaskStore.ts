@@ -120,6 +120,10 @@ export class TaskStore extends StoreSubject<TaskStoreState> {
     super({ tasks: new Map(), nodesByTag: new Map() });
   }
 
+  getNode(id: string) {
+    return this.value.tasks.get(id);
+  }
+
   hasNode(id: string) {
     return this.value.tasks.has(id);
   }

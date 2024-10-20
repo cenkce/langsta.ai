@@ -100,7 +100,7 @@ const CrosswordGrid: React.FC<{
       direction={"row"}
       columnGap={"md"}
     >
-      <div>
+      <Flex gap={1} direction={'column'}>
         {layout.table.map((row, rowIndex) => (
           <div className={styles["crossword-row"]} key={rowIndex}>
             {row.map((cell, colIndex) => (
@@ -159,7 +159,7 @@ const CrosswordGrid: React.FC<{
             ))}
           </div>
         ))}
-      </div>
+      </Flex>
       <Flex direction={"column"}>
         <List type="ordered">
           {layout.result.map(({ clue }) => (

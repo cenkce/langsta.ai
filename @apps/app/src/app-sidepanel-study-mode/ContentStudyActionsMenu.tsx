@@ -26,13 +26,14 @@ const Icons = [
   { icon: IconPageBreak, label: "Summarise", slug: "summary" },
   { icon: IconPageBreak, label: "Simplify", slug: "simplify" },
   { icon: IconCards, label: "Flashcards", slug: "flashcards" },
-  { icon: IconPuzzle, label: "Crosswords", slug: "corsswords" },
+  { icon: IconPuzzle, label: "Crosswords", slug: "crosswords" },
 ] as const;
 
+export type StudyActions = "content" | "words" | "summary" | "simplify" | "flashcards" | "crosswords";
 export type ContentStudyActionsIconsSlugsType = (typeof Icons)[number]["slug"];
 export const ContentStudyActionsIconsSlugs = Icons.map((icon) => icon.slug);
 
-export function ContentStudyActionsBar(props: {
+export function ContentStudyActionsMenu(props: {
   disabled: boolean;
   selectedLink: ContentStudyActionsIconsSlugsType;
   onClick: (link: ContentStudyActionsIconsSlugsType) => void;

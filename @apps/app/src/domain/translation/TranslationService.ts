@@ -118,7 +118,7 @@ export function createSimplyfyRequestMessage(options: {
     type: "gpt/simplify",
     content: options.content,
     userMessage: propmpts.simplfy_text,
-    stream: false,
+    stream: true,
     id: options.id || nanoid(),
     systemMessage: propmpts.systemTeacherMessage,
   };
@@ -160,7 +160,7 @@ export function createSummariseRequestMessage(options: {
     type: "gpt/summary",
     content: options.content,
     id: options.id || nanoid(),
-    stream: false,
+    stream: true,
     userMessage: propmpts.summarise_text,
     systemMessage: propmpts.systemTeacherMessage,
   };

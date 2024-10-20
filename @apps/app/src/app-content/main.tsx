@@ -6,16 +6,20 @@ import { ContentApp } from "./ContentApp";
 import { MantineCommonProvider } from "../app-common";
 import { ContentContextAtom } from "../domain/content/ContentContext.atom";
 import { sanitizeUtmUrl } from "@espoojs/utils";
+// import { ContentContextAtom } from "../domain/content/ContentContext.atom";
+// import { sanitizeUtmUrl } from "@espoojs/utils";
 
-chrome.runtime.onMessage.addListener((message: TabMessages) => {
+chrome.runtime.onMessage.addListener((message: TabMessages, _, sendResponse) => {
   if(message.type === "get-page-content") {
     const state = ContentContextAtom.getValue();
-    const url = sanitizeUtmUrl(window.location.href);
+    // const url = sanitizeUtmUrl(window.location.href);
+    sendResponse({url: sanitizeUtmUrl(window.location.href), content: parseTabPageContent(window.document)});
     ContentContextAtom.set$({
-      activeTabContent: {
-        ...state.activeTabContent,
-        [url]: parseTabPageContent(window.document) || undefined,
-      },
+      // activeTabContent: {
+      //   ...state.activeTabContent,
+      //   // [url]: parseTabPageContent(window.document) || undefined,
+      // },
+      ...state,
       activeTabUrl: sanitizeUtmUrl(window.location.href),
     })
   }
