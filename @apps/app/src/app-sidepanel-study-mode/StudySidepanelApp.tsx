@@ -3,7 +3,7 @@ import {
   ContentReadActionsBar,
   ContentReadActionsSlugsType,
 } from "./ContentReadActionsBar";
-import styles from "./SidepanelApp.module.scss";
+import styles from "./SidepanelApp.module.css";
 import { useTranslateService } from "../domain/translation/TranslationService";
 import { SettingsAtom, SettingsStorage } from "../domain/user/SettingsModel";
 import { UsersAtom, UserStorage } from "../domain/user/UserModel";
@@ -87,17 +87,15 @@ export const SidepanelApp = () => {
     PageContent | undefined
   >();
 
-
   useEffect(() => {
     // if (userContent.activeTabUrl && !userContent.activeTabContent?.[userContent.activeTabUrl])
-      activeTabMessageDispatch({ type: "get-page-content" }).then(({ content}) => {
-        // if(userContent.activeTabContent?.[url]) return;
-        setActiveTabContent(content as PageContent);
-      });
+    activeTabMessageDispatch({ type: "get-page-content" }).then((props) => {
+      if (props?.content) setActiveTabContent(props.content as PageContent);
+    });
   }, []);
 
   const notes = useMemo(() => {
-    const userContents = {...userContent?.activeTabContent};
+    const userContents = { ...userContent?.activeTabContent };
     if (activeTabContent && userContent.activeTabUrl)
       userContents[userContent.activeTabUrl] = activeTabContent;
 
@@ -108,49 +106,62 @@ export const SidepanelApp = () => {
     activeTabContent,
   ]);
 
-  return (
+  const doSaveContent = (url: string, content: PageContent | undefined) => {
+    setUserContents((state) => {
+      const activeTabContent = state.activeTabContent || {};
+      return {
+        ...state,
+        activeTabContent: {
+          ...activeTabContent,
+          [url]: content,
+        },
+      };
+    });
+  };
+
+  return !selectedNote ? (
     <Flex gap={"md"} p={"md"} wrap={"wrap"}>
-      {!selectedNote ? (
-        Object.entries(notes).map(([url, content]) => {
-          return (
-            <NoteCard
-              key={url}
-              title={content?.title}
-              content={content}
-              url={url}
-              active={url === userContent.activeTabUrl}
-              isSaved={!!userContent.activeTabContent?.[url]}
-              onMenuClick={(action, url) => {
-                if (action === "open") setSelectedNote(url);
-                if (action === "save" && url) {
-                  setUserContents((state) => {
-                    const activeTabContent = state.activeTabContent || {};
-                    return {
-                      ...state,
-                      activeTabContent: {
-                        ...activeTabContent,
-                        [url]: content,
-                      },
-                    };
-                  });
-                } else if (action === "remove" && url) {
-                  setUserContents((state) => {
-                    const activeTabContent = {...state.activeTabContent};
-                    delete activeTabContent[url];
-                    return {
-                      ...state,
-                      activeTabContent
-                    };
-                  });
-                }
-              }}
-            />
-          );
-        })
-      ) : (
-        <NotebookReader url={selectedNote} notes={notes} />
-      )}
+      {" "}
+      {Object.entries(notes).map(([url, content]) => {
+        return (
+          <NoteCard
+            key={url}
+            title={content?.title}
+            content={content}
+            url={url}
+            active={url === userContent.activeTabUrl}
+            isSaved={!!userContent.activeTabContent?.[url]}
+            onMenuClick={(action, url) => {
+              if (action === "open") setSelectedNote(url);
+              if (action === "save" && url) {
+                doSaveContent(url, content);
+              } else if (action === "remove" && url) {
+                setUserContents((state) => {
+                  const activeTabContent = { ...state.activeTabContent };
+                  delete activeTabContent[url];
+                  return {
+                    ...state,
+                    activeTabContent,
+                  };
+                });
+              }
+            }}
+          />
+        );
+      })}
     </Flex>
+  ) : (
+    <NotebookReader
+      onClose={() => {
+        setSelectedNote(undefined);
+      }}
+      onSave={(url) => {
+        if (url) doSaveContent(url, activeTabContent);
+      }}
+      isSaved={!!userContent.activeTabContent?.[selectedNote]}
+      url={selectedNote}
+      notes={notes}
+    />
   );
 };
 
@@ -249,7 +260,13 @@ export const NoteCard = (props: {
   );
 };
 
-const NotebookReader = (props: { url: string, notes: Record<string, PageContent | undefined> }) => {
+const NotebookReader = (props: {
+  url: string;
+  notes: Record<string, PageContent | undefined>;
+  onClose: () => void;
+  isSaved?: boolean;
+  onSave: (url?: string) => void;
+}) => {
   const [textSize, setTextSize] = useState<number>(2);
   const [layoutSize, setLayoutSize] = useState<number>(2);
   const [studyTasks, setStudyTasks] = useAtom(studyContentTasksAtom);
@@ -286,6 +303,10 @@ const NotebookReader = (props: { url: string, notes: Record<string, PageContent 
       setTextSize((state) =>
         state < textSizes.length - 1 ? state + 1 : state,
       );
+    } else if (link === "close") {
+      props.onClose();
+    } else if (link === "favorite") {
+      props.onSave(props.url);
     } else if (link === "layout-decrease") {
       setLayoutSize((state) => (state > 0 ? state - 1 : state));
     } else if (link === "layout-increase") {
@@ -410,6 +431,7 @@ const NotebookReader = (props: { url: string, notes: Record<string, PageContent 
             selectedLink={selectedReadActions}
             disabled={isDisabled}
             onClick={readActionsClickHandler}
+            isSaved={props.isSaved}
           />
         </section>
         <Title my={"1rem"} size={"h3"}>

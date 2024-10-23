@@ -7,7 +7,7 @@ import { serviceWorkerContentMessageDispatch } from "../domain/content/messages"
 import { FlexRow } from "../ui/FlexRow";
 import { LoadingIcon } from "../ui/icons/LoadingIcon";
 import { TrashIcon } from "../ui/icons/TrashIcon";
-import styles from "./SidepanelApp.module.scss";
+import styles from "./SidepanelApp.module.css";
 import { Button } from "../ui/Button";
 import { activeTabMessageDispatch } from "../domain/content/activeTabMessageDispatch";
 import { useState } from "react";

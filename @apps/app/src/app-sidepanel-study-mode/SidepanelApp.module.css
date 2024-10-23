@@ -14,7 +14,7 @@
   position: sticky;
 }
 
-:root, :root[data-theme="light"] {
+/* :root, :root[data-theme="light"] {
   --text-font-family: 'Roboto', sans-serif;
   --text-color: #555;
   --background-color: #f5f5f5;
@@ -40,7 +40,7 @@
   --code-font-family: 'Courier New', monospace;
   --code-background-color: var(--background-color);
   --code-font-color: var(--text-color);
-}
+} */
 
 body {
   font-family: var(--text-font-family);
@@ -91,7 +91,7 @@ code {
 
 .readActionsContainer {
   max-height: 60px; 
-  width: max-content; 
+  width: max-content;
   position: sticky;
   top: 0;
   left: 50%;
@@ -136,6 +136,7 @@ code {
   margin: 0 auto;
   padding: 0 16px;
   height: 100%;
+  min-width: min-content;
 }
 
 .textSize-xs {
@@ -186,4 +187,3 @@ code {
   max-width: 90%;
 }
 
-// More themes can be added here...

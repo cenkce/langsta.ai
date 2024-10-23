@@ -14,7 +14,7 @@ export const cssrefresher = () =>
     enforce: "post",
     apply: "serve",
     transform(src, id) {
-      if (/\.(tsx).*$/.test(id) || /\.(scss).*$/.test(id)) {
+      if (/\.(tsx).*$/.test(id) || /\.(scss).*$/.test(id) || /\.(css).*$/.test(id)) {
         const fn =
           "import { updateStyle, removeStyle } from '/script/utils.ts';\n";
         let updatedSrc = fn + src;

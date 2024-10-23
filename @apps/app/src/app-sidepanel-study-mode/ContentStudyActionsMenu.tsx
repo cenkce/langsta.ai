@@ -6,7 +6,7 @@ import {
   IconPageBreak,
   IconTransferOut,
   IconHome2,
-  IconPuzzle
+  IconPuzzle,
 } from "@tabler/icons-react";
 import { FC } from "react";
 import { classNames } from "@espoojs/utils";
@@ -29,7 +29,13 @@ const Icons = [
   { icon: IconPuzzle, label: "Crosswords", slug: "crosswords" },
 ] as const;
 
-export type StudyActions = "content" | "words" | "summary" | "simplify" | "flashcards" | "crosswords";
+export type StudyActions =
+  | "content"
+  | "words"
+  | "summary"
+  | "simplify"
+  | "flashcards"
+  | "crosswords";
 export type ContentStudyActionsIconsSlugsType = (typeof Icons)[number]["slug"];
 export const ContentStudyActionsIconsSlugs = Icons.map((icon) => icon.slug);
 
@@ -51,7 +57,7 @@ export function ContentStudyActionsMenu(props: {
       }}
     />
   ));
-   
+
   return (
     <nav className={classNames(styles.actionsBar)}>
       <div>
