@@ -346,30 +346,38 @@ const NotebookReader = (props: {
   const studyActionsClickHandler = (
     link: ContentStudyActionsIconsSlugsType,
   ) => {
-    const task = studyTaskFactory(link);
     switch (link) {
       case "words":
-        if (!studyTasks?.[link] && !hasWords && task)
-          setStudyTasks((state = {}) => ({
-            ...state,
-            words: task,
-          }));
+        if (!studyTasks?.[link] && !hasWords) {
+          const task = studyTaskFactory(link);
+          if (task)
+            setStudyTasks((state = {}) => ({
+              ...state,
+              words: task,
+            }));
+        }
         setSelectedStudyAction(link);
         break;
       case "summary":
-        if (!studyTasks?.[link] && !hasSummary && task)
-          setStudyTasks((state = {}) => ({
-            ...state,
-            summary: task,
-          }));
+        if (!studyTasks?.[link] && !hasSummary) {
+          const task = studyTaskFactory(link);
+          if (task)
+            setStudyTasks((state = {}) => ({
+              ...state,
+              summary: task,
+            }));
+        }
         setSelectedStudyAction(link);
         break;
       case "simplify":
-        if (!studyTasks?.[link] && !hasSimplifed && task)
-          setStudyTasks((state = {}) => ({
-            ...state,
-            simplify: task,
-          }));
+        if (!studyTasks?.[link] && !hasSimplifed) {
+          const task = studyTaskFactory(link);
+          if (task)
+            setStudyTasks((state = {}) => ({
+              ...state,
+              simplify: task,
+            }));
+        }
         setSelectedStudyAction(link);
         break;
 
@@ -480,9 +488,9 @@ const useWordsStream = () => {
           (acc, example) => {
             const [lang, translation] = example.split("#");
             if (lang === targetLanguage) acc.push({ [lang]: translation });
-            else if(lang) acc[acc.length - 1][lang] = translation;
-            if(!lang) {
-              console.error('Empty lang field', example, acc);
+            else if (lang) acc[acc.length - 1][lang] = translation;
+            if (!lang) {
+              console.error("Empty lang field", example, acc);
             }
             return acc;
           },
@@ -493,7 +501,10 @@ const useWordsStream = () => {
           [word]: {
             translation,
             kind,
-            langs: targetLanguage && nativelanguage? [targetLanguage, nativelanguage] : [],
+            langs:
+              targetLanguage && nativelanguage
+                ? [targetLanguage, nativelanguage]
+                : [],
             examples: examplesCollection,
           },
         };
