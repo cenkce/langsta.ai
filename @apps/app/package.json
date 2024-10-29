@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "terser": "^5.34.1",
-    "@crxjs/vite-plugin": "2.0.0-beta.26",
+    "@crxjs/vite-plugin": "2.0.0-beta.28",
     "@espoojs/atom": "workspace:*",
     "@espoojs/task": "workspace:*",
     "@espoojs/utils": "workspace:*",

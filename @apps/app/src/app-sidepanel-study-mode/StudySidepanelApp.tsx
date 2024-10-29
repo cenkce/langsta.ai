@@ -41,7 +41,7 @@ import { useAtom } from "@espoojs/atom";
 import { studyContentTasksAtom } from "./StudyContentTasksAtom";
 import { FlashCardsView } from "./flash-cards/FlashCardsView";
 import { CrosswordsView } from "./crosswords/CrosswordsView";
-import { WordsCollection } from "../domain/user/WordDescriptor";
+import { WordDescriptor, WordsCollection } from "../domain/user/WordDescriptor";
 import { useCurrentMywords } from "../domain/user/useCurrentMywords";
 import { useStudyTaskHandler } from "./useStudyTaskHandler";
 import {
@@ -466,6 +466,8 @@ const NotebookReader = (props: {
 };
 
 const useWordsStream = () => {
+  const [{ targetLanguage, nativelanguage }] = useAtom(SettingsAtom);
+
   const { mywords } = useCurrentMywords();
   const parse = (content: string) => {
     const result: WordsCollection | undefined = content
@@ -473,15 +475,27 @@ const useWordsStream = () => {
       .reduce<WordsCollection>((acc, line) => {
         // |word|translation|kind|examples|
         const [word, translation, kind, ...examples] = line.trim().split("|");
-        const getExamples = (example: string) => {
-          const [lang, translation] = example.split("#");
-          return { [lang]: translation };
-        };
 
-        const examplesCollection = examples.map(getExamples);
+        const examplesCollection = examples.reduce<WordDescriptor["examples"]>(
+          (acc, example) => {
+            const [lang, translation] = example.split("#");
+            if (lang === targetLanguage) acc.push({ [lang]: translation });
+            else if(lang) acc[acc.length - 1][lang] = translation;
+            if(!lang) {
+              console.error('Empty lang field', example, acc);
+            }
+            return acc;
+          },
+          [],
+        );
         acc = {
           ...acc,
-          [word]: { translation, kind, examples: examplesCollection },
+          [word]: {
+            translation,
+            kind,
+            langs: targetLanguage && nativelanguage? [targetLanguage, nativelanguage] : [],
+            examples: examplesCollection,
+          },
         };
 
         return acc;
@@ -489,7 +503,10 @@ const useWordsStream = () => {
     return result;
   };
 
-  return useCallback((content: string) => {
-    return content ? parse(content) : mywords;
-  }, []);
+  return useCallback(
+    (content: string) => {
+      return content ? parse(content) : mywords;
+    },
+    [targetLanguage],
+  );
 };

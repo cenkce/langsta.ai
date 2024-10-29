@@ -60,11 +60,9 @@ export function ContentStudyActionsMenu(props: {
 
   return (
     <nav className={classNames(styles.actionsBar)}>
-      <div>
-        <Stack className={props.className} justify="center" gap={10}>
-          {links}
-        </Stack>
-      </div>
+      <Stack className={props.className} justify="center" gap={10}>
+        {links}
+      </Stack>
     </nav>
   );
 }

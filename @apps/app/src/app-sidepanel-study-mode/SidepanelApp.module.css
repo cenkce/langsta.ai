@@ -111,6 +111,7 @@ code {
   flex-direction: row;
   overflow: auto;
   max-height: 100vh;
+  height: 100%;
   h1:first-child {
     margin-top: 0;
   }

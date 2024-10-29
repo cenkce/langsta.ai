@@ -11,27 +11,30 @@ import {
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { classNames } from "@espoojs/utils";
-import { FlashCardData } from "./FlashCardData";
 import styles from "./FlashCard.module.css";
 
 export type FlashCardAction = "learned" | "learn-later";
 
 type FlashCardProps = {
-  word: string;
-  translation: string;
   index: number;
   onAction?: (action: FlashCardAction) => void;
   isFadingOut: boolean;
-} & FlashCardData;
+  kind?: string;
+  word?: string;
+  examples?: Array<Array<string>>;
+  image?: string;
+  translation?: string;
+};
 
 const FlashCard: React.FC<FlashCardProps> = ({
-  word,
-  translation,
-  image,
-  examples,
   index,
   onAction,
   isFadingOut,
+  examples,
+  kind,
+  word,
+  image,
+  translation,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -61,7 +64,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
               {word}
             </Title>
             <Text c="dimmed" size="sm">
-              {translation}
+              {kind}
             </Text>
             {/* <Text mt="md">{description}</Text> */}
           </Card>
@@ -82,20 +85,20 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 </ThemeIcon>
               }
             >
-              {examples?.map((example, index) => (
+              {examples?.map(([example, translation], index) => (
                 <List.Item key={index}>
-                  <Text>{example.example}</Text>
+                  <Text size="sm">{example}</Text>
                   <Text color="dimmed" size="xs">
-                    {example?.translation}
+                    {translation}
                   </Text>
                 </List.Item>
               ))}
             </List>
-            <Stack style={{flexDirection: 'row'}}>
-              <Button mt="md" onClick={() => onAction?.( 'learned' )}>
+            <Stack style={{ flexDirection: "row" }}>
+              <Button mt="md" onClick={() => onAction?.("learned")}>
                 Learned
               </Button>
-              <Button mt="md" onClick={() => onAction?.('learn-later')}>
+              <Button mt="md" onClick={() => onAction?.("learn-later")}>
                 Learn Later
               </Button>
             </Stack>

@@ -16,7 +16,7 @@ export const clearUtmFromUrl = (url?: URL) => {
 
 export const clearHashFromUrl = (url?: URL) => {
   if (!url) {
-    throw "Empty url string provided";
+    throw "Empty url string";
   }
   url.hash = "";
 

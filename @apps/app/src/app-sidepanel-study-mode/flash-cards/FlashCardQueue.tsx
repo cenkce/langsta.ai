@@ -8,13 +8,10 @@ type FlashCardQueueProps = {
   onAction?: (action: FlashCardAction, index: number) => void;
 };
 
-const FlashCardQueue: React.FC<FlashCardQueueProps> = ({
-  data,
-  onAction,
-}) => {
+const FlashCardQueue: React.FC<FlashCardQueueProps> = ({ data, onAction }) => {
   const [queue, setQueue] = useState(data);
   const [fadingOutIndex, setFadingOutIndex] = useState<number | null>(null);
-  
+
   const removeCard = (action: FlashCardAction, index: number) => {
     setFadingOutIndex(index);
     setTimeout(() => {
@@ -24,13 +21,24 @@ const FlashCardQueue: React.FC<FlashCardQueueProps> = ({
     onAction?.(action, index);
   };
 
+  console.log(queue);
+
   return (
     <div style={{ position: "relative", height: "400px" }}>
       {queue.map((card, index) => (
         <FlashCard
+          examples={
+            card.descriptor
+              ? card.descriptor.examples.map((example) => {
+                  const langs = card.descriptor?.langs;
+                  return langs ? langs.map((lang) => example[lang]) : [];
+                })
+              : []
+          }
+          word={card.word}
+          kind={card.descriptor?.kind}
           key={index}
           index={index}
-          {...card}
           onAction={(action) => removeCard(action, index)}
           isFadingOut={index === fadingOutIndex}
         />

@@ -9,6 +9,6 @@ export type FlashCardData = {
   word: string;
   descriptor?: WordDescriptor;
   image?: string;
-  examples: Example[];
+  examples?: string[];
   isLearned?: boolean;
 };
