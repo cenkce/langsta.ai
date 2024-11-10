@@ -12,8 +12,9 @@ import {
 import { IconCheck } from "@tabler/icons-react";
 import { classNames } from "@espoojs/utils";
 import styles from "./FlashCard.module.css";
+import { upperFirst } from "@mantine/hooks";
 
-export type FlashCardAction = "learned" | "learn-later";
+export type FlashCardAction = "learned" | "learn-later" | "next";
 
 type FlashCardProps = {
   index: number;
@@ -24,12 +25,14 @@ type FlashCardProps = {
   examples?: Array<Array<string>>;
   image?: string;
   translation?: string;
+  isLearned?: boolean;
 };
 
 const FlashCard: React.FC<FlashCardProps> = ({
   index,
   onAction,
   isFadingOut,
+  isLearned,
   examples,
   kind,
   word,
@@ -60,11 +63,11 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 <Image src={image} alt={word} height={160} />
               </Card.Section>
             ) : null}
-            <Title order={3} mt="md">
-              {word}
+            <Title order={5} mt="md">
+              {upperFirst(word || "")}
             </Title>
             <Text c="dimmed" size="sm">
-              {kind}
+              {upperFirst(kind || "")}
             </Text>
             {/* <Text mt="md">{description}</Text> */}
           </Card>
@@ -95,12 +98,18 @@ const FlashCard: React.FC<FlashCardProps> = ({
               ))}
             </List>
             <Stack style={{ flexDirection: "row" }}>
-              <Button mt="md" onClick={() => onAction?.("learned")}>
-                Learned
-              </Button>
-              <Button mt="md" onClick={() => onAction?.("learn-later")}>
-                Learn Later
-              </Button>
+              {isLearned ? (
+                <>
+                  <Button mt="md" onClick={() => onAction?.("learned")}>
+                    Learned
+                  </Button>
+                  <Button mt="md" onClick={() => onAction?.("learn-later")}>
+                    Learn Later
+                  </Button>{" "}
+                </>
+              ) :  <Button mt="md" onClick={() => onAction?.("next")}>
+              Next
+            </Button>}
             </Stack>
           </Card>
         </div>

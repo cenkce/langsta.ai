@@ -15,7 +15,6 @@ export const FlashCardsView = () => {
   const cards = useMemo(
     () =>
       Object.entries(mywords)
-        .filter(([word]) => !learnedWords?.some((l) => l === word))
         .map(([word, descriptor]) => {
           return {
             descriptor,
