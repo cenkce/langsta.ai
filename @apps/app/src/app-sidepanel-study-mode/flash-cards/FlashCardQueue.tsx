@@ -11,54 +11,68 @@ type FlashCardQueueProps = {
 };
 
 const FlashCardQueue: React.FC<FlashCardQueueProps> = ({ data, onAction }) => {
-  const unlearnedWords = data.filter((card) => !card.isLearned);
-  const [queue, setQueue] = useState(unlearnedWords);
-  const [fadingOutIndex, setFadingOutIndex] = useState<number | null>(null);
+  // const unlearnedWords = data.filter((card) => !card.isLearned);
+  const wordsToStudy = data
+    .map((desc, i) => (desc.isLearned ? null : i))
+    .filter((val) => val !== null) as number[];
+  const learnedWords = data
+    .map((desc, i) => (!desc.isLearned ? null : i))
+    .filter((val) => val !== null) as number[];
+  const [head, setHead] = useState(0);
+  const [status, setStatus] = useState<"fading" | "idle">("idle");
+  console.log("wordsQueue", head, wordsToStudy, learnedWords);
 
-  const learnedWords = data.filter((card) => card.isLearned);
-
-  const removeCard = (action: FlashCardAction, index: number) => {
-    setFadingOutIndex(index);
-    setTimeout(() => {
-      setQueue(queue.filter((_, i) => i !== index));
-      setFadingOutIndex(null);
-    }, 1000); // 1 second fade-out duration
-    onAction?.(action, index);
+  const removeCard = (action: FlashCardAction, current: number) => {
+    if (action !== "flip") {
+      setStatus("fading");
+      const index = wordsToStudy[current];
+      onAction?.(action, index);
+    }
   };
+  const card = data[wordsToStudy[head]];
 
   return (
     <Box>
       <FlexRow>
         <Box>
           <Box>
-            <Title order={6}>
-              Words to learn ({data.length - learnedWords.length})
-            </Title>
+            <Title order={6}>Words to study ({wordsToStudy.length})</Title>
           </Box>
-          <Box
-            style={{ position: "relative", height: "200px", width: "400px" }}
-          >
-            {queue.map((card, index) => (
+          <Box style={{ position: "relative" }}>
+            {card ? (
               <FlashCard
+                width={500}
+                height={400}
                 examples={
                   card.descriptor
-                    ? card.descriptor.examples.map((example) => {
+                    ? (card.descriptor.examples.map((example) => {
                         const langs = card.descriptor?.langs;
                         return langs ? langs.map((lang) => example[lang]) : [];
-                      })
+                      }) as [string, string][])
                     : []
                 }
                 word={card.word}
+                translation={card.descriptor?.translation}
                 kind={card.descriptor?.kind}
-                key={index}
-                index={index}
-                onAction={(action) => removeCard(action, index)}
-                isFadingOut={index === fadingOutIndex}
+                key={head}
+                onAction={(action) => {
+                  removeCard(action, head);
+                }}
+                onFlipped={() => {
+                  setStatus("idle");
+                }}
+                onFadeOutEnd={() => {
+                  setHead((head) =>
+                    head + 1 > wordsToStudy.length - 1 ? 0 : head + 1,
+                  );
+                  setStatus("idle");
+                }}
+                isFadingOut={status === "fading"}
               />
-            ))}
+            ) : null}
           </Box>
         </Box>
-        <Box>
+        {/* <Box>
           <Title order={6}>Learned words {`${learnedWords.length} / ${queue.length}`} </Title>
           <Box
             style={{ position: "relative", height: "200px", width: "400px" }}
@@ -82,7 +96,7 @@ const FlashCardQueue: React.FC<FlashCardQueueProps> = ({ data, onAction }) => {
               />
             ))}
           </Box>
-        </Box>
+        </Box> */}
       </FlexRow>
     </Box>
   );

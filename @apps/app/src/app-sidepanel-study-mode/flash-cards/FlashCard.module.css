@@ -1,14 +1,19 @@
 .flashcardContainer {
   position: absolute;
-  width: 300px;
+  width: 500px;
   height: 400px;
   perspective: 1000px;
   transition: opacity 0.4s ease;
   z-index: 1;
+  opacity: 0;
 }
 
 .fadeOut {
   opacity: 0;
+}
+
+.fadeIn {
+  opacity: 1;
 }
 
 .flashcard {
@@ -28,6 +33,8 @@
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
+  top: 0;
+  left: 0;
 }
 
 .back {

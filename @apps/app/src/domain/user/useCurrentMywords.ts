@@ -3,11 +3,11 @@ import { useMemo } from "react";
 import { useUserContentState } from "../content/ContentContext.atom";
 import { UsersAtom } from "./UserModel";
 
-export const useCurrentMywords = () => {
+export const useCurrentMywords = (contentUrl?: string) => {
   const [state] = useAtom(UsersAtom);
   const { activeTabUrl = "" } = useUserContentState();
   const mywords = useMemo(
-    () => state.myWords?.[activeTabUrl] || {},
+    () => state.myWords?.[contentUrl || activeTabUrl] || {},
     [state.myWords?.[activeTabUrl]],
   );
 

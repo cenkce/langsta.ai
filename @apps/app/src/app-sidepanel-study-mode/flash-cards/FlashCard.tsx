@@ -1,35 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Image,
   Text,
-  Title,
   List,
   Button,
   ThemeIcon,
   Stack,
+  Center,
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { classNames } from "@espoojs/utils";
-import styles from "./FlashCard.module.css";
+import styles, { flipped } from "./FlashCard.module.css";
 import { upperFirst } from "@mantine/hooks";
+import { FlexRow } from "../../ui/FlexRow";
 
-export type FlashCardAction = "learned" | "learn-later" | "next";
+export type FlashCardAction = "learned" | "learn-later" | "flip";
 
 type FlashCardProps = {
-  index: number;
   onAction?: (action: FlashCardAction) => void;
   isFadingOut: boolean;
   kind?: string;
   word?: string;
-  examples?: Array<Array<string>>;
+  examples?: Array<[string, string]>;
   image?: string;
   translation?: string;
   isLearned?: boolean;
+  width?: number;
+  height?: number;
+  onFadeOutEnd?: () => void;
+  onFlipped?: () => void;
 };
 
 const FlashCard: React.FC<FlashCardProps> = ({
-  index,
   onAction,
   isFadingOut,
   isLearned,
@@ -38,12 +41,55 @@ const FlashCard: React.FC<FlashCardProps> = ({
   word,
   image,
   translation,
+  width,
+  height,
+  onFadeOutEnd,
+  onFlipped,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+    if (!flipped) {
+      setTimeout(() => {
+        setIsFlipped(false);
+        onFlipped?.();
+      }, 1000);
+    }
+    setIsFlipped(true);
+    onAction?.("flip");
   };
+
+  useEffect(() => {
+    // Show card with fade in animation after it's mounted
+    setVisible(true);
+  }, []);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (isFadingOut) {
+      timeout = setTimeout(() => {
+        onFadeOutEnd?.();
+      }, 600);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [isFadingOut]);
+
+  console.log("translation : ", translation);
+
+  const wordElement = (
+    <Center>
+      <FlexRow>
+        <Text fw={600} size="lg">
+          {upperFirst(word || "")}
+        </Text>
+        <Text c="dimmed" size="sm">
+          {upperFirst(kind || "")}
+        </Text>
+      </FlexRow>
+    </Center>
+  );
 
   return (
     <div
@@ -51,65 +97,68 @@ const FlashCard: React.FC<FlashCardProps> = ({
         styles.flashcardContainer,
         isFadingOut,
         styles.fadeOut,
+        visible && !isFadingOut,
+        styles.fadeIn,
       )}
-      style={{ left: `${index * 10}px`, top: `${index * 10}px` }}
+      style={{ width, height }}
       onClick={handleFlip}
     >
       <div className={classNames(styles.flashcard, isFlipped, styles.flipped)}>
         <div className={styles.front}>
-          <Card shadow="sm" padding="lg">
+          <Card shadow="sm" padding="lg" style={{ width, height }}>
             {image ? (
               <Card.Section>
                 <Image src={image} alt={word} height={160} />
               </Card.Section>
             ) : null}
-            <Title order={5} mt="md">
-              {upperFirst(word || "")}
-            </Title>
-            <Text c="dimmed" size="sm">
-              {upperFirst(kind || "")}
-            </Text>
-            {/* <Text mt="md">{description}</Text> */}
+            {wordElement}
+            <FlashCardExamples showTranslation={false} examples={examples} />
           </Card>
         </div>
         <div className={styles.back}>
-          <Card shadow="sm" padding="lg">
-            <Title order={3} mt="md">
-              {translation}
-            </Title>
-            <List
-              mt="md"
-              spacing="xs"
-              size="sm"
-              center
-              icon={
-                <ThemeIcon color="teal" size={24} radius="xl">
-                  <IconCheck size={16} />
-                </ThemeIcon>
-              }
+          <Card
+            shadow="sm"
+            padding="lg"
+            style={{ width, height, position: "relative" }}
+          >
+            {wordElement}
+            <Center>
+              <Text size="md" mt="md">
+                {upperFirst(translation || "")}
+              </Text>
+            </Center>
+            <FlashCardExamples examples={examples} />
+            <Stack
+              style={{
+                flexDirection: "row",
+                position: "absolute",
+                bottom: 20,
+                justifyContent: "center",
+                width: "100%"
+              }}
             >
-              {examples?.map(([example, translation], index) => (
-                <List.Item key={index}>
-                  <Text size="sm">{example}</Text>
-                  <Text color="dimmed" size="xs">
-                    {translation}
-                  </Text>
-                </List.Item>
-              ))}
-            </List>
-            <Stack style={{ flexDirection: "row" }}>
-              {isLearned ? (
+              {isFlipped ? (
                 <>
-                  <Button mt="md" onClick={() => onAction?.("learned")}>
+                  <Button
+                    disabled={isLearned}
+                    mt="md"
+                    onClick={() => onAction?.("learned")}
+                  >
                     Learned
                   </Button>
-                  <Button mt="md" onClick={() => onAction?.("learn-later")}>
-                    Learn Later
+                  <Button
+                    disabled={isLearned}
+                    mt="md"
+                    onClick={() => onAction?.("learn-later")}
+                  >
+                    Study more
                   </Button>{" "}
                 </>
-              ) :  <Button mt="md" onClick={() => onAction?.("next")}>
-              Next
-            </Button>}
+              ) : (
+                <Button mt="md" onClick={handleFlip}>
+                  Flip
+                </Button>
+              )}
             </Stack>
           </Card>
         </div>
@@ -117,5 +166,28 @@ const FlashCard: React.FC<FlashCardProps> = ({
     </div>
   );
 };
+
+const FlashCardExamples: React.FC<{ examples?: Array<[string, string]>, showTranslation?: boolean }> = ({ examples, showTranslation }) => (
+  <List
+    mt="md"
+    spacing="xs"
+    size="sm"
+    center
+    icon={
+      <ThemeIcon color="teal" size={24} radius="xl">
+        <IconCheck size={16} />
+      </ThemeIcon>
+    }
+  >
+    {examples?.map(([example, translation], index) => (
+      <List.Item key={index}>
+        <Text size="sm">{example}</Text>
+        <Text color="dimmed" size="xs">
+          {showTranslation !== false ? translation : ""}
+        </Text>
+      </List.Item>
+    ))}
+  </List>
+);
 
 export default FlashCard;

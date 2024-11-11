@@ -2,40 +2,37 @@ import { useAtom } from "@espoojs/atom";
 import FlashCardQueue from "./FlashCardQueue";
 import { UsersAtom } from "../../domain/user/UserModel";
 import { FlashCardData } from "./FlashCardData";
-import { useUserContentState } from "../../domain/content/ContentContext.atom";
 import { useMemo } from "react";
 import { useCurrentMywords } from "../../domain/user/useCurrentMywords";
 
-export const FlashCardsView = () => {
+export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
   const [, setUserContent] = useAtom(UsersAtom);
-  const { activeTabUrl = "" } = useUserContentState();
-  console.log("activeTabUrl", activeTabUrl);
-  const { mywords, learnedWords } = useCurrentMywords();
+  const { mywords, learnedWords } = useCurrentMywords(contentUrl);
 
   const cards = useMemo(
     () =>
-      Object.entries(mywords)
-        .map(([word, descriptor]) => {
-          return {
-            descriptor,
-            image: "",
-            word: word || '',
-            isLearned: learnedWords?.some((l) => l === word),
-          } as FlashCardData;
-        }),
-    [],
+      Object.entries(mywords).map(([word, descriptor]) => {
+        return {
+          descriptor,
+          image: "",
+          word: word || "",
+          isLearned: learnedWords?.some((l) => l === word),
+        } as FlashCardData;
+      }),
+    [mywords, learnedWords],
   );
 
   return (
     <FlashCardQueue
       data={cards}
       onAction={(action, index) => {
-        if (activeTabUrl && action === "learned")
+        if (contentUrl && action === "learned") {
           setUserContent({
             learnedWords: {
-              [activeTabUrl]: [...learnedWords, cards[index].word],
+              [contentUrl]: [...learnedWords, cards[index].word],
             },
           });
+        }
       }}
       learnedWords={learnedWords}
     />

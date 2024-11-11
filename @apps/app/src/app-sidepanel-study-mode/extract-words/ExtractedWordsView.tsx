@@ -3,19 +3,19 @@ import { WordsCollection } from "../../domain/user/WordDescriptor";
 import { Group, Flex, Loader, Text } from "@mantine/core";
 import { UsersAtom } from "../../domain/user/UserModel";
 import { useAtom } from "@espoojs/atom";
-import { useUserContentState } from "../../domain/content/ContentContext.atom";
 import { useCurrentMywords } from "../../domain/user/useCurrentMywords";
 
 export const ExtractedWordsView = ({
   words = {},
   loading,
+  contentUrl
 }: {
   words?: WordsCollection;
   loading?: boolean;
+  contentUrl: string;
 }) => {
   const [, setUserContent] = useAtom(UsersAtom, { noStateUpdate: true });
-  const { activeTabUrl = "" } = useUserContentState();
-  const { mywords } = useCurrentMywords();
+  const { mywords } = useCurrentMywords(contentUrl);
 
   return (
     <>
@@ -30,14 +30,14 @@ export const ExtractedWordsView = ({
               key={word}
               isSaved={mywords[word] !== undefined}
               onMenuClick={(action) => {
-                if (action === "save") {
+                if (action === "save" && contentUrl) {
                   setUserContent((state) => {
                     // const myWords = new Map(state.myWords);
                     // myWords.set(word, item[word]);
                     return {
                       myWords: {
-                        [activeTabUrl]: {
-                          ...(state.myWords?.[activeTabUrl] || {}),
+                        [contentUrl]: {
+                          ...(state.myWords?.[contentUrl] || {}),
                           [word]: descriptor,
                         },
                       },

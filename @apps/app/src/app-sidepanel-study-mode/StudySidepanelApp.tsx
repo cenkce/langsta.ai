@@ -460,14 +460,15 @@ const NotebookReader = (props: {
         ) : null}
         {selectedStudyAction === "words" ? (
           <ExtractedWordsView
+            contentUrl={contentUrl}
             words={getWords(
               studyState[contentUrl]?.[selectedStudyAction] || "",
             )}
             loading={taskStatus === "progress"}
           />
         ) : null}
-        {selectedStudyAction === "crosswords" ? <CrosswordsView /> : null}
-        {selectedStudyAction === "flashcards" ? <FlashCardsView /> : null}
+        {selectedStudyAction === "crosswords" ? <CrosswordsView contentUrl={contentUrl} /> : null}
+        {selectedStudyAction === "flashcards" ? <FlashCardsView contentUrl={contentUrl} /> : null}
       </main>
     </div>
   );
@@ -478,6 +479,7 @@ const useWordsStream = () => {
 
   const { mywords } = useCurrentMywords();
   const parse = (content: string) => {
+    console.log("Parsing words", content);
     const result: WordsCollection | undefined = content
       ?.split("\n")
       .reduce<WordsCollection>((acc, line) => {
@@ -486,7 +488,7 @@ const useWordsStream = () => {
 
         const examplesCollection = examples.reduce<WordDescriptor["examples"]>(
           (acc, example) => {
-            const [lang, translation] = example.split("#");
+            const [lang, translation] = example.split("#") || [];
             if (lang === targetLanguage) acc.push({ [lang]: translation });
             else if (lang) acc[acc.length - 1][lang] = translation;
             if (!lang) {
