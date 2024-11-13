@@ -1,9 +1,11 @@
 import { useAtom } from "@espoojs/atom";
-import FlashCardQueue from "./FlashCardQueue";
+import FlashCardsDeck from "./FlashCardsDeck";
 import { UsersAtom } from "../../domain/user/UserModel";
 import { FlashCardData } from "./FlashCardData";
 import { useMemo } from "react";
 import { useCurrentMywords } from "../../domain/user/useCurrentMywords";
+import { TabContainer } from "../../ui/TabContainer";
+// import { content } from "../../ui/TabContainer.module.scss";
 
 export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
   const [, setUserContent] = useAtom(UsersAtom);
@@ -22,19 +24,57 @@ export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
     [mywords, learnedWords],
   );
 
+
   return (
-    <FlashCardQueue
-      data={cards}
-      onAction={(action, index) => {
-        if (contentUrl && action === "learned") {
-          setUserContent({
-            learnedWords: {
-              [contentUrl]: [...learnedWords, cards[index].word],
+    <TabContainer
+      orientation="horizontal"
+      tabs={[
+        {
+          button: "Words to Study",
+          component: FlashCardsDeck,
+          id: "Words to Study",
+          title: `Words to Study (${cards.length - learnedWords?.length || 0})`,
+          props: {
+            shouldAddData(data) {
+              return !data.isLearned;
             },
-          });
-        }
-      }}
-      learnedWords={learnedWords}
+            data: cards,
+            onAction: (action, index) => {
+              if (contentUrl && action === "learned") {
+                // eslint-disable-next-line no-debugger
+                setUserContent((state) => ({
+                  ...state,
+                  learnedWords: {
+                    [contentUrl]: [
+                      ...(state.learnedWords?.[contentUrl] || []),
+                      cards[index].word,
+                    ],
+                  },
+                }));
+              }
+            },
+          },
+        },
+        {
+          button: "Learned Words",
+          component: FlashCardsDeck,
+          id: "Learned Words",
+          title: `Learned Words (${learnedWords?.length || 0})`,
+          props: {
+            data: cards.filter((card) => card.isLearned),
+            // onAction: (action, index) => {
+            // if (contentUrl && action === "learned") {
+            //   setUserContent({
+            //     learnedWords: {
+            //       [contentUrl]: [...learnedWords, cards[index].word],
+            //     },
+            //   });
+
+            // }
+            // },
+          },
+        },
+      ]}
     />
   );
 };

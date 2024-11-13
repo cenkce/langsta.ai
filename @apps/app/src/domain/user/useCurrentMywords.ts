@@ -5,15 +5,18 @@ import { UsersAtom } from "./UserModel";
 
 export const useCurrentMywords = (contentUrl?: string) => {
   const [state] = useAtom(UsersAtom);
+
   const { activeTabUrl = "" } = useUserContentState();
+  const url = contentUrl || activeTabUrl;
+  
   const mywords = useMemo(
-    () => state.myWords?.[contentUrl || activeTabUrl] || {},
-    [state.myWords?.[activeTabUrl]],
+    () => state.myWords?.[url] || {},
+    [state.myWords?.[url]],
   );
 
   const learnedWords = useMemo(
-    () => state.learnedWords?.[activeTabUrl] || [],
-    [state.learnedWords?.[activeTabUrl]],
+    () => state.learnedWords?.[url] || [],
+    [state.learnedWords?.[url]],
   );
 
   return {mywords, learnedWords};

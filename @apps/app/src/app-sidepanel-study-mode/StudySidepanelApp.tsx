@@ -417,7 +417,7 @@ const NotebookReader = (props: {
     });
   };
 
-  const getWords = useWordsStream();
+  const getWords = useWordsStream(contentUrl);
   return (
     <div ref={scrollContainerRef} className={styles.container}>
       <section className={styles.studyActionsContainer}>
@@ -474,10 +474,10 @@ const NotebookReader = (props: {
   );
 };
 
-const useWordsStream = () => {
+const useWordsStream = (contentUrl: string) => {
   const [{ targetLanguage, nativelanguage }] = useAtom(SettingsAtom);
 
-  const { mywords } = useCurrentMywords();
+  const { mywords } = useCurrentMywords(contentUrl);
   const parse = (content: string) => {
     console.log("Parsing words", content);
     const result: WordsCollection | undefined = content
@@ -485,33 +485,38 @@ const useWordsStream = () => {
       .reduce<WordsCollection>((acc, line) => {
         // |word|translation|kind|examples|
         const [word, translation, kind, ...examples] = line.trim().split("|");
-
-        const examplesCollection = examples.reduce<WordDescriptor["examples"]>(
-          (acc, example) => {
-            const [lang, translation] = example.split("#") || [];
-            if (lang === targetLanguage) acc.push({ [lang]: translation });
-            else if (lang) acc[acc.length - 1][lang] = translation;
-            if (!lang) {
-              console.error("Empty lang field", example, acc);
-            }
-            return acc;
-          },
-          [],
-        );
-        acc = {
-          ...acc,
-          [word]: {
-            translation,
-            kind,
-            langs:
-              targetLanguage && nativelanguage
-                ? [targetLanguage, nativelanguage]
-                : [],
-            examples: examplesCollection,
-          },
-        };
-
-        return acc;
+        try {
+          const examplesCollection = examples.reduce<WordDescriptor["examples"]>(
+            (acc, example) => {
+              const [lang, translation] = example.split("#") || [];
+              if (lang === targetLanguage) acc.push({ [lang]: translation });
+              else if (lang) acc[acc.length - 1][lang] = translation;
+              if (!lang) {
+                console.error("Empty lang field", example, acc);
+              }
+              return acc;
+            },
+            [],
+          );
+          acc = {
+            ...acc,
+            [word]: {
+              translation,
+              kind,
+              langs:
+                targetLanguage && nativelanguage
+                  ? [targetLanguage, nativelanguage]
+                  : [],
+              examples: examplesCollection,
+            },
+          };
+  
+          return acc;
+        } catch (error) {
+          console.error("Error parsing word", error);
+          return acc;
+        }
+        
       }, {});
     return result;
   };

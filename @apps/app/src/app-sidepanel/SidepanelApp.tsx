@@ -22,7 +22,7 @@ export const SidepanelApp = () => {
       <div className={styles.container}>
         <TabContainer
           className={"p-0 #important"}
-          content={[
+          tabs={[
             {
               id: "1",
               component: PageTranslations,

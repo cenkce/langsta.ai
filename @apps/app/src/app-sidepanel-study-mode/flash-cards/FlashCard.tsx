@@ -76,8 +76,6 @@ const FlashCard: React.FC<FlashCardProps> = ({
     return () => clearTimeout(timeout);
   }, [isFadingOut]);
 
-  console.log("translation : ", translation);
-
   const wordElement = (
     <Center>
       <FlexRow>
