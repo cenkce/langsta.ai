@@ -13,8 +13,8 @@ export default defineManifest(async (env) => ({
   manifest_version: 3,
   name:
     env.mode === "staging"
-      ? "[INTERNAL] Wordster Extension"
-      : "Wordster Extension",
+      ? "[INTERNAL] Langsta Extension"
+      : "Langsta Extension",
   // up to four numbers separated by dots
   version: `${major}.${minor}.${patch}.${label}`,
   // semver is OK in "version_name"
