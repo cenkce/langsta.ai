@@ -35,19 +35,16 @@ export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
           id: "Words to Study",
           title: `Words to Study (${cards.length - learnedWords?.length || 0})`,
           props: {
-            shouldAddData(data) {
-              return !data.isLearned;
-            },
-            data: cards,
-            onAction: (action, index) => {
+            data: cards.filter((card) => !card.isLearned),
+            onAction: (action, word) => {
               if (contentUrl && action === "learned") {
-                // eslint-disable-next-line no-debugger
                 setUserContent((state) => ({
                   ...state,
                   learnedWords: {
+                    ...state.learnedWords,
                     [contentUrl]: [
                       ...(state.learnedWords?.[contentUrl] || []),
-                      cards[index].word,
+                      word,
                     ],
                   },
                 }));

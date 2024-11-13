@@ -32,10 +32,10 @@ export const ExtractedWordsView = ({
               onMenuClick={(action) => {
                 if (action === "save" && contentUrl) {
                   setUserContent((state) => {
-                    // const myWords = new Map(state.myWords);
-                    // myWords.set(word, item[word]);
                     return {
+                      ...state,
                       myWords: {
+                        ...state.myWords,
                         [contentUrl]: {
                           ...(state.myWords?.[contentUrl] || {}),
                           [word]: descriptor,

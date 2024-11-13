@@ -5,7 +5,6 @@ import { UsersAtom } from "./UserModel";
 
 export const useCurrentMywords = (contentUrl?: string) => {
   const [state] = useAtom(UsersAtom);
-
   const { activeTabUrl = "" } = useUserContentState();
   const url = contentUrl || activeTabUrl;
   

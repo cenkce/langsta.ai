@@ -121,7 +121,6 @@ export const SidepanelApp = () => {
 
   return !selectedNote ? (
     <Flex gap={"md"} p={"md"} wrap={"wrap"}>
-      {" "}
       {Object.entries(notes).map(([url, content]) => {
         return (
           <NoteCard
@@ -287,7 +286,6 @@ const NotebookReader = (props: {
   );
 
   const isDisabled = taskStatus === "progress";
-  // const [CompID] = useState(() => ++ID);
 
   const { simplify, summarise, extractWords } = useTranslateService();
 
@@ -479,7 +477,6 @@ const useWordsStream = (contentUrl: string) => {
 
   const { mywords } = useCurrentMywords(contentUrl);
   const parse = (content: string) => {
-    console.log("Parsing words", content);
     const result: WordsCollection | undefined = content
       ?.split("\n")
       .reduce<WordsCollection>((acc, line) => {

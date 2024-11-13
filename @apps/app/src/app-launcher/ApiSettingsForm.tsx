@@ -21,7 +21,6 @@ export const ApiSettingsForm = () => {
       apiKey: (value) => !!value?.trim()?.length,
     },
     onValuesChange: (values) => {
-      console.log("values", values);
       setSettings(values);
     },
   });

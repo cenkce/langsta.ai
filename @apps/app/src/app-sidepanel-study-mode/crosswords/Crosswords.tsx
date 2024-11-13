@@ -49,7 +49,6 @@ const CrosswordGrid: React.FC<{
     return layout.result
       .filter((res) => {
         if (res.orientation === "across") {
-          console.log(res.starty, y);
           return (
             res.startx <= x &&
             res.starty === y &&

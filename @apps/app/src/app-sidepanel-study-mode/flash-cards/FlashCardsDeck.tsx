@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import FlashCard, { FlashCardAction } from "./FlashCard";
 import { FlashCardData } from "./FlashCardData";
 import { ActionIcon, Box, Center, Title } from "@mantine/core";
@@ -7,17 +7,24 @@ import { ArrowLeft, ArrowRight } from "react-feather";
 type FlashCardsDeckProps = {
   data: FlashCardData[];
   learnedWords?: string[];
-  onAction?: (action: FlashCardAction, index: number) => void;
-  shouldAddData?: (data: FlashCardData) => boolean;
+  onAction?: (action: FlashCardAction, word: string) => void;
   header?: string;
 };
 
 const FlashCardsDeck: React.FC<FlashCardsDeckProps> = ({
   data,
   onAction,
-  shouldAddData,
   header,
 }) => {
+  const [cardsDict, words] = useMemo(() => {
+    const dict = data.reduce<Record<string, FlashCardData>>((acc, d) => {
+      acc[d.word] = d;
+      return acc;
+    }, {});
+
+    return [dict, Object.keys(dict)];
+  }, [data]);
+
   const prev = () => {
     setHead((head) => (head - 1 < 0 ? words.length - 1 : head - 1));
   };
@@ -26,22 +33,17 @@ const FlashCardsDeck: React.FC<FlashCardsDeckProps> = ({
     setHead((head) => (head + 1 > words.length - 1 ? 0 : head + 1));
   };
 
-  const words = shouldAddData
-    ? data
-        .map((desc, i) => (shouldAddData(desc) ? i : null))
-        .filter((val) => val !== null)
-    : data.map((_, i) => i);
   const [head, setHead] = useState(0);
   const [status, setStatus] = useState<"fading" | "idle">("idle");
 
   const removeCard = (action: FlashCardAction, current: number) => {
     if (action !== "flip") {
       setStatus("fading");
-      const index = words[current];
-      onAction?.(action, index);
+      const word = words[current];
+      onAction?.(action, word);
     }
   };
-  const card = data[words[head]];
+  const card = cardsDict[words[head]];
   const width = 500;
   const height = 400;
 
