@@ -75,14 +75,19 @@
 .clues-list ul {
   list-style: none;
   padding: 0;
+  box-sizing: content-box;
 }
 
 .clues-list li {
   margin-bottom: 5px;
+  border-radius: 0.25em;
+  box-sizing: content-box;
 }
 
 .highlighted {
-  background-color: --mn;
   background-color: var(--mantine-primary-color-light-hover);
+}
 
+.focused {
+  border: thin solid var(--mantine-primary-color-6);
 }
