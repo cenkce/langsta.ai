@@ -48,16 +48,16 @@ export default defineManifest(async (env) => ({
     },
   ],
   icons: {
-    "16": "logo.png",
-    "48": "logo.png",
-    "128": "logo.png",
+    "16": "logo/logo16.png",
+    "48": "logo/logo48.png",
+    "128": "logo/logo128.png",
   },
   action: {
     default_popup: "index.html",
     default_icon: {
-      "16": "logo.png",
-      "32": "logo.png",
-      "24": "logo.png",
+      "16": "logo/logo16.png",
+      "32": "logo/logo32.png",
+      "24": "logo/logo24.png",
     },
   },
 }));

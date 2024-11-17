@@ -4,4 +4,4 @@ Langsta is an assistant application for self-taught language learners. It is cur
 
 Its current status is under development.
 
-### Powered by AI :D:D
+### Powered by AI

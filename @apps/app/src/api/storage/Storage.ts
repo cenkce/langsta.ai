@@ -20,27 +20,9 @@ type StorageAddListener = Parameters<
 type StorageAddListenerCallback = StorageAddListener[0];
 export type AreaName = Parameters<StorageAddListenerCallback>[1];
 
-// type Length<T extends any[]> =
-//   T extends { length: infer L } ? L : never;
-
-// type BuildTuple<L extends number, T extends any[] = []> =
-//   T extends { length: L } ? T : BuildTuple<L, [...T, any]>;
-// type Tt = Length<BuildTuple<3>>
-
 type Tuples<T extends Collection> = T extends Collection<infer K, infer V>
   ? [K, V]
   : [];
-
-// type MergeUnion<
-//   Arr extends {[k: string]: any},
-//   Result extends {[k: string]: any} = {[k: string]: any},
-//   Index extends number[] = []
-//   > =
-//   Arr extends []
-//   ? Result
-//   : Arr extends [infer Key, infer Value, ...infer Tail]
-//   ? MergeUnion<[...Tail], Result | {[K in keyof Key]: Value}, [...Index, 2]>
-//   : Readonly<Result>;
 
 export abstract class Storage<
   StateT extends Collection = Collection,
@@ -51,7 +33,7 @@ export abstract class Storage<
     (param: Changes) => void,
     StorageAddListenerCallback
   > = new WeakMap();
-  private handlers = new Set<(param: Changes) => void>()
+  private handlers = new Set<(param: Changes) => void>();
 
   constructor() {
     // this.getStorageInstance().clear();
@@ -59,28 +41,30 @@ export abstract class Storage<
 
   write = async (...params: U): Promise<void> => {
     const state = await this.getState();
-    return this.getStorageInstance().set({ [this.getStorageName()]: {
-      ...state,
-      [params[0]]: params[1]
-    } });
+    const update = { [params[0]]: params[1] };
+    return this.getStorageInstance().set({
+      [this.getStorageName()]: {
+        ...state,
+        ...update,
+      },
+    });
   };
 
   load = async (params: StateT): Promise<void> => {
-    if(!(this.getStorageName() in params))
-      return this.getStorageInstance().set({[this.getStorageName()]: params});
+    if (!(this.getStorageName() in params))
+      return this.getStorageInstance().set({ [this.getStorageName()]: params });
   };
 
   read = async <M extends Tuples<Required<StateT>>[0]>(key: M) => {
-    const data = await this.getStorageInstance()
-      .get(this.getStorageName());
+    const data = await this.getStorageInstance().get(this.getStorageName());
     return data[this.getStorageName()][key];
   };
 
-  getState(): Promise<StateT>  {
+  getState(): Promise<StateT> {
     return this.getStorageInstance()
       .get(this.getStorageName())
       .then((data) => {
-        return data[this.getStorageName()]
+        return data[this.getStorageName()];
       });
   }
 
@@ -105,25 +89,25 @@ export abstract class Storage<
   protected abstract getStoragAreaName(): AreaName;
 
   /**
-   * 
+   *
    * Refurns a storage instance
    */
   protected abstract getStorageInstance(): chrome.storage.StorageArea;
 
   /**
-   * 
+   *
    * Return storage name
    */
   protected abstract getStorageName(): string;
 
   /**
-   * 
+   *
    * In order to filter out the result
    */
   protected abstract checkValidData(changes: Changes): boolean;
 
   dispose() {
-    for(const handler of this.handlers){
+    for (const handler of this.handlers) {
       this.unsubscribe(handler);
     }
   }
