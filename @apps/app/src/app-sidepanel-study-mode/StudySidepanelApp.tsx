@@ -465,8 +465,12 @@ const NotebookReader = (props: {
             loading={taskStatus === "progress"}
           />
         ) : null}
-        {selectedStudyAction === "crosswords" ? <CrosswordsView contentUrl={contentUrl} /> : null}
-        {selectedStudyAction === "flashcards" ? <FlashCardsView contentUrl={contentUrl} /> : null}
+        {selectedStudyAction === "crosswords" ? (
+          <CrosswordsView contentUrl={contentUrl} />
+        ) : null}
+        {selectedStudyAction === "flashcards" ? (
+          <FlashCardsView contentUrl={contentUrl} />
+        ) : null}
       </main>
     </div>
   );
@@ -483,18 +487,18 @@ const useWordsStream = (contentUrl: string) => {
         // |word|translation|kind|examples|
         const [word, translation, kind, ...examples] = line.trim().split("|");
         try {
-          const examplesCollection = examples.reduce<WordDescriptor["examples"]>(
-            (acc, example) => {
-              const [lang, translation] = example.split("#") || [];
-              if (lang === targetLanguage) acc.push({ [lang]: translation });
-              else if (lang) acc[acc.length - 1][lang] = translation;
-              if (!lang) {
-                console.error("Empty lang field", example, acc);
-              }
-              return acc;
-            },
-            [],
-          );
+          const examplesCollection = examples.reduce<
+            WordDescriptor["examples"]
+          >((acc, example) => {
+            const [lang, translation] = example.split("#") || [];
+            if (lang === targetLanguage) acc.push({ [lang]: translation });
+            else if (lang) acc[acc.length - 1][lang] = translation;
+            if (!lang) {
+              console.error("Empty lang field", example, acc);
+            }
+            return acc;
+          }, []);
+
           acc = {
             ...acc,
             [word]: {
@@ -507,13 +511,12 @@ const useWordsStream = (contentUrl: string) => {
               examples: examplesCollection,
             },
           };
-  
+
           return acc;
         } catch (error) {
           console.error("Error parsing word", error);
           return acc;
         }
-        
       }, {});
     return result;
   };

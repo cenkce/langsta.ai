@@ -90,4 +90,13 @@
 
 .focused {
   border: thin solid var(--mantine-primary-color-6);
+  background-color: var(--mantine-primary-color-2);
+}
+
+.matched {
+  text-decoration: line-through;
+}
+
+.notMatched {
+  background-color: var(--mantine-color-red) !important;
 }
