@@ -45,13 +45,13 @@ const StudyModeSettings = () => {
       >
         Open Study Panel
       </Button>
-      <Button
+      {/* <Button
         onClick={() => {
           chrome.tabs.create({ url: chrome.runtime.getURL("sidepanel-study-mode.html") });
         }}
       >
         Open Standalone
-      </Button>
+      </Button> */}
     </div>
   );
 };

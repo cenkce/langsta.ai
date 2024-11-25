@@ -37,7 +37,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        sidepanel: resolve(__dirname, "sidepanel.html"),
+        // sidepanel: resolve(__dirname, "sidepanel.html"),
         "sidepanel-study-mode.html": resolve(__dirname, "sidepanel-study-mode.html")
       },
     },

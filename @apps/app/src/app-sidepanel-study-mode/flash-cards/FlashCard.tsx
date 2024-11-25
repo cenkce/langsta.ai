@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 import { classNames } from "@espoojs/utils";
-import styles, { flipped } from "./FlashCard.module.css";
+import styles from "./FlashCard.module.css";
 import { upperFirst } from "@mantine/hooks";
 import { FlexRow } from "../../ui/FlexRow";
 
@@ -50,7 +50,7 @@ const FlashCard: React.FC<FlashCardProps> = ({
   const [visible, setVisible] = useState(false);
 
   const handleFlip = () => {
-    if (!flipped) {
+    if (!isFlipped) {
       setTimeout(() => {
         setIsFlipped(false);
         onFlipped?.();

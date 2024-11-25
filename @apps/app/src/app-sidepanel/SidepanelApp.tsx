@@ -37,13 +37,13 @@ export const SidepanelApp = () => {
               title: "Show translations only from the current domain.",
               props: {},
             },
-            {
-              id: "3",
-              component: Translations,
-              button: "All",
-              title: "Show translations only from the current domain.",
-              props: {},
-            },
+            // {
+            //   id: "3",
+            //   component: Translations,
+            //   button: "All",
+            //   title: "Show translations only from the current domain.",
+            //   props: {},
+            // },
           ]}
         />
       </div>

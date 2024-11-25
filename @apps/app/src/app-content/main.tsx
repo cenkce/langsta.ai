@@ -3,7 +3,6 @@ import { parseTabPageContent } from "./parseTabPageContent";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { ContentApp } from "./ContentApp";
-import { MantineCommonProvider } from "../app-common";
 import { ContentContextAtom } from "../domain/content/ContentContext.atom";
 import { sanitizeUtmUrl } from "@espoojs/utils";
 // import { ContentContextAtom } from "../domain/content/ContentContext.atom";
@@ -30,9 +29,9 @@ export function initializeApplication() {
 
   ReactDOM.createRoot(container).render(
     <React.StrictMode>
-      <MantineCommonProvider>
+      {/* <MantineCommonProvider> */}
         <ContentApp />
-      </MantineCommonProvider>
+      {/* </MantineCommonProvider> */}
     </React.StrictMode>,
   );
 }
