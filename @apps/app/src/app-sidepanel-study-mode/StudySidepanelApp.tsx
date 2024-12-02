@@ -416,6 +416,7 @@ const NotebookReader = (props: {
   };
 
   const getWords = useWordsStream(contentUrl);
+
   return (
     <div ref={scrollContainerRef} className={styles.container}>
       <section className={styles.studyActionsContainer}>

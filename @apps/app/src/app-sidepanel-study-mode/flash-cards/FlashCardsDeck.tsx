@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import FlashCard, { FlashCardAction } from "./FlashCard";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import FlashCard, { FlashCardAction, FlashCardAnimState } from "./FlashCard";
 import { FlashCardData } from "./FlashCardData";
 import { ActionIcon, Box, Center, Title } from "@mantine/core";
 import { ArrowLeft, ArrowRight } from "react-feather";
@@ -8,6 +8,7 @@ type FlashCardsDeckProps = {
   data: FlashCardData[];
   learnedWords?: string[];
   onAction?: (action: FlashCardAction, word: string) => void;
+  actions?: FlashCardAction[];
   header?: string;
 };
 
@@ -15,6 +16,7 @@ const FlashCardsDeck: React.FC<FlashCardsDeckProps> = ({
   data,
   onAction,
   header,
+  actions,
 }) => {
   const [cardsDict, words] = useMemo(() => {
     const dict = data.reduce<Record<string, FlashCardData>>((acc, d) => {
@@ -25,27 +27,38 @@ const FlashCardsDeck: React.FC<FlashCardsDeckProps> = ({
     return [dict, Object.keys(dict)];
   }, [data]);
 
+  const [head, setHead] = useState(0);
+
   const prev = () => {
-    setHead((head) => (head - 1 < 0 ? words.length - 1 : head - 1));
+    if (words.length) setHead(head - 1 < 1 ? words.length : head - 1);
+    else setHead(0);
+    setAnimState("idle");
   };
 
   const next = () => {
-    setHead((head) => (head + 1 > words.length - 1 ? 0 : head + 1));
+    if (words.length) setHead(head + 1 > words.length ? 1 : head + 1);
+    else setHead(0);
+    setAnimState("idle");
   };
 
-  const [head, setHead] = useState(0);
-  const [status, setStatus] = useState<"fading" | "idle">("idle");
-
-  const removeCard = (action: FlashCardAction, current: number) => {
-    if (action !== "flip") {
-      setStatus("fading");
-      const word = words[current];
-      onAction?.(action, word);
-    }
-  };
-  const card = cardsDict[words[head]];
+  const card = cardsDict[words[Math.max(head - 1, 0)]];
   const width = 500;
   const height = 400;
+  const [animState, setAnimState] = useState<FlashCardAnimState>("idle");
+  const nextActionRef = useRef<FlashCardAction | null>(null);
+
+  useEffect(() => {
+    if (animState === "fadedOut") {
+      if (nextActionRef.current) {
+        onAction?.(nextActionRef.current, card.word);
+        setAnimState("idle");
+      }
+    }
+  }, [animState]);
+
+  useEffect(() => {
+    if (words.length) next();
+  }, [words.length]);
 
   return (
     <Box>
@@ -56,7 +69,7 @@ const FlashCardsDeck: React.FC<FlashCardsDeckProps> = ({
         <ActionIcon onClick={() => prev()} size="compact-xs">
           <ArrowLeft />
         </ActionIcon>{" "}
-        {head + 1} / {words.length}
+        {head} / {words.length}
         <ActionIcon size="compact-xs" onClick={() => next()}>
           <ArrowRight />
         </ActionIcon>
@@ -79,16 +92,14 @@ const FlashCardsDeck: React.FC<FlashCardsDeckProps> = ({
             kind={card.descriptor?.kind}
             key={head}
             onAction={(action) => {
-              removeCard(action, head);
+              nextActionRef.current = action;
+              setAnimState("fading");
             }}
-            onFlipped={() => {
-              setStatus("idle");
+            actions={actions}
+            onAnimStateChange={(state) => {
+              setAnimState(state);
             }}
-            onFadeOutEnd={() => {
-              next();
-              setStatus("idle");
-            }}
-            isFadingOut={status === "fading"}
+            animState={animState}
           />
         ) : null}
       </Box>

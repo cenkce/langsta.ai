@@ -15,11 +15,21 @@ import styles from "./FlashCard.module.css";
 import { upperFirst } from "@mantine/hooks";
 import { FlexRow } from "../../ui/FlexRow";
 
-export type FlashCardAction = "learned" | "learn-later" | "flip";
+export type FlashCardAnimState =
+  | "idle"
+  | "flipping"
+  | "flipEnded"
+  | "fading"
+  | "fadedOut";
+
+export type FlashCardAction =
+  | "learned"
+  | "learn-later"
+  | "flip"
+  | (string & {});
 
 type FlashCardProps = {
   onAction?: (action: FlashCardAction) => void;
-  isFadingOut: boolean;
   kind?: string;
   word?: string;
   examples?: Array<[string, string]>;
@@ -28,13 +38,15 @@ type FlashCardProps = {
   isLearned?: boolean;
   width?: number;
   height?: number;
-  onFadeOutEnd?: () => void;
-  onFlipped?: () => void;
+  animState?: FlashCardAnimState;
+  onAnimStateChange: (state: FlashCardAnimState) => void;
+  actions?: string[];
 };
+
+const FadeOutDuration = 600;
 
 const FlashCard: React.FC<FlashCardProps> = ({
   onAction,
-  isFadingOut,
   isLearned,
   examples,
   kind,
@@ -43,21 +55,14 @@ const FlashCard: React.FC<FlashCardProps> = ({
   translation,
   width,
   height,
-  onFadeOutEnd,
-  onFlipped,
+  onAnimStateChange,
+  actions,
+  animState
 }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
   const [visible, setVisible] = useState(false);
 
   const handleFlip = () => {
-    if (!isFlipped) {
-      setTimeout(() => {
-        setIsFlipped(false);
-        onFlipped?.();
-      }, 1000);
-    }
-    setIsFlipped(true);
-    onAction?.("flip");
+    onAnimStateChange("flipping");
   };
 
   useEffect(() => {
@@ -67,14 +72,20 @@ const FlashCard: React.FC<FlashCardProps> = ({
 
   useEffect(() => {
     let timeout: NodeJS.Timeout;
-    if (isFadingOut) {
+    if (animState === "flipping") {
       timeout = setTimeout(() => {
-        onFadeOutEnd?.();
-      }, 600);
+        onAnimStateChange?.("flipEnded");
+      }, FadeOutDuration);
+    } else if (animState === "fadedOut") {
+      onAnimStateChange?.("idle");
+    } else if (animState === "fading") {
+      timeout = setTimeout(() => {
+        onAnimStateChange?.("fadedOut");
+      }, FadeOutDuration);
     }
 
     return () => clearTimeout(timeout);
-  }, [isFadingOut]);
+  }, [animState]);
 
   const wordElement = (
     <Center>
@@ -89,6 +100,8 @@ const FlashCard: React.FC<FlashCardProps> = ({
     </Center>
   );
 
+  const isFadingOut = animState === "fading";
+
   return (
     <div
       className={classNames(
@@ -101,7 +114,13 @@ const FlashCard: React.FC<FlashCardProps> = ({
       style={{ width, height }}
       onClick={handleFlip}
     >
-      <div className={classNames(styles.flashcard, isFlipped, styles.flipped)}>
+      <div
+        className={classNames(
+          styles.flashcard,
+          animState !== "idle",
+          styles.flipped,
+        )}
+      >
         <div className={styles.front}>
           <Card shadow="sm" padding="lg" style={{ width, height }}>
             {image ? (
@@ -132,25 +151,25 @@ const FlashCard: React.FC<FlashCardProps> = ({
                 position: "absolute",
                 bottom: 20,
                 justifyContent: "center",
-                width: "100%"
+                width: "100%",
               }}
             >
-              {isFlipped ? (
+              {animState ? (
                 <>
-                  <Button
-                    disabled={isLearned}
-                    mt="md"
-                    onClick={() => onAction?.("learned")}
-                  >
-                    Learned
-                  </Button>
-                  <Button
-                    disabled={isLearned}
-                    mt="md"
-                    onClick={() => onAction?.("learn-later")}
-                  >
-                    Study more
-                  </Button>{" "}
+                  {actions?.map((action) => (
+                    <Button
+                      key={action}
+                      disabled={isLearned}
+                      mt="md"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onAction?.(action)
+                      }}
+                    >
+                      {upperFirst(action)}
+                    </Button>
+                  ))}
                 </>
               ) : (
                 <Button mt="md" onClick={handleFlip}>
@@ -165,7 +184,10 @@ const FlashCard: React.FC<FlashCardProps> = ({
   );
 };
 
-const FlashCardExamples: React.FC<{ examples?: Array<[string, string]>, showTranslation?: boolean }> = ({ examples, showTranslation }) => (
+const FlashCardExamples: React.FC<{
+  examples?: Array<[string, string]>;
+  showTranslation?: boolean;
+}> = ({ examples, showTranslation }) => (
   <List
     mt="md"
     spacing="xs"

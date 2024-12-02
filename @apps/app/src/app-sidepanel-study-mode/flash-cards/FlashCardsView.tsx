@@ -5,7 +5,6 @@ import { FlashCardData } from "./FlashCardData";
 import { useMemo } from "react";
 import { useCurrentMywords } from "../../domain/user/useCurrentMywords";
 import { TabContainer } from "../../ui/TabContainer";
-// import { content } from "../../ui/TabContainer.module.scss";
 
 export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
   const [, setUserContent] = useAtom(UsersAtom);
@@ -24,7 +23,6 @@ export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
     [mywords, learnedWords],
   );
 
-
   return (
     <TabContainer
       orientation="horizontal"
@@ -35,6 +33,7 @@ export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
           id: "Words to Study",
           title: `Words to Study (${cards.length - learnedWords?.length || 0})`,
           props: {
+            actions: ["learned", "learn-later"],
             data: cards.filter((card) => !card.isLearned),
             onAction: (action, word) => {
               if (contentUrl && action === "learned") {
@@ -58,17 +57,21 @@ export const FlashCardsView = ({ contentUrl }: { contentUrl: string }) => {
           id: "Learned Words",
           title: `Learned Words (${learnedWords?.length || 0})`,
           props: {
+            actions: ["delete"],
             data: cards.filter((card) => card.isLearned),
-            // onAction: (action, index) => {
-            // if (contentUrl && action === "learned") {
-            //   setUserContent({
-            //     learnedWords: {
-            //       [contentUrl]: [...learnedWords, cards[index].word],
-            //     },
-            //   });
-
-            // }
-            // },
+            onAction: (action, word) => {
+              if (contentUrl && action === "delete") {
+                setUserContent((state) => ({
+                  learnedWords: {
+                    ...state.learnedWords,
+                    [contentUrl]:
+                      state.learnedWords?.[contentUrl].filter(
+                        (data) => data !== word,
+                      ) || [],
+                  },
+                }));
+              }
+            },
           },
         },
       ]}
