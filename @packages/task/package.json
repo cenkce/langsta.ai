@@ -39,6 +39,6 @@
   "dependencies": {
     "@espoojs/atom": "workspace:*",
     "rxjs": "7.8.1",
-    "nanoid": "5.0.4"
+    "nanoid": "5.0.9"
   }
 }
