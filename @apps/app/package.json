@@ -31,7 +31,7 @@
     "@mozilla/readability": "0.5.0",
     "@popperjs/core": "^2.11.8",
     "@tabler/icons-react": "^2.46.0",
-    "nanoid": "^5.0.4",
+    "nanoid": "^5.0.9",
     "openai": "^4.67.1",
     "ramda": "^0.30.1",
     "react": "18.3.1",
